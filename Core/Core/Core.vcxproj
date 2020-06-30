@@ -181,7 +181,7 @@
     <ClInclude Include="cameras\perspective.hpp" />
     <ClInclude Include="core\bxdf.hpp" />
     <ClInclude Include="core\camera.hpp" />
-    <ClInclude Include="core\header.hpp" />
+    <ClInclude Include="core\header.h" />
     <ClInclude Include="core\integrator.hpp" />
     <ClInclude Include="core\kawaii.hpp" />
     <ClInclude Include="core\light.hpp" />
@@ -199,10 +199,10 @@
     <ClInclude Include="lights\point.hpp" />
     <ClInclude Include="materials\matte.hpp" />
     <ClInclude Include="math\bound.hpp" />
-    <ClInclude Include="math\point.hpp" />
+    <ClInclude Include="math\point.h" />
     <ClInclude Include="math\quaternion.hpp" />
     <ClInclude Include="math\transform.hpp" />
-    <ClInclude Include="math\vector.hpp" />
+    <ClInclude Include="math\vector.h" />
     <ClInclude Include="samplers\random.hpp" />
     <ClInclude Include="shapes\cone.hpp" />
     <ClInclude Include="shapes\cylinder.hpp" />
@@ -212,6 +212,7 @@
     <ClInclude Include="textures\constant.hpp" />
     <ClInclude Include="util\fileio.hpp" />
     <ClInclude Include="util\macro.hpp" />
+    <ClInclude Include="util\stringprint.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

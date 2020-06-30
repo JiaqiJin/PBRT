@@ -155,9 +155,6 @@
     <ClInclude Include="core\camera.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="core\header.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="core\light.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -188,16 +185,10 @@
     <ClInclude Include="math\bound.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="math\point.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="math\quaternion.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="math\transform.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="math\vector.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="shapes\cone.hpp">
@@ -219,6 +210,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="core\kawaii.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="math\vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\header.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="util\stringprint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="math\point.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

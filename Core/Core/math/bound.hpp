@@ -1,7 +1,5 @@
-
-
-#ifndef bound_hpp
-#define bound_hpp
+#ifndef bounds_hpp
+#define bounds_hpp
 
 
 #endif /* bound_h */
