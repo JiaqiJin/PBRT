@@ -1,4 +1,3 @@
-
 #ifndef constant_hpp
 #define constant_hpp
 

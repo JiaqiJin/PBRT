@@ -1,5 +1,4 @@
 
-
 #ifndef triangle_hpp
 #define triangle_hpp
 

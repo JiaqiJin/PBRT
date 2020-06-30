@@ -87,6 +87,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>E:\VisualStudio\PBRTStudy\Core\Core\core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -99,6 +100,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>E:\VisualStudio\PBRTStudy\Core\Core\core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -113,6 +115,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>E:\VisualStudio\PBRTStudy\Core\Core\core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -129,6 +132,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>E:\VisualStudio\PBRTStudy\Core\Core\core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -139,30 +143,75 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="accelerators\bvh.cpp" />
+    <ClCompile Include="accelerators\kdtree.cpp" />
     <ClCompile Include="cameras\perspective.cpp" />
+    <ClCompile Include="core\bxdf.cpp" />
+    <ClCompile Include="core\camera.cpp" />
     <ClCompile Include="core\integrator.cpp" />
+    <ClCompile Include="core\kawaii.cpp" />
+    <ClCompile Include="core\light.cpp" />
+    <ClCompile Include="core\material.cpp" />
+    <ClCompile Include="core\sampler.cpp" />
+    <ClCompile Include="core\sampling.cpp" />
+    <ClCompile Include="core\scene.cpp" />
+    <ClCompile Include="core\shape.cpp" />
+    <ClCompile Include="core\spectrum.cpp" />
+    <ClCompile Include="core\texture.cpp" />
     <ClCompile Include="ext\log.cpp" />
+    <ClCompile Include="filters\box.cpp" />
     <ClCompile Include="filters\sinc.cpp" />
     <ClCompile Include="integrators\path.cpp" />
     <ClCompile Include="lights\point.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="materials\matte.cpp" />
+    <ClCompile Include="math\quaternion.cpp" />
+    <ClCompile Include="math\transform.cpp" />
     <ClCompile Include="samplers\random.cpp" />
+    <ClCompile Include="shapes\cone.cpp" />
+    <ClCompile Include="shapes\cylinder.cpp" />
+    <ClCompile Include="shapes\disk.cpp" />
+    <ClCompile Include="shapes\sphere.cpp" />
     <ClCompile Include="shapes\triangle.cpp" />
     <ClCompile Include="textures\constant.cpp" />
+    <ClCompile Include="util\fileio.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="accelerators\bvh.hpp" />
+    <ClInclude Include="accelerators\kdtree.hpp" />
     <ClInclude Include="cameras\perspective.hpp" />
+    <ClInclude Include="core\bxdf.hpp" />
+    <ClInclude Include="core\camera.hpp" />
+    <ClInclude Include="core\header.hpp" />
     <ClInclude Include="core\integrator.hpp" />
+    <ClInclude Include="core\kawaii.hpp" />
+    <ClInclude Include="core\light.hpp" />
+    <ClInclude Include="core\material.hpp" />
+    <ClInclude Include="core\sampler.hpp" />
+    <ClInclude Include="core\sampling.hpp" />
+    <ClInclude Include="core\scene.hpp" />
+    <ClInclude Include="core\shape.hpp" />
+    <ClInclude Include="core\spectrum.hpp" />
+    <ClInclude Include="core\texture.hpp" />
     <ClInclude Include="ext\log.hpp" />
+    <ClInclude Include="filters\box.hpp" />
     <ClInclude Include="filters\sinc.hpp" />
     <ClInclude Include="integrators\path.hpp" />
     <ClInclude Include="lights\point.hpp" />
     <ClInclude Include="materials\matte.hpp" />
+    <ClInclude Include="math\bound.hpp" />
+    <ClInclude Include="math\point.hpp" />
+    <ClInclude Include="math\quaternion.hpp" />
+    <ClInclude Include="math\transform.hpp" />
+    <ClInclude Include="math\vector.hpp" />
     <ClInclude Include="samplers\random.hpp" />
+    <ClInclude Include="shapes\cone.hpp" />
+    <ClInclude Include="shapes\cylinder.hpp" />
+    <ClInclude Include="shapes\disk.hpp" />
+    <ClInclude Include="shapes\sphere.hpp" />
     <ClInclude Include="shapes\triangle.hpp" />
     <ClInclude Include="textures\constant.hpp" />
+    <ClInclude Include="util\fileio.hpp" />
+    <ClInclude Include="util\macro.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

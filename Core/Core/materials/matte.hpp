@@ -1,5 +1,4 @@
 
-
 #ifndef matte_hpp
 #define matte_hpp
 

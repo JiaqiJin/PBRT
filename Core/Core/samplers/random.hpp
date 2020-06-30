@@ -1,5 +1,3 @@
-
-
 #ifndef random_hpp
 #define random_hpp
 
