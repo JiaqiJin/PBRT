@@ -8,7 +8,19 @@ template<typename T>
 class Point3;
 
 template<typename T>
+class Vector3;
+
+template<typename T>
+class Vector2;
+
+template<typename T>
 class Normal3;
+
+template<typename T>
+class Bounds3;
+
+template<typename T>
+class Bounds2;
 
 #include<iostream>
 #include<cmath>
@@ -17,5 +29,9 @@ class Normal3;
 
 #include "../math/vector.h"
 #include "../math/point.h"
+
+KAWAII_BEGIN
+
+KAWAII_END
 
 #endif /* header_h */

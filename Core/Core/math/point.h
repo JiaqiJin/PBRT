@@ -25,22 +25,22 @@ template <typename T>
 class Point2 {
 public:
     // Point2 Public Methods
-    explicit Point2(const Point3<T>& p) : x(p.x), y(p.y) { DCHECK(!HasNaNs()); }
+    explicit Point2(const Point3<T>& p) : x(p.x), y(p.y) { DCHECK(!hasNaNs()); }
     Point2() { x = y = 0; }
-    Point2(T xx, T yy) : x(xx), y(yy) { DCHECK(!HasNaNs()); }
+    Point2(T xx, T yy) : x(xx), y(yy) { DCHECK(!hasNaNs()); }
 
     template <typename U>
     explicit Point2(const Point2<U>& p) {
         x = (T)p.x;
         y = (T)p.y;
-        DCHECK(!HasNaNs());
+        DCHECK(!hasNaNs());
     }
 
     template <typename U>
     explicit Point2(const Vector2<U>& p) {
         x = (T)p.x;
         y = (T)p.y;
-        DCHECK(!HasNaNs());
+        DCHECK(!hasNaNs());
     }
 
     template <typename U>
@@ -50,53 +50,53 @@ public:
 
 #ifndef NDEBUG
     Point2(const Point2<T>& p) {
-        DCHECK(!p.HasNaNs());
+        DCHECK(!p.hasNaNs());
         x = p.x;
         y = p.y;
     }
 
     Point2<T>& operator=(const Point2<T>& p) {
-        DCHECK(!p.HasNaNs());
+        DCHECK(!p.hasNaNs());
         x = p.x;
         y = p.y;
         return *this;
     }
 #endif  // !NDEBUG
     Point2<T> operator+(const Vector2<T>& v) const {
-        DCHECK(!v.HasNaNs());
+        DCHECK(!v.hasNaNs());
         return Point2<T>(x + v.x, y + v.y);
     }
 
     Point2<T>& operator+=(const Vector2<T>& v) {
-        DCHECK(!v.HasNaNs());
+        DCHECK(!v.hasNaNs());
         x += v.x;
         y += v.y;
         return *this;
     }
     Vector2<T> operator-(const Point2<T>& p) const {
-        DCHECK(!p.HasNaNs());
+        DCHECK(!p.hasNaNs());
         return Vector2<T>(x - p.x, y - p.y);
     }
 
     Point2<T> operator-(const Vector2<T>& v) const {
-        DCHECK(!v.HasNaNs());
+        DCHECK(!v.hasNaNs());
         return Point2<T>(x - v.x, y - v.y);
     }
     Point2<T> operator-() const { return Point2<T>(-x, -y); }
     Point2<T>& operator-=(const Vector2<T>& v) {
-        DCHECK(!v.HasNaNs());
+        DCHECK(!v.hasNaNs());
         x -= v.x;
         y -= v.y;
         return *this;
     }
     Point2<T>& operator+=(const Point2<T>& p) {
-        DCHECK(!p.HasNaNs());
+        DCHECK(!p.hasNaNs());
         x += p.x;
         y += p.y;
         return *this;
     }
     Point2<T> operator+(const Point2<T>& p) const {
-        DCHECK(!p.HasNaNs());
+        DCHECK(!p.hasNaNs());
         return Point2<T>(x + p.x, y + p.y);
     }
     template <typename U>
@@ -136,7 +136,7 @@ public:
     }
     bool operator==(const Point2<T>& p) const { return x == p.x && y == p.y; }
     bool operator!=(const Point2<T>& p) const { return x != p.x || y != p.y; }
-    bool HasNaNs() const { return isNaN(x) || isNaN(y); }
+    bool hasNaNs() const { return isNaN(x) || isNaN(y); }
 
     // Point2 Public Data
     T x, y;
@@ -153,16 +153,17 @@ inline std::ostream& operator<<(std::ostream& os, const Point2<Float>& v) {
     os << StringPrintf("[ %f, %f ]", v.x, v.y);
     return os;
 }
+
 template <typename T>
 class Point3 {
 public:
     // Point3 Public Methods
     Point3() { x = y = z = 0; }
-    Point3(T x, T y, T z) : x(x), y(y), z(z) { DCHECK(!HasNaNs()); }
+    Point3(T x, T y, T z) : x(x), y(y), z(z) { DCHECK(!hasNaNs()); }
     template <typename U>
     explicit Point3(const Point3<U>& p)
         : x((T)p.x), y((T)p.y), z((T)p.z) {
-        DCHECK(!HasNaNs());
+        DCHECK(!hasNaNs());
     }
     template <typename U>
     explicit operator Vector3<U>() const {
@@ -170,14 +171,14 @@ public:
     }
 #ifndef NDEBUG
     Point3(const Point3<T>& p) {
-        DCHECK(!p.HasNaNs());
+        DCHECK(!p.hasNaNs());
         x = p.x;
         y = p.y;
         z = p.z;
     }
 
     Point3<T>& operator=(const Point3<T>& p) {
-        DCHECK(!p.HasNaNs());
+        DCHECK(!p.hasNaNs());
         x = p.x;
         y = p.y;
         z = p.z;
@@ -185,40 +186,40 @@ public:
     }
 #endif  // !NDEBUG
     Point3<T> operator+(const Vector3<T>& v) const {
-        DCHECK(!v.HasNaNs());
+        DCHECK(!v.hasNaNs());
         return Point3<T>(x + v.x, y + v.y, z + v.z);
     }
     Point3<T>& operator+=(const Vector3<T>& v) {
-        DCHECK(!v.HasNaNs());
+        DCHECK(!v.hasNaNs());
         x += v.x;
         y += v.y;
         z += v.z;
         return *this;
     }
     Vector3<T> operator-(const Point3<T>& p) const {
-        DCHECK(!p.HasNaNs());
+        DCHECK(!p.hasNaNs());
         return Vector3<T>(x - p.x, y - p.y, z - p.z);
     }
     Point3<T> operator-(const Vector3<T>& v) const {
-        DCHECK(!v.HasNaNs());
+        DCHECK(!v.hasNaNs());
         return Point3<T>(x - v.x, y - v.y, z - v.z);
     }
     Point3<T>& operator-=(const Vector3<T>& v) {
-        DCHECK(!v.HasNaNs());
+        DCHECK(!v.hasNaNs());
         x -= v.x;
         y -= v.y;
         z -= v.z;
         return *this;
     }
     Point3<T>& operator+=(const Point3<T>& p) {
-        DCHECK(!p.HasNaNs());
+        DCHECK(!p.hasNaNs());
         x += p.x;
         y += p.y;
         z += p.z;
         return *this;
     }
     Point3<T> operator+(const Point3<T>& p) const {
-        DCHECK(!p.HasNaNs());
+        DCHECK(!p.hasNaNs());
         return Point3<T>(x + p.x, y + p.y, z + p.z);
     }
     template <typename U>
@@ -266,7 +267,7 @@ public:
     bool operator!=(const Point3<T>& p) const {
         return x != p.x || y != p.y || z != p.z;
     }
-    bool HasNaNs() const { return isNaN(x) || isNaN(y) || isNaN(z); }
+    bool hasNaNs() const { return isNaN(x) || isNaN(y) || isNaN(z); }
     Point3<T> operator-() const { return Point3<T>(-x, -y, -z); }
 
     // Point3 Public Data
@@ -289,9 +290,6 @@ typedef Point2<Float> Point2f;
 typedef Point2<int> Point2i;
 typedef Point3<Float> Point3f;
 typedef Point3<int> Point3i;
-
-
-
 
 KAWAII_END
 

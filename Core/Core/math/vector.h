@@ -1,11 +1,3 @@
-//
-//  vector.hpp
-//  Paladin
-//
-//  Created by SATAN_Z on 2019/6/30.
-//  Copyright © 2019 Zero. All rights reserved.
-//
-
 #ifndef vector_hpp
 #define vector_hpp
 
@@ -22,14 +14,14 @@ public:
     Vector2(T xx, T yy) : x(xx), y(yy) {
         // DCHECK(!HasNaNs()); 
     }
-    bool HasNaNs() const { return std::isnan(x) || std::isnan(y); }
+    bool HasNaNs() const { return isNaN(x) || isNaN(y); }
     explicit Vector2(const Point2<T>& p);
     explicit Vector2(const Point3<T>& p);
 #ifndef NDEBUG
     // The default versions of these are fine for release builds; for debug
     // we define them so that we can add the Assert checks.
     Vector2(const Vector2<T>& v) {
-        DCHECK(!v.HasNaNs());
+        // DCHECK(!v.HasNaNs());
         x = v.x;
         y = v.y;
     }
@@ -42,12 +34,12 @@ public:
 #endif  // !NDEBUG
 
     Vector2<T> operator+(const Vector2<T>& v) const {
-        DCHECK(!v.HasNaNs());
+        // DCHECK(!v.HasNaNs());
         return Vector2(x + v.x, y + v.y);
     }
 
     Vector2<T>& operator+=(const Vector2<T>& v) {
-        //DCHECK(!v.HasNaNs());
+        // DCHECK(!v.HasNaNs());
         x += v.x;
         y += v.y;
         return *this;
@@ -108,7 +100,8 @@ public:
     Float length() const { return std::sqrt(lengthSquared()); }
 
     // Vector2 Public Data
-    T x, y;
+    T x;
+    T y;
 };
 
 template <typename T>
@@ -127,7 +120,9 @@ template <typename T>
 class Vector3 {
 public:
     // Vector3 Public Methods
-    Vector3(T x, T y, T z) : x(x),y(y),z(z) {}
+    Vector3(T x, T y, T z) : x(x), y(y), z(z) {
+
+    }
 
     T operator[](int i) const {
         // DCHECK(i >= 0 && i <= 2);
@@ -228,9 +223,9 @@ public:
         return *this;
     }
     Vector3<T> operator-() const { return Vector3<T>(-x, -y, -z); }
-    Float LengthSquared() const { return x * x + y * y + z * z; }
-    Float Length() const { return std::sqrt(LengthSquared()); }
-    explicit Vector3(const Normal3<T> &n);
+    Float lengthSquared() const { return x * x + y * y + z * z; }
+    Float length() const { return std::sqrt(lengthSquared()); }
+    explicit Vector3(const Normal3<T>& n);
 
     // Vector3 Public Data
     T x;
@@ -260,7 +255,7 @@ class Normal3 {
 public:
     // Normal3 Public Methods
     Normal3() { x = y = z = 0; }
-    Normal3(T xx, T yy, T zz) : x(xx), y(yy), z(zz) { DCHECK(!HasNaNs()); }
+    Normal3(T xx, T yy, T zz) : x(xx), y(yy), z(zz) { DCHECK(!hasNaNs()); }
     Normal3<T> operator-() const { return Normal3(-x, -y, -z); }
     Normal3<T> operator+(const Normal3<T>& n) const {
         DCHECK(!n.HasNaNs());
@@ -286,7 +281,7 @@ public:
         z -= n.z;
         return *this;
     }
-    bool HasNaNs() const { return std::isnan(x) || std::isnan(y) || std::isnan(z); }
+    bool hasNaNs() const { return isNaN(x) || isNaN(y) || isNaN(z); }
     template <typename U>
     Normal3<T> operator*(U f) const {
         return Normal3<T>(f * x, f * y, f * z);
@@ -315,19 +310,19 @@ public:
         z *= inv;
         return *this;
     }
-    Float LengthSquared() const { return x * x + y * y + z * z; }
-    Float Length() const { return std::sqrt(LengthSquared()); }
+    Float lengthSquared() const { return x * x + y * y + z * z; }
+    Float length() const { return std::sqrt(lengthSquared()); }
 
 #ifndef NDEBUG
     Normal3<T>(const Normal3<T>& n) {
-        DCHECK(!n.HasNaNs());
+        DCHECK(!n.hasNaNs());
         x = n.x;
         y = n.y;
         z = n.z;
     }
 
     Normal3<T>& operator=(const Normal3<T>& n) {
-        DCHECK(!n.HasNaNs());
+        DCHECK(!n.hasNaNs());
         x = n.x;
         y = n.y;
         z = n.z;
@@ -378,30 +373,43 @@ inline std::ostream& operator<<(std::ostream& os, const Normal3<Float>& v) {
 
 typedef Normal3<Float> Normal3f;
 
+
+
 template <typename T>
-class Direction3
-{
+class Direction3 {
+
+    void normalize() {
+        T len = length();
+        x = x / len;
+        y = y / len;
+        z = z / len;
+    }
+
+public:
     // Direction3 Public Methods
     Direction3(T x, T y, T z) : x(x), y(y), z(z) {
-
+        normalize();
     }
 
-    T operator[](int i) const
-    {
+    Direction3(const Vector3<T>& v) {
+        x = v.x;
+        y = v.y;
+        z = v.z;
+        normalize();
+    }
+
+    T operator[](int i) const {
         // DCHECK(i >= 0 && i <= 2);
         if (i == 0) return x;
         if (i == 1) return y;
         return z;
     }
-
-    T &operator[](int i) const
-    {
+    T& operator[](int i) {
         // DCHECK(i >= 0 && i <= 2);
         if (i == 0) return x;
         if (i == 1) return y;
         return z;
     }
-
     Direction3() { x = y = z = 0; }
     // Direction3(T x, T y, T z) : x(x), y(y), z(z) { DCHECK(!HasNaNs()); }
     bool hasNaNs() const { return isNaN(x) || isNaN(y) || isNaN(z); }
@@ -414,6 +422,7 @@ class Direction3
         x = v.x;
         y = v.y;
         z = v.z;
+        normalize();
     }
 
     Direction3<T>& operator=(const Direction3<T>& v) {
@@ -421,10 +430,10 @@ class Direction3
         x = v.x;
         y = v.y;
         z = v.z;
+        normalize();
         return *this;
     }
 #endif  // !NDEBUG
-
     Direction3<T> operator+(const Direction3<T>& v) const {
         // DCHECK(!v.HasNaNs());
         return Direction3(x + v.x, y + v.y, z + v.z);
@@ -489,11 +498,11 @@ class Direction3
         z *= inv;
         return *this;
     }
-
     Direction3<T> operator-() const { return Direction3<T>(-x, -y, -z); }
     Float lengthSquared() const { return x * x + y * y + z * z; }
     Float length() const { return std::sqrt(lengthSquared()); }
     explicit Direction3(const Normal3<T>& n);
+
     // Direction3 Public Data
     T x;
     T y;
