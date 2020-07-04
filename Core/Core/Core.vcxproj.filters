@@ -224,5 +224,8 @@
     <ClInclude Include="math\point.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="math\mathutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
