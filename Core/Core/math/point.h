@@ -1,6 +1,3 @@
-//
-//  point.hpp
-
 #ifndef point_hpp
 #define point_hpp
 
@@ -294,7 +291,6 @@ typedef Point3<int> Point3i;
 KAWAII_END
 
 #endif /* point_h */
-
 
 
 
