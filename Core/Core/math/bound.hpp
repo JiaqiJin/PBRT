@@ -1,6 +1,8 @@
 #ifndef bounds_hpp
 #define bounds_hpp
 
+KAWAII_BEGIN
+
 template <typename T>
 class Bounds2 {
 
@@ -103,11 +105,11 @@ public:
             (*this)[(corner & 4) ? 1 : 0].z);
     }
     Vector3<T> diagonal() const { return pMax - pMin; }
-    T SurfaceArea() const {
+    T surfaceArea() const {
         Vector3<T> d = diagonal();
         return 2 * (d.x * d.y + d.x * d.z + d.y * d.z);
     }
-    T Volume() const {
+    T volume() const {
         Vector3<T> d = diagonal();
         return d.x * d.y * d.z;
     }
@@ -157,5 +159,44 @@ typedef Bounds2<Float> Bounds2f;
 typedef Bounds2<int> Bounds2i;
 typedef Bounds3<Float> Bounds3f;
 typedef Bounds3<int> Bounds3i;
+
+class Bounds2iIterator : public std::forward_iterator_tag {
+public:
+
+    Bounds2iIterator(const Bounds2i& b, const Point2i& pt)
+        : p(pt), bounds(&b){}
+    Bounds2iIterator operator++() {
+        advance();
+        return *this;
+    }
+    Bounds2iIterator operator++(int) {
+        Bounds2iIterator old = *this;
+        advance();
+        return old;
+    }
+    bool operator==(const Bounds2iIterator& bi) const {
+        return p == bi.p && bounds == bi.bounds;
+    }
+    bool operator!=(const Bounds2iIterator& bi) const {
+        return p != bi.p || bounds != bi.bounds;
+    }
+
+    Point2i operator*() const { return p; }
+
+
+private:
+    void advance() {
+        ++p.x;
+        if (p.x == bounds->pMax.x) {
+            p.x = bounds->pMin.x;
+            ++p.y;
+        }
+    }
+
+    Point2i p;
+    const Bounds2i* bounds;
+};
+
+KAWAII_END
 
 #endif /* bound_h */
