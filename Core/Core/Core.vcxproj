@@ -198,7 +198,7 @@
     <ClInclude Include="integrators\path.hpp" />
     <ClInclude Include="lights\point.hpp" />
     <ClInclude Include="materials\matte.hpp" />
-    <ClInclude Include="math\bound.hpp" />
+    <ClInclude Include="math\bound.h" />
     <ClInclude Include="math\mathutil.h" />
     <ClInclude Include="math\point.h" />
     <ClInclude Include="math\quaternion.hpp" />

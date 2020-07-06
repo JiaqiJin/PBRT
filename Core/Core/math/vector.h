@@ -1,10 +1,20 @@
-#ifndef vector_hpp
-#define vector_hpp
+#ifndef vector_h
+#define vector_h
 
 #include "header.h"
 
 KAWAII_BEGIN
+/*
+template <typename T>
+inline bool isNaN(const T x) {
+    return std::isnan(x);
+}
 
+template <>
+inline bool isNaN(const int x) {
+    return false;
+}
+*/
 // Vector Declarations
 template <typename T>
 class Vector2 {
@@ -132,6 +142,8 @@ template <typename T>
 class Vector3 {
 public:
     // Vector3 Public Methods
+    Vector3() { x = y = z = 0; }
+
     Vector3(T x, T y, T z) : x(x), y(y), z(z) {
 
     }
@@ -148,7 +160,7 @@ public:
         if (i == 1) return y;
         return z;
     }
-    Vector3() { x = y = z = 0; }
+
 
     bool hasNaNs() const { return isNaN(x) || isNaN(y) || isNaN(z); }
 
@@ -380,6 +392,7 @@ public:
     T z;
 };
 
+
 template <typename T>
 inline std::ostream& operator<<(std::ostream& os, const Normal3<T>& v) {
     os << "[ " << v.x << ", " << v.y << ", " << v.z << " ]";
@@ -393,8 +406,6 @@ inline std::ostream& operator<<(std::ostream& os, const Normal3<Float>& v) {
 }
 
 typedef Normal3<Float> Normal3f;
-
-
 
 template <typename T>
 class Direction3 {

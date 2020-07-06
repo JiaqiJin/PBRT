@@ -1,5 +1,5 @@
-#ifndef bounds_hpp
-#define bounds_hpp
+#ifndef bounds_h
+#define bounds_h
 
 KAWAII_BEGIN
 

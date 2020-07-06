@@ -2,9 +2,10 @@
 #define point_hpp
 
 #include "header.h"
+#include "mathutil.h"
 
 KAWAII_BEGIN
-
+/*
 template <typename T>
 inline bool isNaN(const T x) {
     return std::isnan(x);
@@ -14,7 +15,7 @@ template <>
 inline bool isNaN(const int x) {
     return false;
 }
-
+*/
 template<typename T>
 class Point3;
 
@@ -291,6 +292,5 @@ typedef Point3<int> Point3i;
 KAWAII_END
 
 #endif /* point_h */
-
 
 

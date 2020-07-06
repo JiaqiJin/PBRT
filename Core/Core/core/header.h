@@ -1,5 +1,5 @@
-#ifndef header_hpp
-#define header_hpp
+#ifndef header_h
+#define header_h
 
 template<typename T>
 class Point2;
@@ -31,7 +31,7 @@ class Bounds2;
 
 #include "../math/vector.h"
 #include "../math/point.h"
-#include "../math/bound.hpp"
+#include "../math/bound.h"
 #include "../math/mathutil.h"
 
 KAWAII_BEGIN
