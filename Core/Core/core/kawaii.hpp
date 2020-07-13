@@ -6,18 +6,19 @@
 class Scene;
 class Integrator;
 
-namespace Kawaii
-{
-    class KawaiiDesune {
+KAWAII_BEGIN
 
-    public:
+class KawaiiDesune {
 
-        int run(int argc, const char* argv[]);
+public:
 
-        Scene* m_scene;
+    int run(int argc, const char* argv[]);
 
-        Integrator* m_integrator;
+    Scene* m_scene;
+    
+    Integrator* m_integrator;
     };
-}
+
+KAWAII_END
 
 #endif /* paladin_hpp */

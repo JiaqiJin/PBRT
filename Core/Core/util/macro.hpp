@@ -5,7 +5,7 @@
 
 #define CONSTEXPR constexpr
 
-#define USING_KAWAII using namespace kawaii
+#define USING_KAWAII using namespace kawaii;
 #define USING_STD using namespace std;
 
 #define KAWAII_BEGIN namespace kawaii {
