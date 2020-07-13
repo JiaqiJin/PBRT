@@ -22,6 +22,13 @@ class Bounds3;
 template<typename T>
 class Bounds2;
 
+template<typename T>
+class Direction3;
+
+class Medium;
+
+class Ray;
+
 #include<iostream>
 #include<cmath>
 #include <algorithm>

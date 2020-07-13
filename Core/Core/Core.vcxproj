@@ -202,6 +202,7 @@
     <ClInclude Include="math\mathutil.h" />
     <ClInclude Include="math\point.h" />
     <ClInclude Include="math\quaternion.hpp" />
+    <ClInclude Include="math\ray.h" />
     <ClInclude Include="math\transform.hpp" />
     <ClInclude Include="math\vector.h" />
     <ClInclude Include="samplers\random.hpp" />

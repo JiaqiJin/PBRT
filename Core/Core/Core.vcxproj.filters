@@ -227,5 +227,8 @@
     <ClInclude Include="math\bound.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="math\ray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

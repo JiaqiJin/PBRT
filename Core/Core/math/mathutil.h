@@ -1,4 +1,4 @@
-
+﻿
 #ifndef mathutil_h
 #define mathutil_h
 
@@ -449,6 +449,9 @@ Bounds2<T> expand(const Bounds2<T>& b, U delta) {
         b.pMax + Vector2<T>(delta, delta));
 }
 
+inline Float gamma(int n) {
+    return (n * MachineEpsilon) / (1 - n * MachineEpsilon);
+}
 
 KAWAII_END
 
