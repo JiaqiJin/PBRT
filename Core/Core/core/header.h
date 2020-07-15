@@ -29,6 +29,8 @@ class Medium;
 
 class Ray;
 
+class Transform;
+
 #include<iostream>
 #include<cmath>
 #include <algorithm>
@@ -43,6 +45,7 @@ class Ray;
 #include "../math/bound.h"
 #include "../math/mathutil.h"
 #include "../math/ray.h"
+#include "../math/transform.hpp"
 
 KAWAII_BEGIN
 

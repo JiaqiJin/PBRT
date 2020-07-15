@@ -293,4 +293,3 @@ KAWAII_END
 
 #endif /* point_h */
 
-

@@ -132,7 +132,6 @@ inline std::ostream& operator<<(std::ostream& os, const Vector2<Float>& v) {
 template <typename T>
 class Vector3 {
 public:
-
     Vector3() { x = y = z = 0; }
 
     Vector3(T x, T y, T z) : x(x), y(y), z(z) {

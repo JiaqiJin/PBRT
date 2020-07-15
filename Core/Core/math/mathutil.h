@@ -1,5 +1,4 @@
-﻿
-#ifndef mathutil_h
+﻿#ifndef mathutil_h
 #define mathutil_h
 
 KAWAII_BEGIN
@@ -13,6 +12,15 @@ template <>
 inline bool isNaN(const int x) {
     return false;
 }
+
+inline Float degree2radian(Float deg) {
+    return (Pi / 180) * deg;
+}
+
+inline Float radian2degree(Float rad) {
+    return (180 / Pi) * rad;
+}
+
 
 template <typename T, typename U>
 inline Vector3<T> operator*(U s, const Vector3<T>& v) {
@@ -352,6 +360,21 @@ template <typename T, typename U>
 inline Bounds3<T> expand(const Bounds3<T>& b, U delta) {
     return Bounds3<T>(b.pMin - Vector3<T>(delta, delta, delta),
         b.pMax + Vector3<T>(delta, delta, delta));
+}
+
+inline bool solveLinearSystem2x2(const Float A[2][2], const Float B[2], Float *x0, Float *x1) {
+    /*
+    求解2元线性方程组
+    a00 a01     x0     b0
+             *      =
+    a10 a11     x1     b1
+    */
+    Float det = A[0][0] * A[1][1] - A[0][1] * A[1][0];
+    if (std::abs(det) < 1e-10f) return false;
+    *x0 = (A[1][1] * B[0] - A[0][1] * B[1]) / det;
+    *x1 = (A[0][0] * B[1] - A[1][0] * B[0]) / det;
+    if (std::isnan(*x0) || std::isnan(*x1)) return false;
+    return true;
 }
 
 inline Float lerp(Float t, Float v1, Float v2) {

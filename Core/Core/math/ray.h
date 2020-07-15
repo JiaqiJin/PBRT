@@ -24,7 +24,7 @@ public:
     }
 
     bool hasNaNs() const {
-        return (ori.hasNaNs() || dir.hasNaNs() || isNaN(tMax));
+        return (ori.hasNaNs() || dir.hasNaNs() || isnan(tMax));
     }
 
     friend std::ostream& operator<<(std::ostream& os, const Ray& r) {
