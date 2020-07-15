@@ -1,6 +1,6 @@
 #include <iostream>
 #include "core/kawaii.hpp"
-#include "util/macro.hpp"
+#include "util/macro.h"
 
 USING_KAWAII
 

@@ -11,7 +11,7 @@
 #define KAWAII_BEGIN namespace kawaii {
 #define KAWAII_END }
 
-#define DCHECK(args) (args)
+#define DCHECK(args) assert(args)
 #define CHECK_NE(a, b) (a, b)
 
 #ifdef FLOAT_AS_DOUBLE

@@ -33,7 +33,9 @@ class Ray;
 #include<cmath>
 #include <algorithm>
 #include <limits>
-#include "../util/macro.hpp"
+#include <assert.h>
+
+#include "../util/macro.h"
 #include "../util/stringprint.h"
 
 #include "../math/vector.h"

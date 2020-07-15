@@ -213,7 +213,7 @@
     <ClInclude Include="shapes\triangle.hpp" />
     <ClInclude Include="textures\constant.hpp" />
     <ClInclude Include="util\fileio.hpp" />
-    <ClInclude Include="util\macro.hpp" />
+    <ClInclude Include="util\macro.h" />
     <ClInclude Include="util\stringprint.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
