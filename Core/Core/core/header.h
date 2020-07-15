@@ -40,6 +40,7 @@ class Ray;
 #include "../math/point.h"
 #include "../math/bound.h"
 #include "../math/mathutil.h"
+#include "../math/ray.h"
 
 KAWAII_BEGIN
 
