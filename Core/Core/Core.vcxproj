@@ -148,6 +148,7 @@
     <ClCompile Include="core\bxdf.cpp" />
     <ClCompile Include="core\camera.cpp" />
     <ClCompile Include="core\integrator.cpp" />
+    <ClCompile Include="core\interaction.cpp" />
     <ClCompile Include="core\kawaii.cpp" />
     <ClCompile Include="core\light.cpp" />
     <ClCompile Include="core\material.cpp" />
@@ -161,9 +162,10 @@
     <ClCompile Include="filters\box.cpp" />
     <ClCompile Include="filters\sinc.cpp" />
     <ClCompile Include="integrators\path.cpp" />
-    <ClCompile Include="lights\point.cpp" />
+    <ClCompile Include="lights\pointlight.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="materials\matte.cpp" />
+    <ClCompile Include="math\animatedtransform.cpp" />
     <ClCompile Include="math\quaternion.cpp" />
     <ClCompile Include="math\transform.cpp" />
     <ClCompile Include="samplers\random.cpp" />
@@ -183,6 +185,7 @@
     <ClInclude Include="core\camera.hpp" />
     <ClInclude Include="core\header.h" />
     <ClInclude Include="core\integrator.hpp" />
+    <ClInclude Include="core\interaction.hpp" />
     <ClInclude Include="core\kawaii.hpp" />
     <ClInclude Include="core\light.hpp" />
     <ClInclude Include="core\material.hpp" />
@@ -196,8 +199,9 @@
     <ClInclude Include="filters\box.hpp" />
     <ClInclude Include="filters\sinc.hpp" />
     <ClInclude Include="integrators\path.hpp" />
-    <ClInclude Include="lights\point.hpp" />
+    <ClInclude Include="lights\pointlight.hpp" />
     <ClInclude Include="materials\matte.hpp" />
+    <ClInclude Include="math\animatedtransform.hpp" />
     <ClInclude Include="math\bound.h" />
     <ClInclude Include="math\mathutil.h" />
     <ClInclude Include="math\point.h" />

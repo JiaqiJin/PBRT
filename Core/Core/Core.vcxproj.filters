@@ -36,9 +36,6 @@
     <ClCompile Include="integrators\path.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="lights\point.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="materials\matte.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -111,6 +108,15 @@
     <ClCompile Include="core\kawaii.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="core\interaction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lights\pointlight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="math\animatedtransform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="accelerators\bvh.hpp">
@@ -129,9 +135,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="integrators\path.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="lights\point.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="materials\matte.hpp">
@@ -218,9 +221,6 @@
     <ClInclude Include="math\point.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="math\mathutil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="math\bound.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -228,6 +228,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="util\macro.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\interaction.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lights\pointlight.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="math\mathutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="math\animatedtransform.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

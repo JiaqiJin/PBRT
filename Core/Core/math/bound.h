@@ -3,6 +3,7 @@
 
 #include "ray.h"
 
+
 KAWAII_BEGIN
 
 // Bounds Declarations

@@ -44,7 +44,7 @@ inline T absDot(const Vector3<T>& v1, const Vector3<T>& v2) {
 }
 
 template <typename T>
-inline Vector3<T> cross(const Vector3<T>& v1, const Vector3<T>& v2) {
+Vector3<T> cross(const Vector3<T>& v1, const Vector3<T>& v2) {
     DCHECK(!v1.hasNaNs() && !v2.hasNaNs());
     double v1x = v1.x, v1y = v1.y, v1z = v1.z;
     double v2x = v2.x, v2y = v2.y, v2z = v2.z;
@@ -53,7 +53,7 @@ inline Vector3<T> cross(const Vector3<T>& v1, const Vector3<T>& v2) {
 }
 
 template <typename T>
-inline Vector3<T> cross(const Vector3<T>& v1, const Normal3<T>& v2) {
+Vector3<T> cross(const Vector3<T>& v1, const Normal3<T>& v2) {
     DCHECK(!v1.hasNaNs() && !v2.hasNaNs());
     double v1x = v1.x, v1y = v1.y, v1z = v1.z;
     double v2x = v2.x, v2y = v2.y, v2z = v2.z;
@@ -62,7 +62,7 @@ inline Vector3<T> cross(const Vector3<T>& v1, const Normal3<T>& v2) {
 }
 
 template <typename T>
-inline Vector3<T> cross(const Normal3<T>& v1, const Vector3<T>& v2) {
+Vector3<T> cross(const Normal3<T>& v1, const Vector3<T>& v2) {
     DCHECK(!v1.hasNaNs() && !v2.hasNaNs());
     double v1x = v1.x, v1y = v1.y, v1z = v1.z;
     double v2x = v2.x, v2y = v2.y, v2z = v2.z;
@@ -71,7 +71,7 @@ inline Vector3<T> cross(const Normal3<T>& v1, const Vector3<T>& v2) {
 }
 
 template <typename T>
-inline Vector3<T> normalize(const Vector3<T>& v) {
+Vector3<T> normalize(const Vector3<T>& v) {
     return v / v.length();
 }
 
