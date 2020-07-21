@@ -31,6 +31,12 @@ class Ray;
 
 class Transform;
 
+class Interaction;
+
+class AnimatedTransform;
+
+struct Quaternion;
+
 #include<iostream>
 #include<cmath>
 #include <algorithm>

@@ -3,6 +3,16 @@
 
 KAWAII_BEGIN
 
+template <typename T, typename U, typename V>
+inline T clamp(T val, U low, V high) {
+    if (val < low)
+        return low;
+    else if (val > high)
+        return high;
+    else
+        return val;
+}
+
 template <typename T>
 inline bool isNaN(const T x) {
     return std::isnan(x);
