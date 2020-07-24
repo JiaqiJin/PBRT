@@ -3,7 +3,6 @@
 
 #include "ray.h"
 
-
 KAWAII_BEGIN
 
 // Bounds Declarations
@@ -221,7 +220,7 @@ typedef Bounds3<Float> Bounds3f;
 typedef Bounds3<int> Bounds3i;
 
 template <typename T>
-inline bool Bounds3<T>::intersectP(const Ray& ray, const Vector3f& invDir,
+bool Bounds3<T>::intersectP(const Ray& ray, const Vector3f& invDir,
     const int dirIsNeg[3]) const {
     // 总体思路，先用x方向求出两个交点t值，再加入y方向更新t值，最后加入z方向更新t值
     //dirIsNeg为数组，表示ray方向的三个分量是否为负，dirIsNeg[0]=1表示，x方向为负，以此类推

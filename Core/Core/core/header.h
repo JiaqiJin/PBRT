@@ -1,6 +1,15 @@
 #ifndef header_h
 #define header_h
 
+
+#include<iostream>
+#include<cmath>
+#include <algorithm>
+#include <limits>
+#include <assert.h>
+#include "../util/macro.h"
+#include "../util/stringprint.h"
+KAWAII_BEGIN
 template<typename T>
 class Point2;
 
@@ -37,14 +46,7 @@ class AnimatedTransform;
 
 struct Quaternion;
 
-#include<iostream>
-#include<cmath>
-#include <algorithm>
-#include <limits>
-#include <assert.h>
-
-#include "../util/macro.h"
-#include "../util/stringprint.h"
+KAWAII_END
 
 #include "../math/vector.h"
 #include "../math/point.h"
@@ -53,8 +55,5 @@ struct Quaternion;
 #include "../math/ray.h"
 #include "../math/transform.hpp"
 
-KAWAII_BEGIN
-
-KAWAII_END
 
 #endif /* header_h */
