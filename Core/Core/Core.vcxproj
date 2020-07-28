@@ -152,6 +152,7 @@
     <ClCompile Include="core\kawaii.cpp" />
     <ClCompile Include="core\light.cpp" />
     <ClCompile Include="core\material.cpp" />
+    <ClCompile Include="core\medium.cpp" />
     <ClCompile Include="core\sampler.cpp" />
     <ClCompile Include="core\sampling.cpp" />
     <ClCompile Include="core\scene.cpp" />
@@ -189,6 +190,7 @@
     <ClInclude Include="core\kawaii.hpp" />
     <ClInclude Include="core\light.hpp" />
     <ClInclude Include="core\material.hpp" />
+    <ClInclude Include="core\medium.hpp" />
     <ClInclude Include="core\sampler.hpp" />
     <ClInclude Include="core\sampling.hpp" />
     <ClInclude Include="core\scene.hpp" />

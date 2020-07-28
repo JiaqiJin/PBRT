@@ -23,6 +23,13 @@
 	typedef float Float;
 #endif
 
+
+#define KAWAII_HAVE_POSIX_MEMALIGN
+
+#ifndef KAWAII_L1_CACHE_LINE_SIZE
+#define KAWAII_L1_CACHE_LINE_SIZE 64
+#endif
+
 static CONSTEXPR Float MaxFloat = std::numeric_limits<Float>::max();
 static CONSTEXPR Float Infinity = std::numeric_limits<Float>::infinity();
 static CONSTEXPR Float MachineEpsilon = std::numeric_limits<Float>::epsilon() * 0.5;

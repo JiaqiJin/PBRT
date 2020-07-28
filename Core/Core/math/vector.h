@@ -4,7 +4,6 @@
 #include "header.h"
 
 KAWAII_BEGIN
-
 // Vector Declarations
 template <typename T>
 class Vector2 {
@@ -96,8 +95,18 @@ public:
         if (i == 0) return x;
         return y;
     }
-    Float lengthSquared() const { return x * x + y * y; }
-    Float length() const { return std::sqrt(lengthSquared()); }
+
+    Float lengthSquared() const {
+        return x * x + y * y;
+    }
+
+    Float length() const {
+        return std::sqrt(lengthSquared());
+    }
+
+    bool isZero() const {
+        return x == 0 and y == 0;
+    }
 
     // Vector2 Public Data
     T x;
@@ -132,6 +141,7 @@ inline std::ostream& operator<<(std::ostream& os, const Vector2<Float>& v) {
 template <typename T>
 class Vector3 {
 public:
+
     Vector3() { x = y = z = 0; }
 
     Vector3(T x, T y, T z) : x(x), y(y), z(z) {
@@ -242,9 +252,22 @@ public:
         z *= inv;
         return *this;
     }
-    Vector3<T> operator-() const { return Vector3<T>(-x, -y, -z); }
-    Float lengthSquared() const { return x * x + y * y + z * z; }
-    Float length() const { return std::sqrt(lengthSquared()); }
+    Vector3<T> operator-() const {
+        return Vector3<T>(-x, -y, -z);
+    }
+
+    Float lengthSquared() const {
+        return x * x + y * y + z * z;
+    }
+
+    Float length() const {
+        return std::sqrt(lengthSquared());
+    }
+
+    bool isZero() const {
+        return x == 0 and y == 0 and z == 0;
+    }
+
     explicit Vector3(const Normal3<T>& n);
 
     // Vector3 Public Data
@@ -309,7 +332,7 @@ public:
         z -= n.z;
         return *this;
     }
-    bool hasNaNs() const { return isNaN(x) || isNaN(y) || isNaN(z); }
+    bool hasNaNs() const { return isnan(x) || isnan(y) || isnan(z); }
     template <typename U>
     Normal3<T> operator*(U f) const {
         return Normal3<T>(f * x, f * y, f * z);
@@ -381,6 +404,10 @@ public:
         return z;
     }
 
+    bool isZero() const {
+        return x == 0 and y == 0 and z == 0;
+    }
+
     // Normal3 Public Data
     T x;
     T y;
@@ -401,157 +428,6 @@ inline std::ostream& operator<<(std::ostream& os, const Normal3<Float>& v) {
 }
 
 typedef Normal3<Float> Normal3f;
-
-
-/*
-用于区别向量类，方向是单位向量，此运算
- */
-template <typename T>
-class Direction3 {
-
-public:
-    void normalize() {
-        T lenInv = 1 / length();
-        x = x * lenInv;
-        y = y * lenInv;
-        z = z * lenInv;
-    }
-
-    // Direction3 Public Methods
-    Direction3(T x, T y, T z) : x(x), y(y), z(z) {
-        normalize();
-    }
-
-    Direction3(const Vector3<T>& v) {
-        x = v.x;
-        y = v.y;
-        z = v.z;
-        normalize();
-    }
-
-    T operator[](int i) const {
-        // DCHECK(i >= 0 && i <= 2);
-        if (i == 0) return x;
-        if (i == 1) return y;
-        return z;
-    }
-    T& operator[](int i) {
-        // DCHECK(i >= 0 && i <= 2);
-        if (i == 0) return x;
-        if (i == 1) return y;
-        return z;
-    }
-    Direction3() { x = y = z = 0; }
-    // Direction3(T x, T y, T z) : x(x), y(y), z(z) { DCHECK(!HasNaNs()); }
-    bool hasNaNs() const { return isNaN(x) || isNaN(y) || isNaN(z); }
-    explicit Direction3(const Point3<T>& p) {
-        x = p.x;
-        y = p.y;
-        z = p.z;
-        normalize();
-    }
-#ifndef NDEBUG
-    // The default versions of these are fine for release builds; for debug
-    // we define them so that we can add the Assert checks.
-    Direction3(const Direction3<T>& v) {
-        // DCHECK(!v.HasNaNs());
-        x = v.x;
-        y = v.y;
-        z = v.z;
-        normalize();
-    }
-
-    Direction3<T>& operator=(const Direction3<T>& v) {
-        // DCHECK(!v.HasNaNs());
-        x = v.x;
-        y = v.y;
-        z = v.z;
-        normalize();
-        return *this;
-    }
-#endif  // !NDEBUG
-    Direction3<T> operator+(const Direction3<T>& v) const {
-        // DCHECK(!v.HasNaNs());
-        return Direction3(x + v.x, y + v.y, z + v.z);
-    }
-
-    Direction3<T>& operator+=(const Direction3<T>& v) {
-        // DCHECK(!v.HasNaNs());
-        x += v.x;
-        y += v.y;
-        z += v.z;
-        return *this;
-    }
-
-    Vector3<T> getVector3() const {
-        return Vector3<T>(x, y, z);
-    }
-
-    Direction3<T> operator-(const Direction3<T>& v) const {
-        // DCHECK(!v.HasNaNs());
-        return Direction3(x - v.x, y - v.y, z - v.z);
-    }
-
-    Direction3<T>& operator-=(const Direction3<T>& v) {
-        // DCHECK(!v.HasNaNs());
-        x -= v.x;
-        y -= v.y;
-        z -= v.z;
-        normalize();
-        return *this;
-    }
-
-    bool operator==(const Direction3<T>& v) const {
-        return x == v.x && y == v.y && z == v.z;
-    }
-
-    bool operator!=(const Direction3<T>& v) const {
-        return x != v.x || y != v.y || z != v.z;
-    }
-
-    template <typename U>
-    Vector3<T> operator*(U s) const {
-        return Vector3<T>(s * x, s * y, s * z);
-    }
-
-    template <typename U>
-    Vector3<T> operator/(U f) const {
-        CHECK_NE(f, 0);
-        Float inv = (Float)1 / f;
-        return Vector3<T>(x * inv, y * inv, z * inv);
-    }
-
-    Direction3<T> operator-() const {
-        return Direction3<T>(-x, -y, -z);
-    }
-
-    Float lengthSquared() const {
-        return x * x + y * y + z * z;
-    }
-
-    Float length() const {
-        return std::sqrt(lengthSquared());
-    }
-
-    // Direction3 Public Data
-    T x;
-    T y;
-    T z;
-};
-
-typedef Direction3<Float> Direction3f;
-
-template <typename T>
-inline std::ostream& operator<<(std::ostream& os, const Direction3<T>& v) {
-    os << "[ " << v.x << ", " << v.y << ", " << v.z << " ]";
-    return os;
-}
-
-template <>
-inline std::ostream& operator<<(std::ostream& os, const Direction3f& v) {
-    os << StringPrintf("[ %f, %f, %f ]", v.x, v.y, v.z);
-    return os;
-}
 
 KAWAII_END
 

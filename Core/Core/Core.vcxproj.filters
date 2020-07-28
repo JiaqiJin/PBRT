@@ -117,6 +117,9 @@
     <ClCompile Include="math\animatedtransform.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="core\medium.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="accelerators\bvh.hpp">
@@ -240,6 +243,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="math\animatedtransform.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\medium.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
