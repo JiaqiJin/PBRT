@@ -49,6 +49,15 @@ public:
 
     Float getDet() const;
 
+    // 返回左上角3x3矩阵的行列式
+    inline Float det3x3() const {
+        Float det =
+            _m[0][0] * (_m[1][1] * _m[2][2] - _m[1][2] * _m[2][1]) -
+            _m[0][1] * (_m[1][0] * _m[2][2] - _m[1][2] * _m[2][0]) +
+            _m[0][2] * (_m[1][0] * _m[2][1] - _m[1][1] * _m[2][0]);
+        return det;
+    }
+
     //判断变量中是否包含nan分量
     bool hasNaNs() const {
         for (int i = 0; i < 16; ++i) {
@@ -279,13 +288,9 @@ public:
 
     inline bool swapsHandedness() const {
         /*
-         如果左上角3x3的矩阵行列式小于零，则说明这个变换是换了手的，至于为何是这样，暂时没有了解太深，搞完主线再说
-         */
-        Float det =
-            _mat._m[0][0] * (_mat._m[1][1] * _mat._m[2][2] - _mat._m[1][2] * _mat._m[2][1]) -
-            _mat._m[0][1] * (_mat._m[1][0] * _mat._m[2][2] - _mat._m[1][2] * _mat._m[2][0]) +
-            _mat._m[0][2] * (_mat._m[1][0] * _mat._m[2][1] - _mat._m[1][1] * _mat._m[2][0]);
-        return det < 0;
+          如果左上角3x3的矩阵行列式小于零，则说明这个变换是换了手的，至于为何是这样，暂时没有了解太深，搞完主线再说todo
+          */
+        return _mat.det3x3() < 0;
     }
 
     static Transform translate(const Vector3f& delta);
