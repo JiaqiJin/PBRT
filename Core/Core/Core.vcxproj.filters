@@ -120,6 +120,9 @@
     <ClCompile Include="core\medium.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="util\memory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="accelerators\bvh.hpp">
@@ -246,6 +249,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="core\medium.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="util\memory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

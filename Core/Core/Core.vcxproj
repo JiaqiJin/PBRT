@@ -177,6 +177,7 @@
     <ClCompile Include="shapes\triangle.cpp" />
     <ClCompile Include="textures\constant.cpp" />
     <ClCompile Include="util\fileio.cpp" />
+    <ClCompile Include="util\memory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="accelerators\bvh.hpp" />
@@ -220,6 +221,7 @@
     <ClInclude Include="textures\constant.hpp" />
     <ClInclude Include="util\fileio.hpp" />
     <ClInclude Include="util\macro.h" />
+    <ClInclude Include="util\memory.h" />
     <ClInclude Include="util\stringprint.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
