@@ -12,9 +12,14 @@ int main(int argc, const char* argv[]) {
     KawaiiDesune kawakawa;
 
     uint32_t a = 2;
-    cout << bitsToFloat(a) << endl;
+    uint32_t b = 45565555;
+    b = floatToBits(MaxFloat);
+    cout << MaxFloat << endl;
+    cout << bitsToFloat(b) << endl;
 
-    /*for (int i = 0; i < 5; ++i) {
+    /*
+    auto p = BlockedArray<int>(8,8);
+    for (int i = 0; i < 5; ++i) {
         cout << p.block(i) << "  b" << i << endl;
         cout << p.offset(i) << "  o" << i << endl;
     }

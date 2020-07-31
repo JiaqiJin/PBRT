@@ -70,6 +70,9 @@ struct MediumInterface;
 template<typename T, int logBlockSize = 2>
 class BlockedArray;
 
+class EFloat;
+
+
 KAWAII_END
 
 inline uint32_t floatToBits(float f) {
