@@ -219,9 +219,10 @@
     <ClInclude Include="shapes\sphere.hpp" />
     <ClInclude Include="shapes\triangle.hpp" />
     <ClInclude Include="textures\constant.hpp" />
+    <ClInclude Include="util\errfloat.h" />
     <ClInclude Include="util\fileio.hpp" />
     <ClInclude Include="util\macro.h" />
-    <ClInclude Include="util\memory.h" />
+    <ClInclude Include="util\memory.hpp" />
     <ClInclude Include="util\stringprint.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

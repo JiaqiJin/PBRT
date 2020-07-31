@@ -16,6 +16,7 @@
 #define CHECK_NE(a, b) DCHECK((a) != (b))
 #define CHECK_LE(a, b) DCHECK((a) <= (b))
 #define CHECK_GE(a, b) DCHECK((a) >= (b))
+#define CHECK_EQ(a, b) CHECK_OP(==, (a), (b))
 
 #ifdef FLOAT_AS_DOUBLE
 	typedef double Float;
@@ -23,11 +24,24 @@
 	typedef float Float;
 #endif
 
+#if defined(_MSC_VER)
+#define KAWAII_HAVE_ALIGNED_MALLOC
+#endif
+
+#ifndef KAWAII_HAVE_ALIGNOF
+#define KAWAII_HAVE_ALIGNOF 16
+#endif
 
 #define KAWAII_HAVE_POSIX_MEMALIGN
 
+#define KAWAII_HAVE_CONSTEXPR
+
 #ifndef KAWAII_L1_CACHE_LINE_SIZE
 #define KAWAII_L1_CACHE_LINE_SIZE 64
+#endif
+
+#ifndef KAWAII_HAVE_ALIGNOF
+#define KAWAII_HAVE_ALIGNOF 16
 #endif
 
 static CONSTEXPR Float MaxFloat = std::numeric_limits<Float>::max();

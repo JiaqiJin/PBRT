@@ -251,7 +251,10 @@
     <ClInclude Include="core\medium.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="util\memory.h">
+    <ClInclude Include="util\errfloat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="util\memory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
