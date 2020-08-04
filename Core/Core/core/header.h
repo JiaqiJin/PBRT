@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <limits>
 #include <assert.h>
+#include <string>
 #include "../util/macro.h"
 #include "../util/stringprint.h"
 
@@ -72,6 +73,7 @@ class BlockedArray;
 
 class EFloat;
 
+class Shape;
 
 KAWAII_END
 

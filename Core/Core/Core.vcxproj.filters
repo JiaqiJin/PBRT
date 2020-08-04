@@ -257,5 +257,8 @@
     <ClInclude Include="util\memory.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="util\macro_config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

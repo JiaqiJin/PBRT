@@ -222,6 +222,7 @@
     <ClInclude Include="util\errfloat.h" />
     <ClInclude Include="util\fileio.hpp" />
     <ClInclude Include="util\macro.h" />
+    <ClInclude Include="util\macro_config.h" />
     <ClInclude Include="util\memory.hpp" />
     <ClInclude Include="util\stringprint.h" />
   </ItemGroup>
