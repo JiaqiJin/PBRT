@@ -167,6 +167,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="materials\matte.cpp" />
     <ClCompile Include="math\animatedtransform.cpp" />
+    <ClCompile Include="math\lowdiscrepancy.cpp" />
     <ClCompile Include="math\quaternion.cpp" />
     <ClCompile Include="math\transform.cpp" />
     <ClCompile Include="samplers\random.cpp" />
@@ -206,10 +207,12 @@
     <ClInclude Include="materials\matte.hpp" />
     <ClInclude Include="math\animatedtransform.hpp" />
     <ClInclude Include="math\bound.h" />
+    <ClInclude Include="math\lowdiscrepancy.hpp" />
     <ClInclude Include="math\mathutil.h" />
     <ClInclude Include="math\point.h" />
     <ClInclude Include="math\quaternion.hpp" />
     <ClInclude Include="math\ray.h" />
+    <ClInclude Include="math\rng.h" />
     <ClInclude Include="math\transform.hpp" />
     <ClInclude Include="math\vector.h" />
     <ClInclude Include="samplers\random.hpp" />

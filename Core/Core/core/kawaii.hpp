@@ -1,5 +1,5 @@
-#ifndef paladin_hpp
-#define paladin_hpp
+#ifndef kawaii_hpp
+#define kawaii_hpp
 
 #include "header.h"
 
@@ -21,4 +21,4 @@ public:
 
 KAWAII_END
 
-#endif /* paladin_hpp */
+#endif 

@@ -6,9 +6,12 @@
 #include "interaction.hpp"
 
 KAWAII_BEGIN
-
-class Shape
-{
+/*
+所有图形的基类，假设读者已经掌握概率论基础知识
+科普一下，pdf为概率密度函数，pdf在定义域上积分为1，且恒不小于零
+如果没有读过概率密度函数，建议阅读浙大的概率密度函数，经典
+*/
+class Shape {
 public:
 	Shape(const Transform* ObjectToWorld, const Transform* WorldToObject,
 		bool reverseOrientation);
@@ -21,13 +24,13 @@ public:
 	// 返回在世界坐标系中的包围盒
 	virtual Bounds3f worldBound() const;
 
-	// 求交函数(intersect function)，填充SurfaceInteraction数据
+	// 求交函数，填充SurfaceInteraction数据
 	virtual bool intersect(const Ray& ray,
 		Float* tHit,
 		SurfaceInteraction* isect,
 		bool testAlphaTexture = true) const = 0;
 
-	virtual bool IntersectP(const Ray& ray,
+	virtual bool intersectP(const Ray& ray,
 		bool testAlphaTexture = true) const {
 		return intersect(ray, nullptr, nullptr, testAlphaTexture);
 	}
@@ -36,9 +39,9 @@ public:
 	virtual Float area() const = 0;
 
 	/*
-在图形表面采样一个点，返回该点的概率密度函数，与interaction结构
-u为表面参数坐标，u ∈ [0, 1]^2，通常为外部通过某种算法生成，最简单就是随机数
-*/
+	在图形表面采样一个点，返回该点的基于面积的概率密度函数值，与interaction结构
+	u为表面参数坐标，u ∈ [0, 1]^2，通常为外部通过某种算法生成，最简单就是随机数
+	*/
 	virtual Interaction sample(const Point2f& u, Float* pdf) const = 0;
 
 	// 概率密度函数，表面某点的pdf，函数空间为表面参数空间
@@ -58,18 +61,12 @@ u为表面参数坐标，u ∈ [0, 1]^2，通常为外部通过某种算法生�
 	*/
 	virtual Float pdf(const Interaction& ref, const Vector3f& wi) const;
 
-	virtual Float SolidAngle(const Point3f& p, int nSamples = 512) const;
+	//    virtual Float SolidAngle(const Point3f &p, int nSamples = 512) const;
 
-
-
-	//Transformation thaht describe the mapping from object space to world space
 	const Transform* _objectToWorld;
 	const Transform* _worldToObject;
-	//Indicate where the surface nornal sould be reverese
 	const bool _reverseOrientation;
-	//world to object transformation
 	const bool _transformSwapsHandedness;
-
 };
 
 KAWAII_END

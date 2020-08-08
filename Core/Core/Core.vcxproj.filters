@@ -87,9 +87,6 @@
     <ClCompile Include="math\quaternion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="math\transform.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="shapes\cone.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -121,6 +118,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="util\memory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="math\lowdiscrepancy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="math\transform.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -194,9 +197,6 @@
     <ClInclude Include="math\quaternion.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="math\transform.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="shapes\cone.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -258,6 +258,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="util\macro_config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="math\lowdiscrepancy.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="math\rng.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="math\transform.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -5,15 +5,11 @@
 #include "medium.hpp"
 
 KAWAII_BEGIN
-
 /*
 Interaction为光线与物体作用的点
 该结构储存着各种数据
-The light interacts with the object
-The structure stores various data
 */
 struct Interaction {
-
 
     Interaction() : time(0) {}
 
@@ -46,11 +42,11 @@ struct Interaction {
 
     }
 
-    const Medium* GetMedium(const Vector3f& w) const {
+    const Medium* getMedium(const Vector3f& w) const {
         return dot(w, normal) > 0 ? mediumInterface.outside : mediumInterface.inside;
     }
 
-    const Medium* GetMedium() const {
+    const Medium* getMedium() const {
         CHECK_EQ(mediumInterface.inside, mediumInterface.outside);
         return mediumInterface.inside;
     }
@@ -63,26 +59,26 @@ struct Interaction {
         return !isSurfaceInteraction();
     }
 
-    Ray SpawnRay(const Vector3f& d) const {
+    Ray spawnRay(const Vector3f& d) const {
         /*
-        由于计算的交点可能会有误差，如果直接把pos作为光线的起点，可能取到的是shape内部的点
-          如果从内部的点发出光线，则可能产生自相交，为了避免这种情况，通常会对pos做一定的偏移。
-        */
+          由于计算出的交点可能会有误差，如果直接把pos作为光线的起点，可能取到的是shape内部的点
+          如果从内部的点发出光线，则可能产生自相交，为了避免这种情况，通常会对pos做一定的偏移
+         */
         Point3f o = offsetRayOrigin(pos, pError, normal, d);
-        return Ray(o, d, Infinity, time, GetMedium(d));
+        return Ray(o, d, Infinity, time, getMedium(d));
     }
 
-    Ray SpawnRayTo(const Point3f& p2) const {
+    Ray spawnRayTo(const Point3f& p2) const {
         Point3f origin = offsetRayOrigin(pos, pError, normal, p2 - pos);
         Vector3f d = p2 - pos;
-        return Ray(origin, d, 1 - ShadowEpsilon, time, GetMedium(d));
+        return Ray(origin, d, 1 - ShadowEpsilon, time, getMedium(d));
     }
 
-    Ray SpawnRayTo(const Interaction& it) const {
+    Ray spawnRayTo(const Interaction& it) const {
         Point3f origin = offsetRayOrigin(pos, pError, normal, it.pos - pos);
         Point3f target = offsetRayOrigin(it.pos, it.pError, it.normal, origin - it.pos);
         Vector3f d = target - origin;
-        return Ray(origin, d, 1 - ShadowEpsilon, time, GetMedium(d));
+        return Ray(origin, d, 1 - ShadowEpsilon, time, getMedium(d));
     }
 
     Point3f pos;

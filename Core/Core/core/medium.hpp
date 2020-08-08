@@ -1,9 +1,9 @@
 ﻿#ifndef medium_hpp
 #define medium_hpp
+
 #include "header.h"
 
 KAWAII_BEGIN
-
 // 介质
 class Medium {
 public:
@@ -15,23 +15,24 @@ public:
     //                            MediumInteraction *mi) const = 0;
 };
 
+
 // 两个介质的相交处，nullptr表示真空
 struct MediumInterface {
+    MediumInterface() : inside(nullptr), outside(nullptr) {}
 
     MediumInterface(const Medium* medium) : inside(medium), outside(medium) {
 
     }
 
-    MediumInterface(const Medium* inside = nullptr, const Medium* outside = nullptr)
+    MediumInterface(const Medium* inside, const Medium* outside)
         :inside(inside),
         outside(outside) {
 
     }
 
-    bool IsMediumTransition() const {
+    bool isMediumTransition() const {
         return inside != outside;
     }
-
     // 内部的介质
     const Medium* inside;
 
