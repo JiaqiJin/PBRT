@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{C03CC5EA-E98C-410C-8073-FD23F0B4D6E6}</ProjectGuid>
+    <RootNamespace>Paladin</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="accelerators\bvh.cpp" />
+    <ClCompile Include="accelerators\kdtree.cpp" />
+    <ClCompile Include="cameras\perspective.cpp" />
+    <ClCompile Include="core\bxdf.cpp" />
+    <ClCompile Include="core\camera.cpp" />
+    <ClCompile Include="core\integrator.cpp" />
+    <ClCompile Include="core\interaction.cpp" />
+    <ClCompile Include="core\light.cpp" />
+    <ClCompile Include="core\material.cpp" />
+    <ClCompile Include="core\medium.cpp" />
+    <ClCompile Include="core\paladin.cpp" />
+    <ClCompile Include="core\sampler.cpp" />
+    <ClCompile Include="core\sampling.cpp" />
+    <ClCompile Include="core\scene.cpp" />
+    <ClCompile Include="core\shape.cpp" />
+    <ClCompile Include="core\spectrum.cpp" />
+    <ClCompile Include="core\texture.cpp" />
+    <ClCompile Include="filters\box.cpp" />
+    <ClCompile Include="filters\sinc.cpp" />
+    <ClCompile Include="integrators\path.cpp" />
+    <ClCompile Include="lights\pointlight.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="materials\matte.cpp" />
+    <ClCompile Include="math\animatedtransform.cpp" />
+    <ClCompile Include="math\lowdiscrepancy.cpp" />
+    <ClCompile Include="math\quaternion.cpp" />
+    <ClCompile Include="math\transform.cpp" />
+    <ClCompile Include="samplers\random.cpp" />
+    <ClCompile Include="shapes\cone.cpp" />
+    <ClCompile Include="shapes\cylinder.cpp" />
+    <ClCompile Include="shapes\disk.cpp" />
+    <ClCompile Include="shapes\sphere.cpp" />
+    <ClCompile Include="shapes\triangle.cpp" />
+    <ClCompile Include="textures\constant.cpp" />
+    <ClCompile Include="tools\fileio.cpp" />
+    <ClCompile Include="tools\memory.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="accelerators\bvh.hpp" />
+    <ClInclude Include="accelerators\kdtree.hpp" />
+    <ClInclude Include="cameras\perspective.hpp" />
+    <ClInclude Include="core\bxdf.hpp" />
+    <ClInclude Include="core\camera.hpp" />
+    <ClInclude Include="core\header.h" />
+    <ClInclude Include="core\integrator.hpp" />
+    <ClInclude Include="core\interaction.hpp" />
+    <ClInclude Include="core\light.hpp" />
+    <ClInclude Include="core\material.hpp" />
+    <ClInclude Include="core\medium.hpp" />
+    <ClInclude Include="core\paladin.hpp" />
+    <ClInclude Include="core\sampler.hpp" />
+    <ClInclude Include="core\sampling.hpp" />
+    <ClInclude Include="core\scene.hpp" />
+    <ClInclude Include="core\shape.hpp" />
+    <ClInclude Include="core\spectrum.hpp" />
+    <ClInclude Include="core\texture.hpp" />
+    <ClInclude Include="filters\box.hpp" />
+    <ClInclude Include="filters\sinc.hpp" />
+    <ClInclude Include="integrators\path.hpp" />
+    <ClInclude Include="lights\pointlight.hpp" />
+    <ClInclude Include="materials\matte.hpp" />
+    <ClInclude Include="math\animatedtransform.hpp" />
+    <ClInclude Include="math\bounds.h" />
+    <ClInclude Include="math\lowdiscrepancy.hpp" />
+    <ClInclude Include="math\mathutil.h" />
+    <ClInclude Include="math\point.h" />
+    <ClInclude Include="math\quaternion.hpp" />
+    <ClInclude Include="math\ray.h" />
+    <ClInclude Include="math\rng.h" />
+    <ClInclude Include="math\transform.hpp" />
+    <ClInclude Include="math\vector.h" />
+    <ClInclude Include="samplers\random.hpp" />
+    <ClInclude Include="shapes\cone.hpp" />
+    <ClInclude Include="shapes\cylinder.hpp" />
+    <ClInclude Include="shapes\disk.hpp" />
+    <ClInclude Include="shapes\sphere.hpp" />
+    <ClInclude Include="shapes\triangle.hpp" />
+    <ClInclude Include="textures\constant.hpp" />
+    <ClInclude Include="tools\errfloat.h" />
+    <ClInclude Include="tools\fileio.hpp" />
+    <ClInclude Include="tools\macro.h" />
+    <ClInclude Include="tools\macro_config.h" />
+    <ClInclude Include="tools\memory.hpp" />
+    <ClInclude Include="tools\stringprint.hpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
