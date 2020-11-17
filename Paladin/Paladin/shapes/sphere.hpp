@@ -1,4 +1,3 @@
-
 #ifndef sphere_hpp
 #define sphere_hpp
 
@@ -22,51 +21,55 @@ PALADIN_BEGIN
  z = rcosθ
 
  x^2 + y^2 +z^2 − r^2 =0.
+
+ 表面参数uv为
+ φ = u * φmax
+ θ = θmin + v * (θmax - θmin)
  */
-class Sphere : public Shape {
-    
-public:
-    Sphere(Transform *objectToWorld,
-           Transform *worldToObject,
-           bool reverseOrientation,
-           Float radius,
-           Float zMax,
-           Float zMin,
-           Float phiMax):
-    Shape(objectToWorld, worldToObject, reverseOrientation),
-    _radius(radius),
-    _zMax(clamp(zMax, -radius, radius)),
-    _zMin(clamp(zMin, -radius, radius)),
-    _phiMax(degree2radian(clamp(phiMax, 0, 360))),
-    _minTheta(std::acos(clamp(std::min(_zMin, _zMax) / _radius, -1, 1))),
-    _maxTheta(std::acos(clamp(std::max(_zMin, _zMax) / _radius, -1, 1))) {
-        init();
-    }
-    
-    void init();
-    
-    Bounds3f objectBound() const;
-    
-    bool intersect(const Ray &ray, Float *tHit, SurfaceInteraction *isect, bool testAlphaTexture) const;
-    
-    bool intersectP(const Ray &ray, bool testAlphaTexture) const;
-    
-    Float area() const;
-    
-    Interaction sampleA(const Point2f &u, Float *pdf) const;
-    
-    Interaction sampleW(const Interaction &ref, const Point2f &u, Float *pdf) const;
-    
-    Float pdfW(const Interaction &ref, const Vector3f &wi) const;
-    
-private:
-    
-    const Float _zMin;
-    const Float _zMax;
-    const Float _phiMax;
-    const Float _radius;
-    const Float _minTheta;
-    const Float _maxTheta;
+    class Sphere : public Shape {
+
+    public:
+        Sphere(Transform* objectToWorld,
+            Transform* worldToObject,
+            bool reverseOrientation,
+            Float radius,
+            Float zMax,
+            Float zMin,
+            Float phiMax) :
+            Shape(objectToWorld, worldToObject, reverseOrientation),
+            _radius(radius),
+            _zMax(clamp(std::max(zMax, zMin), -radius, radius)),
+            _zMin(clamp(std::min(zMax, zMin), -radius, radius)),
+            _phiMax(degree2radian(clamp(phiMax, 0, 360))),
+            _thetaMin(std::acos(clamp(_zMin / _radius, -1, 1))),
+            _thetaMax(std::acos(clamp(_zMax / _radius, -1, 1))) {
+            init();
+        }
+
+        void init();
+
+        Bounds3f objectBound() const;
+
+        bool intersect(const Ray& ray, Float* tHit, SurfaceInteraction* isect, bool testAlphaTexture) const;
+
+        bool intersectP(const Ray& ray, bool testAlphaTexture) const;
+
+        Float area() const;
+
+        Interaction sampleA(const Point2f& u, Float* pdf) const;
+
+        Interaction sampleW(const Interaction& ref, const Point2f& u, Float* pdf) const;
+
+        Float pdfW(const Interaction& ref, const Vector3f& wi) const;
+
+    private:
+
+        const Float _zMin;
+        const Float _zMax;
+        const Float _phiMax;
+        const Float _radius;
+        const Float _thetaMin;
+        const Float _thetaMax;
 };
 
 PALADIN_END

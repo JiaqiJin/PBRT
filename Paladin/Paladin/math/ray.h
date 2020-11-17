@@ -6,6 +6,12 @@
 PALADIN_BEGIN
 
 /*
+假设ray与shape相交的点为(x,y,z)，则t与x满足如下关系
+t = (x − Ox)/dx
+t = (x ⊖ Ox) ⊗ (1 ⊘ dx) ⊂ ((x − Ox)/dx) * (1 ± ε)^3
+ */
+
+/*
 ray类由一个点作为起点，一个单位向量作为方向
 tMax决定了ray的最远距离
 */
@@ -51,6 +57,9 @@ public:
     const Medium *medium;
 };
 
+/*
+Contain two auxiliar rays : camera rays offset by one sample in the  and  direction
+*/
 class RayDifferential : public Ray {
 public:
     RayDifferential() {
@@ -96,13 +105,14 @@ public:
  基本思路：
  以计算出的交点p为中心，误差偏移量为包围盒的一个顶点，组成一个最小包围盒b
  过p点做垂直于法线的平面s，将s沿着法线方向推到于b相交的最远位置，此时s与法线相交的点p'作为光线起点
+ http://www.pbr-book.org/3ed-2018/Shapes/Managing_Rounding_Error.html#sec:generating-rays
  */
 static Point3f offsetRayOrigin(const Point3f &p, const Vector3f &pError,
                                const Normal3f &n, const Vector3f &w) {
-    // 包围盒b的八个顶点为 (±δx , ±δy , ±δz)
+    // 包围盒b的八个顶点为 (±δx , ±δy , ±δz) find the maximum value of  for the eight corners of the error bounding box
     // 假设平面s的函数为 ax+by+cz = d，法向量为(a,b,c)
     // 将法线的绝对值带入方程，求得d的最大值(注意此处把pError当成一个点带入函数)
-    // 注意：这里的法向量是单位向量
+    // 注意：这里的法向量是单位向量 d = |nx|δx + |ny|δy + |nz|δz
     Float d = dot(abs(n), pError);
 #ifdef FLOAT_AS_DOUBLE
     // 暂时不理解pbrt为何要这样写
