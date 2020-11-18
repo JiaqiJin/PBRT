@@ -13,6 +13,7 @@
 #include <limits>
 #include <string>
 #include <stdlib.h>
+#include <memory>
 
 #ifdef __GNUC__
     //fix 'numeric_limits' is not a member of 'std' for linux
@@ -27,6 +28,8 @@
     #include <string>
     //fix “max”: 不是“std”的成员 for vs2015
     #include <algorithm>
+
+    #include <memory>
 #endif
 
 #include "../tools/stringprint.hpp"

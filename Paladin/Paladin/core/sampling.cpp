@@ -16,6 +16,13 @@ Vector3f uniformSampleSphere(const Point2f& u) {
     return Vector3f(r * std::cos(phi), r * std::sin(phi), z);
 }
 
+Vector3f uniformSamplePartialSphere(const Point2f& u, Float phiMax, Float cosThetaMin, Float cosThetaMax) {
+    Float z = cosThetaMin - u[0] * (cosThetaMin - cosThetaMax);
+    Float r = std::sqrt(std::max((Float)0, (Float)1 - z * z));
+    Float phi = phiMax * u[1];
+    return Vector3f(r * std::cos(phi), r * std::sin(phi), z);
+}
+
 Float uniformConePdf(Float cosThetaMax) {
     return 1 / (_2Pi * (1 - cosThetaMax));
 }
@@ -40,5 +47,11 @@ Point2f uniformSampleSector(const Point2f& u, Float thetaMax) {
     return Point2f(r * std::cos(theta), r * std::sin(theta));
 }
 
+Point2f uniformSamplePartialSector(const Point2f& u, Float thetaMax, Float rMin) {
+    Float rMin2 = rMin * rMin;
+    Float r = std::sqrt(u[0] * (1 - rMin2) + rMin2);
+    Float theta = thetaMax * u[1];
+    return Point2f(r * std::cos(theta), r * std::sin(theta));
+}
 
 PALADIN_END

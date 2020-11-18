@@ -1,10 +1,17 @@
 #ifndef macro_hpp
 #define macro_hpp
 
-#include "macro_config.h"
 #include "../core/header.h"
 
 #define CONSTEXPR constexpr
+
+//#define OUTPUT_LINENO 1
+
+#ifdef OUTPUT_LINENO
+#define COUT std::cout << __FILE__ << " " << __LINE__ << std::endl
+#else
+#define COUT std::cout
+#endif
 
 #define USING_PALADIN using namespace paladin;
 #define USING_STD using namespace std;
@@ -20,17 +27,17 @@
 #define CHECK_EQ(a, b) CHECK_OP(==, (a), (b))
 
 #ifdef FLOAT_AS_DOUBLE
-    typedef double Float;
+typedef double Float;
 #else
-    typedef float Float;
+typedef float Float;
 #endif
 
 #define PALADIN_HAVE_POSIX_MEMALIGN
 
 #define PALADIN_HAVE_CONSTEXPR
 
-#if defined(_WIN32) || defined(_WIN64)
-    #define PALADIN_HAVE_ALIGNED_MALLOC
+#if defined(_MSC_VER)
+#define PALADIN_HAVE_ALIGNED_MALLOC
 #endif
 
 #ifndef PALADIN_L1_CACHE_LINE_SIZE
@@ -58,7 +65,6 @@ static CONSTEXPR Float Sqrt2 = 1.41421356237309504880;
 
 
 #endif /* macro_h */
-
 
 
 

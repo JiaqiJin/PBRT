@@ -112,6 +112,33 @@ Vector3f uniformSampleSphere(const Point2f& u);
 
 
 /*
+ 在一个局部球表面上生成均匀的随机点
+ 三个参数控制局部球，θmin θmax φmax
+ ∫p(w)dw = 1
+ 球的立体角为dw = sinθdθdφ
+ 局部球面面积为 s = ∫[0, φmax]∫[θmin, θmax]sinθdθdφ = φmax(cosθmin - cosθmax)
+
+ 均匀分布p(w)为常数c，求解 c = p(w) = 1 / s，又由3式得 p(θ,φ) = sinθ/s
+
+ p(θ) = ∫[0, φmax]p(θ,φ)dφ = ∫[0, φmax](sinθ/s)dφ = sinθ/(cosθmin - cosθmax)
+ p(φ|θ) = p(φ,θ)/p(θ) = 1/φmax
+
+ 对p(θ)积分: P(θ) = ∫[0,θ]sinθ'/(cosθmin - cosθmax)dθ' = (cosθmin - cosθ)/(cosθmin - cosθmax)
+ 对p(φ|θ)积分: P(φ|θ) = ∫[0,φ]1/φmaxdφ' = φ/φmax
+ a,b为[0,1]的均匀分布随机数
+ θ = arccos(cosθmin - a(cosθmin - cosθmax))
+ φ = φmax * b
+
+ sinθ = sqrt(1 - (cosθ)^2)
+ 求得
+ x = sinθcosφ = sinθcos(b * φmax)
+ y = sinθsinφ = sinθsin(b * φmax)
+ z = cosθ = cosθmin - a(cosθmin - cosθmax)
+
+ */
+Vector3f uniformSamplePartialSphere(const Point2f& u, Float phiMax, Float cosThetaMin, Float cosThetaMax);
+
+/*
  均匀采样一个圆锥的pdf函数
 
  p(θ, φ) = sinθ p(w)
@@ -198,6 +225,32 @@ Point2f uniformSampleDisk(const Point2f& u);
 
 */
 Point2f uniformSampleSector(const Point2f& u, Float thetaMax);
+
+
+/*
+ 均匀采样局部扇形，其中扇形角度为 θmax，外径为1，内径为rMin
+ 0 <= rMin <= 1
+ 面积为 s = θmax/2 * (1 - rMin^2)
+
+ 均匀分布可得p(x,y) = 1/s
+ p(x,y) = p(θ,r)/r 8式
+ 又由8式，可得
+ p(θ,r) = 2r/(θmax(1 - rMin^2))
+ 由边缘概率密度函数公式可得
+ p(r) = ∫[0,θmax]p(θ,r)dθ = 2r/(1 - rMin^2)
+ p(θ|r) = p(θ,r)/p(r) = 1/θmax
+ θ与r相互独立 p(θ|r) = 1/θmax = p(θ)
+ 对p(θ)积分可得
+ P(θ) = θ/θmax
+ 对p(r)积分可得
+ P(r) = (r^2 - rMin^2)/(1 - rMin^2)
+
+ a,b为[0,1]的均匀分布随机数
+ r = √(a(1 - rMin^2) + rMin^2)
+ θ = θmaxb
+
+*/
+Point2f uniformSamplePartialSector(const Point2f& u, Float thetaMax, Float rMin);
 
 PALADIN_END
 
