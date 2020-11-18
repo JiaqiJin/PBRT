@@ -14,6 +14,7 @@
 #include <string>
 #include <stdlib.h>
 #include <memory>
+#include <vector>
 
 #ifdef __GNUC__
     //fix 'numeric_limits' is not a member of 'std' for linux
@@ -63,6 +64,16 @@ class Direction3;
 
 class Medium;
 
+class RGBSpectrum;
+
+class SampledSpectrum;
+
+#ifdef PALADIN_SAMPLED_SPECTRUM
+typedef SampledSpectrum Spectrum;
+#else
+typedef RGBSpectrum Spectrum;
+#endif
+
 class Ray;
 
 class Transform;
@@ -93,6 +104,11 @@ class BlockedArray;
 class EFloat;
 
 class Shape;
+
+class Material;
+
+template <typename T>
+class Texture;
 
 PALADIN_END
 
@@ -197,6 +213,23 @@ inline CONSTEXPR bool isPowerOf2(T v) {
 }
 
 #include "../math/mathutil.h"
+
+template <typename Predicate>
+int findInterval(int size, const Predicate& pred) {
+    int first = 0, len = size;
+    while (len > 0) {
+        int half = len >> 1, middle = first + half;
+        // Bisect range based on value of _pred_ at _middle_
+        if (pred(middle)) {
+            first = middle + 1;
+            len -= half + 1;
+        }
+        else
+            len = half;
+    }
+    return paladin::clamp(first - 1, 0, size - 2);
+}
+
 #include "../math/vector.h"
 #include "../math/point.h"
 #include "../math/ray.h"

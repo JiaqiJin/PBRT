@@ -87,6 +87,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>E:\VisualStudio\PBRTStudy\Paladin\Paladin\core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -113,6 +114,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>E:\VisualStudio\PBRTStudy\Paladin\Paladin\core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -149,6 +151,7 @@
     <ClCompile Include="core\material.cpp" />
     <ClCompile Include="core\medium.cpp" />
     <ClCompile Include="core\paladin.cpp" />
+    <ClCompile Include="core\primitive.cpp" />
     <ClCompile Include="core\sampler.cpp" />
     <ClCompile Include="core\sampling.cpp" />
     <ClCompile Include="core\scene.cpp" />
@@ -190,12 +193,14 @@
     <ClInclude Include="core\material.hpp" />
     <ClInclude Include="core\medium.hpp" />
     <ClInclude Include="core\paladin.hpp" />
+    <ClInclude Include="core\primitive.hpp" />
     <ClInclude Include="core\sampler.hpp" />
     <ClInclude Include="core\sampling.hpp" />
     <ClInclude Include="core\scene.hpp" />
     <ClInclude Include="core\shape.hpp" />
     <ClInclude Include="core\spectrum.hpp" />
     <ClInclude Include="core\texture.hpp" />
+    <ClInclude Include="ext\tinyobj\tiny_obj_loader.h" />
     <ClInclude Include="filters\box.hpp" />
     <ClInclude Include="filters\sinc.hpp" />
     <ClInclude Include="integrators\path.hpp" />
@@ -225,6 +230,7 @@
     <ClInclude Include="tools\macro.h" />
     <ClInclude Include="tools\macro_config.h" />
     <ClInclude Include="tools\memory.hpp" />
+    <ClInclude Include="tools\model.h" />
     <ClInclude Include="tools\stringprint.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
