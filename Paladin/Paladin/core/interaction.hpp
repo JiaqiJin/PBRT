@@ -103,7 +103,9 @@ struct Interaction {
     MediumInterface mediumInterface;
 };
 
-
+/*
+表面上特定"点"(point)的几何形状由SurfaceInteraction表示
+*/
 class SurfaceInteraction : public Interaction {
     // 用于着色的参数结构
     struct Shading {

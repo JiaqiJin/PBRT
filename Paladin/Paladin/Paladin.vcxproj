@@ -167,6 +167,8 @@
     <ClCompile Include="math\transform.cpp" />
     <ClCompile Include="samplers\random.cpp" />
     <ClCompile Include="shapes\cone.cpp" />
+    <ClCompile Include="shapes\cube.cpp" />
+    <ClCompile Include="shapes\curve.cpp" />
     <ClCompile Include="shapes\cylinder.cpp" />
     <ClCompile Include="shapes\disk.cpp" />
     <ClCompile Include="shapes\sphere.cpp" />
@@ -211,6 +213,8 @@
     <ClInclude Include="math\vector.h" />
     <ClInclude Include="samplers\random.hpp" />
     <ClInclude Include="shapes\cone.hpp" />
+    <ClInclude Include="shapes\cube.hpp" />
+    <ClInclude Include="shapes\curve.hpp" />
     <ClInclude Include="shapes\cylinder.hpp" />
     <ClInclude Include="shapes\disk.hpp" />
     <ClInclude Include="shapes\sphere.hpp" />

@@ -19,16 +19,17 @@ public:
     virtual ~Shape();
 
     // 返回在对象坐标系中的包围盒
-    virtual Bounds3f objectBound() const = 0;
+    virtual AABB3f objectBound() const = 0;
 
     // 返回在世界坐标系中的包围盒
-    virtual Bounds3f worldBound() const;
+    virtual AABB3f worldBound() const;
 
     // 初始化函数，每个子类构造时都要调用
     // 目前用于计算表面积
     virtual void init() = 0;
 
     // 求交函数，填充SurfaceInteraction数据
+    // 几乎所有的shape与ray求交的计算都是将ray转换到object空间中进行的
     virtual bool intersect(const Ray& ray,
         Float* tHit,
         SurfaceInteraction* isect,

@@ -1,38 +1,7 @@
-//
-//  sphere.cpp
-//  Paladin
-//
-//  Created by SATAN_Z on 2019/6/30.
-//  Copyright © 2019 Zero. All rights reserved.
-//
-
 #include "sphere.hpp"
 #include "../core/sampling.hpp"
 
 PALADIN_BEGIN
-
-void Sphere::init() {
-    _invArea = 1.f / area();
-}
-
-/*
- 可以把球体当做一个180°的圆弧以z轴旋转360°得到的一个回转体
- 球体的一部分则可以当做一个圆弧以z轴旋转φ
- 由高等数学知识可得，回转体的表面积为
- area = φ * ∫[zMin, zMax]f(z) * sqrt(1 + (f'(z))^2)dz
- f(z) = sqrt(r^2 - z^2)
- f'(z) = -(z / sqrt(r^2 - z^2))
- 积分可得 area = φ * r * (zMax - zMin)
- */
-Float Sphere::area() const {
-    return _phiMax * _radius * (_zMax - _zMin);
-}
-
-Bounds3f Sphere::objectBound() const {
-    return Bounds3f(Point3f(-_radius, -_radius, _zMin),
-        Point3f(_radius, _radius, _zMax));
-}
-
 
 bool Sphere::intersect(const Ray& r, Float* tHit, SurfaceInteraction* isect, bool testAlphaTexture) const {
     Float phi;
@@ -74,7 +43,7 @@ bool Sphere::intersect(const Ray& r, Float* tHit, SurfaceInteraction* isect, boo
         pHit.x = 1e-5f * _radius;
     }
 
-    phi = std::atan2(pHit.x, pHit.y);
+    phi = std::atan2(pHit.y, pHit.x);
     if (phi < 0) {
         phi += 2 * Pi;
     }
@@ -102,7 +71,7 @@ bool Sphere::intersect(const Ray& r, Float* tHit, SurfaceInteraction* isect, boo
             pHit.x = 1e-5f * _radius;
         }
 
-        phi = std::atan2(pHit.x, pHit.y);
+        phi = std::atan2(pHit.y, pHit.x);
         if (phi < 0) {
             phi += 2 * Pi;
         }
@@ -155,6 +124,7 @@ bool Sphere::intersect(const Ray& r, Float* tHit, SurfaceInteraction* isect, boo
     Normal3f dndv = Normal3f((g * F - f * G) * invEGF2 * dpdu +
         (f * F - g * E) * invEGF2 * dpdv);
 
+    // sampleA函数中有gamma(5)的推导过程
     Vector3f pError = gamma(5) * abs(Vector3f(pHit));
 
     *isect = objectToWorld->exec(SurfaceInteraction(pHit, pError, Point2f(u, v),
@@ -206,7 +176,7 @@ bool Sphere::intersectP(const Ray& r, bool testAlphaTexture) const {
         pHit.x = 1e-5f * _radius;
     }
 
-    phi = std::atan2(pHit.x, pHit.y);
+    phi = std::atan2(pHit.y, pHit.x);
     if (phi < 0) {
         phi += 2 * Pi;
     }
@@ -234,7 +204,7 @@ bool Sphere::intersectP(const Ray& r, bool testAlphaTexture) const {
             pHit.x = 1e-5f * _radius;
         }
 
-        phi = std::atan2(pHit.x, pHit.y);
+        phi = std::atan2(pHit.y, pHit.x);
         if (phi < 0) {
             phi += 2 * Pi;
         }
@@ -265,7 +235,12 @@ Interaction Sphere::sampleA(const Point2f& u, Float* pdf) const {
      x' = x * (r / sqrt(x^2 + y^2 + z^2))
      x' = x ⊗ r ⊘ sqrt((x ⊗ x) ⊕ (y ⊗ y) ⊕ (z ⊗ z))
      ∈ xr(1± ε)^2 / sqrt(x^2*(1 ± ε)^3 + y^2*(1 ± ε)^3 + z^2*(1 ± ε)^2)(1 ± ε)
-     ∈ xr(1± γ2) / sqrt(x^2*(1 ± γ3) + y^2*(1 ± γ3) + z^2*(1 ± γ2))(1 ± γ)
+     ∈ xr(1± γ2) / sqrt(x^2*(1 ± γ3) + y^2*(1 ± γ3) + z^2*(1 ± γ2))(1 ± γ1)
+     个人理解，这里是扩大范围保守估计γ3变成了γ4，开方之后得γ2
+     ∈ xr(1± γ2) / sqrt((x^2 + y^2 + z^2)*(1 ± γ4))(1 ± γ1)
+     开方之后得γ2
+     ∈ xr(1± γ2) / sqrt((x^2 + y^2 + z^2))(1 ± γ2)(1 ± γ1)
+     保守估计，两个下标相加得5
      ∈ (xr / sqrt(x2 + y2 + z2)) * (1 ± γ5)
      y与z同理
     */
