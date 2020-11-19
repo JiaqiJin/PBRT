@@ -103,9 +103,18 @@ struct Interaction {
     MediumInterface mediumInterface;
 };
 
-/*
-表面上特定"点"(point)的几何形状由SurfaceInteraction表示
-*/
+class MediumInteraction : public Interaction {
+public:
+    // MediumInteraction Public Methods
+    MediumInteraction() : phase(nullptr) {}
+    MediumInteraction(const Point3f& p, const Vector3f& wo, Float time,
+        const Medium* medium, const PhaseFunction* phase)
+        : Interaction(p, wo, time, medium), phase(phase) {}
+    bool isValid() const { return phase != nullptr; }
+
+    const PhaseFunction* phase;
+};
+
 class SurfaceInteraction : public Interaction {
     // 用于着色的参数结构
     struct Shading {
