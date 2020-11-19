@@ -118,7 +118,7 @@ private:
     };
 
     friend class Transform;
-    friend class Quaternion;
+    friend struct Quaternion;
     friend class AnimatedTransform;
 };
 

@@ -1,4 +1,4 @@
-//
+﻿//
 //  bvh.hpp
 //  Paladin
 #ifndef bvh_hpp
