@@ -14,7 +14,7 @@ public:
     virtual ~Primitive() {
 
     }
-    virtual AABB3f worldBound() const = 0;
+    virtual AABB3f worldBound() const = 0; 
     virtual bool intersect(const Ray& r, SurfaceInteraction*) const = 0;
     virtual bool intersectP(const Ray& r) const = 0;
     virtual const AreaLight* getAreaLight() const = 0;
@@ -51,9 +51,12 @@ private:
     MediumInterface _mediumInterface;
 };
 
-// 用于多个完全相同的实例，只保存一个实例对象在内存中，其他的不同通过transform来区分，节省内存空间
+// 用于多个完全相同的实例，只保存一个"实例对象"在内存中，其他的不同通过transform来区分，节省内存空间
+// reduce the memory requirements for scenes that contain many instances of the same geometry at different locations 
+// reuses transformed copies of a single collection of geometry at multiple positions in a scene.
 class TransformedPrimitive : public Primitive {
 public:
+   
     TransformedPrimitive(std::shared_ptr<Primitive>& primitive,
         const AnimatedTransform& PrimitiveToWorld);
 
