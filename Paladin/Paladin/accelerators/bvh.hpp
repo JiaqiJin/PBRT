@@ -1,17 +1,12 @@
-﻿//
-//  bvh.hpp
-//  Paladin
-#ifndef bvh_hpp
+﻿#ifndef bvh_hpp
 #define bvh_hpp
 
 #include "header.h"
 #include "primitive.hpp"
-
 PALADIN_BEGIN
 
-//代表一个图元的部分信息 primitive info
-struct BVHPrimitiveInfo 
-{
+//代表一个图元的部分信息
+struct BVHPrimitiveInfo {
     BVHPrimitiveInfo() {}
     BVHPrimitiveInfo(size_t primitiveNumber, const AABB3f& bounds)
         : primitiveNumber(primitiveNumber),
@@ -22,16 +17,17 @@ struct BVHPrimitiveInfo
     Point3f centroid;
 };
 
-//bvh可以理解为一个二叉树
-struct BVHBuildNode
-{
-    void InitLeaf(int first, int n, const AABB3f& b) {
+// bvh可以理解为一个二叉树
+// 这是构建二叉树时的节点对象
+// 构建完毕之后会转成连续内存的储存方式
+struct BVHBuildNode {
+    void initLeaf(int first, int n, const AABB3f& b) {
         firstPrimOffset = first;
         nPrimitives = n;
         bounds = b;
         children[0] = children[1] = nullptr;
     }
-    void InitInterior(int axis, BVHBuildNode* c0, BVHBuildNode* c1) {
+    void initInterior(int axis, BVHBuildNode* c0, BVHBuildNode* c1) {
         children[0] = c0;
         children[1] = c1;
         bounds = unionSet(c0->bounds, c1->bounds);
@@ -49,13 +45,30 @@ struct BVHBuildNode
     int nPrimitives;
 };
 
+// 莫顿码片元
 struct MortonPrimitive {
     int primitiveIndex;
     uint32_t mortonCode;
 };
 
+// 用于lbvh
+struct LBVHTreelet {
+    int startIndex, nPrimitives;
+    BVHBuildNode* buildNodes;
+};
 
-//在内存中的一个线性BVH节点
+/*
+ 在内存中的一个线性BVH节点
+ 布局如下
+     A
+    / \
+   B   C
+  / \
+ D   E
+
+ 线性顺序为 A B D E C
+ 一个节点的第一个子节点紧接在该节点的后面
+ */
 struct LinearBVHNode {
     AABB3f bounds;
     union {
@@ -67,21 +80,22 @@ struct LinearBVHNode {
     uint8_t pad[1];        // 确保32个字节为一个对象，提高缓存命中率
 };
 
+
 /*
- 根据对象划分 object subdivision
+ 根据对象划分
  */
-class BVHAccel : public Aggregate 
-{
-public:
-    enum class SplitMethod { SAH, HLBVH, Middle, EqualCounts };
+class BVHAccel : public Aggregate {
+
+    enum SplitMethod { SAH, HLBVH, Middle, EqualCounts };
 
     BVHAccel(std::vector<std::shared_ptr<Primitive>> p,
         int maxPrimsInNode = 1,
         SplitMethod splitMethod = SplitMethod::SAH);
 
-    ~BVHAccel();
-
     virtual AABB3f worldBound() const;
+
+    virtual ~BVHAccel();
+
     virtual bool intersect(const Ray& ray, SurfaceInteraction* isect) const;
     virtual bool intersectP(const Ray& ray) const;
 
