@@ -84,14 +84,28 @@ BVHAccel::~BVHAccel() {
 
 }
 
+/*
+ 基本思路
+ 根据根据光线的方向以及当前节点的分割轴
+ 选择较近的一个子节点求交，远的子节点放入栈中
+ 近的子节点如果与光线没有交点，则对栈中的节点求交
+ 循环以上过程
+*/
 bool BVHAccel::intersectP(const paladin::Ray& ray) const {
     if (!_nodes) {
         return false;
     }
     Vector3f invDir(1.f / ray.dir.x, 1.f / ray.dir.y, 1.f / ray.dir.z);
     int dirIsNeg[3] = { invDir.x < 0, invDir.y < 0, invDir.z < 0 };
+
+    // 即将访问的节点，栈结构
     int nodesToVisit[64];
-    int toVisitOffset = 0, currentNodeIndex = 0;
+
+    // 即将要访问到的节点
+    int toVisitOffset = 0;
+
+    // 储存在包围盒在_node数组中节点的位置 
+    int currentNodeIndex = 0;
 
     // 从根节点开始遍历
     while (true) {
@@ -109,23 +123,29 @@ bool BVHAccel::intersectP(const paladin::Ray& ray) const {
                 if (toVisitOffset == 0) {
                     break;
                 }
+
+                // 取出栈中的节点求交
                 currentNodeIndex = nodesToVisit[--toVisitOffset];
             }
             else {
                 // 内部节点
                 if (dirIsNeg[node->axis]) {
-                    // 如果ray的方向为负，则先判断右子树
+                    // 如果ray的方向为负，则先判断右子树，把左子树压入栈中
+                    // 下次循环时直接判断与右子树是否有相交，如果没有相交
+                    // 则访问栈中的节点求交
                     nodesToVisit[toVisitOffset++] = currentNodeIndex + 1;
                     currentNodeIndex = node->secondChildOffset;
                 }
                 else {
-                    // 如果ray的方向为正，则先判断左子树
+                    // 如果ray的方向为正，则先判断左子树，把右子树压入栈中
                     nodesToVisit[toVisitOffset++] = node->secondChildOffset;
                     currentNodeIndex = currentNodeIndex + 1;
                 }
             }
         }
         else {
+
+            //如果没有相交 则访问栈中的节点求交
             if (toVisitOffset == 0) {
                 break;
             }

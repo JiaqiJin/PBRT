@@ -145,6 +145,7 @@
     <ClCompile Include="cameras\perspective.cpp" />
     <ClCompile Include="core\bxdf.cpp" />
     <ClCompile Include="core\camera.cpp" />
+    <ClCompile Include="core\film.cpp" />
     <ClCompile Include="core\integrator.cpp" />
     <ClCompile Include="core\interaction.cpp" />
     <ClCompile Include="core\light.cpp" />
@@ -186,6 +187,7 @@
     <ClInclude Include="cameras\perspective.hpp" />
     <ClInclude Include="core\bxdf.hpp" />
     <ClInclude Include="core\camera.hpp" />
+    <ClInclude Include="core\film.hpp" />
     <ClInclude Include="core\header.h" />
     <ClInclude Include="core\integrator.hpp" />
     <ClInclude Include="core\interaction.hpp" />
