@@ -2,6 +2,22 @@
 
 PALADIN_BEGIN
 
+// Camera Method Definitions
+Camera::~Camera() { delete film; }
+
+Camera::Camera(const AnimatedTransform& CameraToWorld, Float shutterOpen,
+    Float shutterClose, Film* film, const Medium* medium)
+    : cameraToWorld(CameraToWorld),
+    shutterOpen(shutterOpen),
+    shutterClose(shutterClose),
+    film(film),
+    medium(medium) {
+    if (cameraToWorld.hasScale()) {
+
+    }
+
+}
+
 /*
 Compute the main ray, and also computes the corresponding rays for pixes
  shifted in "x" and "y" direction on the film plane.

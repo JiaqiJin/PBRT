@@ -23,9 +23,7 @@ public:
 		VisibilityTester* vis) const;
 
 
-
-
-	AnimatedTransform CameraToWorld;
+	AnimatedTransform cameraToWorld;
 	const Float shutterOpen, shutterClose;
 	Film* film;
 	//Scattering medium.
