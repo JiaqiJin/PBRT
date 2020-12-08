@@ -3,10 +3,15 @@
 PALADIN_BEGIN
 
 Film::Film(const Point2i& resolution, const AABB2f& cropWindow,
-    std::unique_ptr<Filter> filt, Float diagonal,
-    const std::string& filename, Float scale)
-    :fullResolution(resolution), diagonal(diagonal * .001),
-    filter(std::move(filt)), filename(filename), scale(scale)
+    std::unique_ptr<Filter> filter, Float diagonal,
+    const std::string& filename, Float scale,
+    Float maxSampleLuminance) :
+    fullResolution(resolution),
+    diagonal(diagonal * .001),
+    filter(std::move(filter)),
+    filename(filename),
+    _scale(scale),
+    _maxSampleLuminance(maxSampleLuminance)
 {
     // upper-left to lower right corner of crowp window pixels bounds
     croppedPixelBounds =
@@ -15,7 +20,7 @@ Film::Film(const Point2i& resolution, const AABB2f& cropWindow,
             Point2i(std::ceil(fullResolution.x * cropWindow.pMax.x),
                 std::ceil(fullResolution.y * cropWindow.pMax.y)));
 
-    pixels = std::unique_ptr<Pixel[]>(new Pixel[croppedPixelBounds.Area()]);
+    _pixels = std::unique_ptr<Pixel[]>(new Pixel[croppedPixelBounds.Area()]);
     //f(x,y) = f(|x|,||y) hold value for positives quadrant of filter offset
     int offset = 0;
     for (int y = 0; y < filterTableWidth; ++y) {

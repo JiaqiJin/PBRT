@@ -293,5 +293,8 @@
     <ClInclude Include="core\film.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="core\filter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

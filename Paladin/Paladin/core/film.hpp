@@ -1,9 +1,10 @@
-#ifndef film_hpp
+﻿#ifndef film_hpp
 #define film_hpp
 
 #include "header.h"
 #include "spectrum.hpp"
 #include "filter.h"
+#include "../parallel/parallel.hpp"
 
 PALADIN_BEGIN
 
@@ -16,11 +17,24 @@ class Film
 {
 public:
     Film(const Point2i& resolution, const AABB2f& cropWindow,
-        std::unique_ptr<Filter> filt, Float diagonal,
-        const std::string& filename, Float scale);
+        std::unique_ptr<Filter> filter, Float diagonal,
+        const std::string& filename, Float scale,
+        Float maxSampleLuminance = Infinity);
 
     AABB2i GetSampleBounds() const;
     AABB2f GetPhysicalExtent() const;
+
+    std::unique_ptr<FilmTile> getFilmTile(const AABB2i& sampleBounds);
+
+    void mergeFilmTile(std::unique_ptr<FilmTile> tile);
+
+    void setImage(const Spectrum* img) const;
+
+    void addSplat(const Point2f& p, Spectrum v);
+
+    void writeImage(Float splatScale = 1);
+
+    void clear();
 
     const Point2f fullResolution;
     const Float diagonal;
@@ -29,22 +43,35 @@ public:
     AABB2i croppedPixelBounds;
 
 private:
-    
-    struct Pixel
-    {
-        Float xyz[3] = { 0,0,0 };
-        Float filterWeightSum = 0; // sample contribution to the pixels
-        //AtomicFloat splatXYZ[3];
-        Float pad; // 32 bytes
+    // 像素数据
+    struct Pixel {
+        Pixel() { xyz[0] = xyz[1] = xyz[2] = filterWeightSum = 0; }
+        Float xyz[3];
+        Float filterWeightSum;
+        AtomicFloat splatXYZ[3];
+        Float pad; // 占位，凑够32字节
     };
-    std::unique_ptr<Pixel[]> pixels;
+
+    std::unique_ptr<Pixel[]> _pixels;
     static constexpr int filterTableWidth = 16;
     //Film class precalculate a table of filter values(16 o more pixels per image samples)
     Float filterTable[filterTableWidth * filterTableWidth];
-    const Float scale;
+    const Float _scale;
+    const Float _maxSampleLuminance;
+    std::mutex _mutex; // 64字节
+
+    Pixel& getPixel(const Point2i& p)
+    {
+        DCHECK(insideExclusive(p, croppedPixelBounds));
+        int width = croppedPixelBounds.pMax.x - croppedPixelBounds.pMin.x;
+        int offset = (p.x - croppedPixelBounds.pMin.x) + (p.y - croppedPixelBounds.pMin.y) * width;
+        return _pixels[offset];
+    }
 };
 
-
+/*
+ 把整个胶片分为若干个块
+*/
 class FilmTile
 {
 public:
@@ -116,6 +143,7 @@ public:
     }
 
 private:
+    // 像素的范围
     const AABB2i _pixelBounds;
 
     const Vector2f _filterRadius, _invFilterRadius;

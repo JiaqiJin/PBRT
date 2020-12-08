@@ -188,6 +188,7 @@
     <ClInclude Include="core\bxdf.hpp" />
     <ClInclude Include="core\camera.hpp" />
     <ClInclude Include="core\film.hpp" />
+    <ClInclude Include="core\filter.h" />
     <ClInclude Include="core\header.h" />
     <ClInclude Include="core\integrator.hpp" />
     <ClInclude Include="core\interaction.hpp" />
