@@ -135,6 +135,9 @@
     <ClCompile Include="core\film.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="parallel\parallel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="accelerators\bvh.hpp">
@@ -294,6 +297,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="core\filter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="parallel\parallel.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
