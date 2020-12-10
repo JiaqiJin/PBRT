@@ -83,7 +83,7 @@ public:
 		_cameraToScreen(cameraToScreen)
 	{
 		_lensRadius = lensr;
-		_focusDistance = focald;
+		_focalDistance = focald;
 
 		// 屏幕空间(0,0)为胶片平面矩形的中点
 		_screenToRaster = Transform::scale(film->fullResolution.x, film->fullResolution.y, 1)
@@ -100,8 +100,7 @@ protected:
 	// 透镜半径
 	Float _lensRadius;
 	// 焦距
-	Float _focusDistance;
-
+	Float _focalDistance;
 };
 
 

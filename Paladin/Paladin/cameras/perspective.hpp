@@ -1,4 +1,4 @@
-//
+﻿//
 //  perspective.hpp
 //  Paladin
 //
@@ -30,8 +30,14 @@ public:
     virtual Spectrum sampleWi(const Interaction& ref, const Point2f& sample,
         Vector3f* wi, Float* pdf, Point2f* pRaster,
         VisibilityTester* vis) const;
-private:
 
+private:
+    // 向x轴移动一个像素，对应相机空间的变化率
+    Vector3f _dxCamera;
+    // 向y轴移动一个像素，对应相机空间的变化率
+    Vector3f _dyCamera;
+    // z=1的情况下的film的面积
+    Float _area;
 };
 
 PALADIN_END
