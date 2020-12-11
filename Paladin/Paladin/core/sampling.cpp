@@ -1,4 +1,4 @@
-#include "sampling.hpp"
+﻿#include "sampling.hpp"
 
 PALADIN_BEGIN
 
@@ -39,6 +39,35 @@ Point2f uniformSampleDisk(const Point2f& u) {
     Float r = std::sqrt(u[0]);
     Float theta = _2Pi * u[1];
     return Point2f(r * std::cos(theta), r * std::sin(theta));
+}
+
+Point2f concentricSampleDisk(const Point2f& u)
+{
+    // 把[0,1]映射到[-1,1]
+    Point2f uOffset = 2.f * u - Vector2f(1, 1);
+
+    // 退化到原点的情况
+    if (uOffset.x == 0 && uOffset.y == 0) {
+        return Point2f(0, 0);
+    }
+
+    /*
+     r = x
+    θ = y/x * π/4
+    */
+    Float theta, r;
+
+    if (std::abs(uOffset.x) > std::abs(uOffset.y)) {
+        // 如果x偏移量比y偏移量大
+        r = uOffset.x;
+        theta = PiOver4 * (uOffset.y / uOffset.x);
+    }
+    else {
+        // 如果y偏移量比x偏移量大
+        r = uOffset.y;
+        theta = PiOver2 - PiOver4 * (uOffset.x / uOffset.y);
+    }
+    return r * Point2f(std::cos(theta), std::sin(theta));
 }
 
 Point2f uniformSampleSector(const Point2f& u, Float thetaMax) {

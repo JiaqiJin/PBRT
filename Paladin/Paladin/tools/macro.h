@@ -1,7 +1,7 @@
 #ifndef macro_hpp
 #define macro_hpp
 
-#include "../core/header.h"
+#include "header.h"
 
 #define CONSTEXPR constexpr
 
@@ -12,6 +12,7 @@
 #else
 #define COUT std::cout
 #endif
+
 
 #define TINYOBJLOADER_IMPLEMENTATION
 
@@ -40,6 +41,10 @@ typedef float Float;
 
 #define PALADIN_HAVE_CONSTEXPR
 
+#define PALADIN_NO_INLINE __attribute__((noinline))
+
+#define PALADIN_INLINE __attribute__((always_inline))
+
 #if defined(_MSC_VER)
 #define PALADIN_HAVE_ALIGNED_MALLOC
 #endif
@@ -51,6 +56,8 @@ typedef float Float;
 #ifndef PALADIN_HAVE_ALIGNOF
 #define PALADIN_HAVE_ALIGNOF 16
 #endif
+
+#define PALADIN_HAVE_HEX_FP_CONSTANTS
 
 #ifndef PALADIN_HAVE_HEX_FP_CONSTANTS
 static const double DoubleOneMinusEpsilon = 0.99999999999999989;
@@ -83,6 +90,3 @@ static CONSTEXPR Float Sqrt2 = 1.41421356237309504880;
 
 
 #endif /* macro_h */
-
-
-

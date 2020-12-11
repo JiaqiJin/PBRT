@@ -13,84 +13,27 @@ struct FilmTilePixel {
     Float filterWeightSum = 0.f;
 };
 
-class Film
-{
-public:
-    Film(const Point2i& resolution, const AABB2f& cropWindow,
-        std::unique_ptr<Filter> filter, Float diagonal,
-        const std::string& filename, Float scale,
-        Float maxSampleLuminance = Infinity);
-
-    AABB2i GetSampleBounds() const;
-    AABB2f GetPhysicalExtent() const;
-
-    std::unique_ptr<FilmTile> getFilmTile(const AABB2i& sampleBounds);
-
-    void mergeFilmTile(std::unique_ptr<FilmTile> tile);
-
-    void setImage(const Spectrum* img) const;
-
-    void addSplat(const Point2f& p, Spectrum v);
-
-    void writeImage(Float splatScale = 1);
-
-    void clear();
-
-    const Point2f fullResolution;
-    const Float diagonal;
-    std::unique_ptr<Filter> filter;
-    const std::string filename;
-    AABB2i croppedPixelBounds;
-
-private:
-    // 像素数据
-    struct Pixel {
-        Pixel() { xyz[0] = xyz[1] = xyz[2] = filterWeightSum = 0; }
-        Float xyz[3];
-        Float filterWeightSum;
-        AtomicFloat splatXYZ[3];
-        Float pad; // 占位，凑够32字节
-    };
-
-    std::unique_ptr<Pixel[]> _pixels;
-    static constexpr int filterTableWidth = 16;
-    //Film class precalculate a table of filter values(16 o more pixels per image samples)
-    Float filterTable[filterTableWidth * filterTableWidth];
-    const Float _scale;
-    const Float _maxSampleLuminance;
-    std::mutex _mutex; // 64字节
-
-    Pixel& getPixel(const Point2i& p)
-    {
-        DCHECK(insideExclusive(p, croppedPixelBounds));
-        int width = croppedPixelBounds.pMax.x - croppedPixelBounds.pMin.x;
-        int offset = (p.x - croppedPixelBounds.pMin.x) + (p.y - croppedPixelBounds.pMin.y) * width;
-        return _pixels[offset];
-    }
-};
-
 /*
  把整个胶片分为若干个块
-*/
-class FilmTile
-{
+ */
+class FilmTile {
 public:
 
     FilmTile(const AABB2i& pixelBounds, const Vector2f& filterRadius,
         const Float* filterTable, int filterTableSize,
-        Float maxSampleLuminance):
-        _pixelBounds(pixelBounds),
+        Float maxSampleLuminance)
+        : _pixelBounds(pixelBounds),
         _filterRadius(filterRadius),
         _invFilterRadius(1 / filterRadius.x, 1 / filterRadius.y),
         _filterTable(filterTable),
         _filterTableSize(filterTableSize),
-        _maxSampleLuminance(maxSampleLuminance)
-    {
+        _maxSampleLuminance(maxSampleLuminance) {
         _pixels = std::vector<FilmTilePixel>(std::max(0, _pixelBounds.Area()));
     }
-    //TODO equation
-    void AddSample(const Point2f& pFilm, Spectrum L,
+
+    void addSample(const Point2f& pFilm, Spectrum L,
         Float sampleWeight = 1.) {
+
         if (L.y() > _maxSampleLuminance) {
             L *= _maxSampleLuminance / L.y();
         }
@@ -158,6 +101,83 @@ private:
 
     friend class Film;
 };
+
+class Film {
+public:
+
+    Film(const Point2i& resolution, const AABB2f& cropWindow,
+        std::unique_ptr<Filter> filter, Float diagonal,
+        const std::string& filename, Float scale,
+        Float maxSampleLuminance = Infinity);
+
+    AABB2i getSampleBounds() const;
+
+    AABB2f getPhysicalExtent() const;
+
+    std::unique_ptr<FilmTile> getFilmTile(const AABB2i& sampleBounds);
+
+    void mergeFilmTile(std::unique_ptr<FilmTile> tile);
+
+    void setImage(const Spectrum* img) const;
+
+    void addSplat(const Point2f& p, Spectrum v);
+
+    void writeImage(Float splatScale = 1);
+
+    void clear();
+
+    // 图片分辨率，原点在左上角
+    const Point2i fullResolution;
+
+    // 对角线长度，单位为米
+    const Float diagonal;
+
+    // 过滤器
+    std::unique_ptr<Filter> filter;
+
+    // 文件名
+    const std::string filename;
+
+    // 需要渲染的子区域
+    AABB2i croppedPixelBounds;
+
+private:
+    // 像素数据
+    struct Pixel {
+        Pixel() {
+            xyz[0] = xyz[1] = xyz[2] = filterWeightSum = 0;
+        }
+        // xyz颜色空间，与设备无关
+        Float xyz[3];
+        // 所有样本的filter权重之和
+        Float filterWeightSum;
+        // 保存（未加权）样本splats总和
+        AtomicFloat splatXYZ[3];
+        // 占位，凑够32字节,为了避免一个对象横跨两个cache line，从而提高缓存命中率
+        Float pad;
+    };
+
+    // 像素列表
+    std::unique_ptr<Pixel[]> _pixels;
+
+    static CONSTEXPR int _filterTableWidth = 16;
+
+    Float filterTable[_filterTableWidth * _filterTableWidth];
+
+    std::mutex _mutex; // 64字节
+
+    const Float _scale;
+
+    const Float _maxSampleLuminance;
+
+    Pixel& getPixel(const Point2i& p) {
+        DCHECK(insideExclusive(p, croppedPixelBounds));
+        int width = croppedPixelBounds.pMax.x - croppedPixelBounds.pMin.x;
+        int offset = (p.x - croppedPixelBounds.pMin.x) + (p.y - croppedPixelBounds.pMin.y) * width;
+        return _pixels[offset];
+    }
+};
+
 
 PALADIN_END
 
