@@ -41,9 +41,9 @@ typedef float Float;
 
 #define PALADIN_HAVE_CONSTEXPR
 
-#define PALADIN_NO_INLINE __attribute__((noinline))
+#define PALADIN_NO_INLINE __declspec(noinline)
 
-#define PALADIN_INLINE __attribute__((always_inline))
+#define PALADIN_INLINE __declspec(__forceinline)//__inline 
 
 #if defined(_MSC_VER)
 #define PALADIN_HAVE_ALIGNED_MALLOC
