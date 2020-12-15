@@ -133,6 +133,71 @@ private:
     RNG rng;
 };
 
+/*
+ 全局采样器不是基于像素的，是针对整个图像空间进行采样
+ 如下例子，霍尔顿序列
+
+ 放置一些样本在2x3的像素中
+ global index       [0, 1)^2 sample coordinates     Pixel sample coordinates
+  0                 (0.000000, 0.000000)              (0.000000, 0.000000)
+  1                 (0.500000, 0.333333)              (1.000000, 1.000000)
+  2                 (0.250000, 0.666667)              (0.500000, 2.000000)
+  3                 (0.750000, 0.111111)              (1.500000, 0.333333)
+  4                 (0.125000, 0.444444)              (0.250000, 1.333333)
+  5                 (0.625000, 0.777778)              (1.250000, 2.333333)
+  6                 (0.375000, 0.222222)              (0.750000, 0.666667)
+  7                 (0.875000, 0.555556)              (1.750000, 1.666667)
+  8                 (0.062500, 0.888889)              (0.125000, 2.666667)
+  9                 (0.562500, 0.037037)              (1.125000, 0.111111)
+  10                (0.312500, 0.370370)              (0.625000, 1.111111)
+  11                (0.812500, 0.703704)              (1.625000, 2.111111)
+  12                (0.187500, 0.148148)              (0.375000, 0.444444)
+ */
+class GlobalSampler : public Sampler {
+
+public:
+    GlobalSampler(int64_t samplesPerPixel) : Sampler(samplesPerPixel) {}
+
+    virtual bool startNextSample();
+
+    virtual void startPixel(const Point2i& p);
+
+    virtual bool setSampleNumber(int64_t sampleNum);
+
+    virtual Float get1D();
+
+    virtual Point2f get2D();
+
+    /*
+    以上图表为例，如果当前像素为(0,2)，
+    则该函数返回该第一个出现在该像素上的样本索引
+    getIndexForSample(0)应该返回2
+    getIndexForSample(1)应该返回8
+    */
+    virtual int64_t getIndexForSample(int64_t sampleNum) const = 0;
+
+    /*
+     返回指定索引跟维度的样本值
+     是指像素内的偏移值，而不是初始的[0,1)^2空间的样本值
+     以上图表为例 sampleDimension(4,1)，返回0.3333333
+     先根据索引4找到(0.250000, 1.333333)，根据维度找出1.333333，然后算出偏移值0.3333333
+     */
+    virtual Float sampleDimension(int64_t index, int dimension) const = 0;
+
+private:
+    // 当前样本的维度
+    int _dimension;
+
+    // 当前样本的全局索引
+    int64_t _globalIndex;
+
+    // 样本数组开始的维度，前五个样本生成的是相机样本
+    static const int _arrayStartDim = 5;
+
+    // 样本数组结束的维度
+    int _arrayEndDim;
+};
+
 PALADIN_END
 
 #endif /* sampler_hpp */
