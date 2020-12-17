@@ -123,14 +123,14 @@ public:
     // 当预先申请的二维随机变量数组数据完全消耗之后使用该函数
     virtual Point2f get2D();
 
-private:
+protected:
     std::vector<std::vector<Float>> _samples1D;
     std::vector<std::vector<Point2f>> _samples2D;
     //当下像素采样的偏移的数组
     int _curDimension1D;
     int _curDimension2D;
 
-    RNG rng;
+    RNG _rng;
 };
 
 /*

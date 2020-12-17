@@ -2,6 +2,7 @@
 #define sampling_hpp
 
 #include "header.h"
+#include "../math/rng.h"
 
 /*
 P为累积分布函数(cdf)，p为概率密度函数(pdf)，cdf求导得到pdf
@@ -282,6 +283,25 @@ Point2f uniformSamplePartialSector(const Point2f& u, Float thetaMax, Float rMin)
  v = b * √a
  */
 Point2f uniformSampleTriangle(const Point2f& u);
+
+/*
+
+*/
+template<typename T>
+void Shuffle(T* samp, int count, int nDimensions, RNG& rng) {
+
+}
+
+/*
+一维分层采样
+其实就是给一维均匀分布添加了一个扰动
+*/
+void stratifiedSample1D(Float* samples, int nsamples, RNG& rng, bool jitter = true);
+
+/*
+ 二维分层采样
+*/
+void stratifiedSample2D(Point2f* samples, int nx, int ny, RNG& rng, bool jitter = true);
 
 PALADIN_END
 
