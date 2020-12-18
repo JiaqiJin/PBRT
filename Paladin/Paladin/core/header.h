@@ -15,6 +15,8 @@
 #include <stdlib.h>
 #include <memory>
 #include <vector>
+#include <atomic>
+#include <mutex>
 
 #ifdef __GNUC__
     //fix 'numeric_limits' is not a member of 'std' for linux
@@ -198,6 +200,11 @@ template <typename T>
 inline T Mod(T a, T b) {
     T result = a - (a / b) * b;
     return (T)((result < 0) ? result + b : result);
+}
+
+template <>
+inline Float Mod(Float a, Float b) {
+    return std::fmod(a, b);
 }
 
 inline Float gammaCorrect(Float value) {

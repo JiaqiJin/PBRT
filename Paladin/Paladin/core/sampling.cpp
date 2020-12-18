@@ -50,9 +50,9 @@ Point2f concentricSampleDisk(const Point2f& u) {
         return Point2f(0, 0);
     }
 
-    /*
-     r = x
-     θ = y/x * π/4
+    /**
+     * r = x
+     * θ = y/x * π/4
      */
     Float theta, r;
 
@@ -112,12 +112,15 @@ void stratifiedSample2D(Point2f* samp, int nx, int ny, RNG& rng, bool jitter) {
 
 void latinHypercube(Float* samples, int nSamples, int nDim, RNG& rng) {
     // nDim维向量，每个维度采样nSamples个样本
+    // 通常维度都是2，这段代码可以理解为在一个正方形的一条对角线上放置样本
     Float invNSamples = (Float)1 / nSamples;
-    for (int i = 0; i < nSamples; ++i)
+    for (int i = 0; i < nSamples; ++i) {
         for (int j = 0; j < nDim; ++j) {
             Float sj = (i + (rng.uniformFloat())) * invNSamples;
             samples[nDim * i + j] = std::min(sj, OneMinusEpsilon);
         }
+    }
+
     // 打乱每个维度样本顺序
     for (int i = 0; i < nDim; ++i) {
         for (int j = 0; j < nSamples; ++j) {

@@ -9,6 +9,8 @@ PALADIN_BEGIN
 
 /**
  * 霍尔顿采样器
+ * 继承GlobalSampler，针对整个图像空间进行采样
+ *
  * 在介绍霍尔顿采样器之前我们先介绍一下低差异序列
  *
  * 低差异序列可以生成更加均匀的样本，从而提高采样效率
@@ -49,43 +51,72 @@ PALADIN_BEGIN
  * 在样本矢量的较高维度中，样本值的投影开始呈现规则结构，太过于规则了，对于渲染效果来说不好
  *
  * 这可以通过添加一个轻微的扰动，解决这个问题
+ *
+ * halton序列理论知识已经理解，根据当前像素样本索引获取样本全局索引的方式还没搞懂todo
+ *
+ *
  */
-class HaltonSampler : public GlobalSampler {
-    // 渲染时会把图片分割为若干个块(tile)，每个tile使用一个采样器
-    // 所以构造函数会接收一个AABB参数
-    HaltonSampler(int nsamp, const AABB2i& sampleBounds, bool sampleAtCenter = false);
+    class HaltonSampler : public GlobalSampler {
 
-    virtual int64_t getIndexForSample(int64_t sampleNum) const;
+    public:
 
-    virtual Float sampleDimension(int64_t index, int dimension) const;
+        /**
+         * 渲染时会把图片分割为若干个块(tile)，每个tile使用一个采样器
+         * 所以构造函数会接收一个AABB参数
+         */
+        HaltonSampler(int spp, const AABB2i& sampleBounds, bool sampleAtCenter = false);
 
-    virtual std::unique_ptr<Sampler> clone(int seed);
+        virtual int64_t getIndexForSample(int64_t sampleNum) const;
 
-private:
+        virtual Float sampleDimension(int64_t index, int dimension) const;
 
-    static std::vector<uint16_t> _radicalInversePermutations;
+        virtual std::unique_ptr<Sampler> clone(int seed);
 
-    Point2i _baseScales, _baseExponents;
+    private:
 
-    int _sampleStride;
+        // 质数进制的随机重排表
+        static std::vector<uint16_t> _radicalInversePermutations;
 
-    int _multInverse[2];
+        // 在构造函数中有详细注释
+        Point2i _baseScales, _baseExponents;
 
-    mutable Point2i _pixelForOffset = Point2i(std::numeric_limits<int>::max(),
-        std::numeric_limits<int>::max());
+        // 暂时称为采样步长
+        // 步长的定义为假设当前像素第一个样本的全局索引为idx，那么第二个样本的全局索引
+        // 为idx + _sampleStride * 1，每次在该像素采样时，都是上一个样本的索引加上一个步长
+        // 相关信息在getIndexForSample函数的注释中详细说明
+        // _sampleStride = _baseScales[0] * _baseScales[1];
+        int _sampleStride;
 
-    mutable int64_t _offsetForCurrentPixel;
-    // Added after book publication: force all image samples to be at the
-    // center of the pixel area.
-    bool _sampleAtPixelCenter;
+        // 储存数论倒数
+        // 数论倒数的定义
+        // 如果两个数a和b，它们的乘积关于模m余1，那么我们称它们互为关于模m的数论倒数
+        // 2*3 mod 5 = 1，所以3是2关于5的数论倒数
+        int _multInverse[2];
 
-    // HaltonSampler Private Methods
-    const uint16_t* permutationForDimension(int dim) const {
-        if (dim >= PrimeTableSize)
-            COUT << StringPrintf("HaltonSampler can only sample %d "
-                "dimensions.", PrimeTableSize);
-        return &_radicalInversePermutations[PrimeSums[dim]];
-    }
+        // 用于储存当前采样的像素，这跟_currentPixel区别的一点
+        // 主要在于，每次切换像素的时候需要_offsetForCurrentPixel
+        // 之后就_sampleStride的步长进行采样，这个变量主要是为了记录之后计算了_offsetForCurrentPixel
+        mutable Point2i _pixelForOffset = Point2i(std::numeric_limits<int>::max(),
+            std::numeric_limits<int>::max());
+
+        // 用于储存第一个落在该像素上的样本点的全局样本索引
+        mutable int64_t _offsetForCurrentPixel;
+
+        // 是否强制采样像素中心，如果为true，
+        // 则生成的高维变量的前两个维度为0.5，采样像素中心
+        bool _sampleAtPixelCenter;
+
+        /**
+         * 返回对应维度重排之后的数组
+         * @param  dim 维度
+         * @return     [description]
+         */
+        const uint16_t* permutationForDimension(int dim) const {
+            if (dim >= PrimeTableSize)
+                COUT << StringPrintf("HaltonSampler can only sample %d "
+                    "dimensions.", PrimeTableSize);
+            return &_radicalInversePermutations[PrimeSums[dim]];
+        }
 };
 
 PALADIN_END

@@ -4,10 +4,12 @@
 PALADIN_BEGIN
 
 void StratifiedSampler::startPixel(const Point2i& p) {
-    // 为每个像素生成一系列单独的样本
+    // 为每个像素生成一系列单独的样本，然后乱序
     size_t count = _xPixelSamples * _xPixelSamples;
     for (size_t i = 0; i < _samples1D.size(); ++i) {
         stratifiedSample1D(&_samples1D[i][0], count, _rng, _jitterSamples);
+        // 下标i代表维度
+        // 重排的目的是为了避免不同维度之间对应同一个cell，形成artifact
         shuffle(&_samples1D[i][0], count, 1, _rng);
     }
     for (size_t i = 0; i < _samples2D.size(); ++i) {
@@ -15,16 +17,15 @@ void StratifiedSampler::startPixel(const Point2i& p) {
         shuffle(&_samples2D[i][0], count, 1, _rng);
     }
 
-    // 为每个像素生成一组样本
     for (size_t i = 0; i < _sampleArray1D.size(); ++i) {
-        for (size_t j = 0; samplesPerPixel; ++j) {
+        for (size_t j = 0; j < samplesPerPixel; ++j) {
             size_t count = _samples1DArraySizes[i];
             stratifiedSample1D(&_sampleArray1D[i][j * count], count, _rng, _jitterSamples);
             shuffle(&_sampleArray1D[i][j * count], count, 1, _rng);
         }
     }
     for (size_t i = 0; i < _sampleArray2D.size(); ++i) {
-        for (size_t j = 0; samplesPerPixel; ++j) {
+        for (size_t j = 0; j < samplesPerPixel; ++j) {
             size_t count = _samples2DArraySizes[i];
             latinHypercube(&_sampleArray2D[i][j * count].x, count, 2, _rng);
         }
