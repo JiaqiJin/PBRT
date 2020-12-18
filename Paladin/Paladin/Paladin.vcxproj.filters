@@ -93,9 +93,6 @@
     <ClCompile Include="math\transform.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="samplers\random.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="shapes\cone.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -139,6 +136,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="samplers\halton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="samplers\stratified.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="samplers\random.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -242,9 +245,6 @@
     <ClInclude Include="math\vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="samplers\random.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="shapes\cone.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -306,6 +306,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="samplers\halton.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="samplers\stratified.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="samplers\random.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

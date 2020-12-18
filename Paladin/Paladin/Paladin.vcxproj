@@ -172,6 +172,7 @@
     <ClCompile Include="parallel\parallel.cpp" />
     <ClCompile Include="samplers\halton.cpp" />
     <ClCompile Include="samplers\random.cpp" />
+    <ClCompile Include="samplers\stratified.cpp" />
     <ClCompile Include="shapes\cone.cpp" />
     <ClCompile Include="shapes\cube.cpp" />
     <ClCompile Include="shapes\curve.cpp" />
@@ -224,6 +225,7 @@
     <ClInclude Include="parallel\parallel.hpp" />
     <ClInclude Include="samplers\halton.hpp" />
     <ClInclude Include="samplers\random.hpp" />
+    <ClInclude Include="samplers\stratified.hpp" />
     <ClInclude Include="shapes\cone.hpp" />
     <ClInclude Include="shapes\cube.hpp" />
     <ClInclude Include="shapes\curve.hpp" />

@@ -41,8 +41,7 @@ Point2f uniformSampleDisk(const Point2f& u) {
     return Point2f(r * std::cos(theta), r * std::sin(theta));
 }
 
-Point2f concentricSampleDisk(const Point2f& u)
-{
+Point2f concentricSampleDisk(const Point2f& u) {
     // 把[0,1]映射到[-1,1]
     Point2f uOffset = 2.f * u - Vector2f(1, 1);
 
@@ -53,16 +52,18 @@ Point2f concentricSampleDisk(const Point2f& u)
 
     /*
      r = x
-    θ = y/x * π/4
-    */
+     θ = y/x * π/4
+     */
     Float theta, r;
 
     if (std::abs(uOffset.x) > std::abs(uOffset.y)) {
+
         // 如果x偏移量比y偏移量大
         r = uOffset.x;
         theta = PiOver4 * (uOffset.y / uOffset.x);
     }
     else {
+
         // 如果y偏移量比x偏移量大
         r = uOffset.y;
         theta = PiOver2 - PiOver4 * (uOffset.x / uOffset.y);
@@ -90,9 +91,8 @@ Point2f uniformSampleTriangle(const Point2f& u) {
 
 void stratifiedSample1D(Float* samp, int nSamples, RNG& rng, bool jitter) {
     Float invNSamples = (Float)1 / nSamples;
-    for (int i = 0; i < nSamples; i++)
-    {
-        Float delta;
+    for (int i = 0; i < nSamples; ++i) {
+        Float delta = jitter ? rng.uniformFloat() : 0.5f;
         samp[i] = std::min((i + delta) * invNSamples, OneMinusEpsilon);
     }
 }
@@ -101,11 +101,28 @@ void stratifiedSample2D(Point2f* samp, int nx, int ny, RNG& rng, bool jitter) {
     Float dx = (Float)1 / nx, dy = (Float)1 / ny;
     for (int y = 0; y < ny; ++y) {
         for (int x = 0; x < nx; ++x) {
-            Float jx;
-            Float jy;
+            Float jx = jitter ? rng.uniformFloat() : 0.5f;
+            Float jy = jitter ? rng.uniformFloat() : 0.5f;
             samp->x = std::min((x + jx) * dx, OneMinusEpsilon);
             samp->y = std::min((y + jy) * dy, OneMinusEpsilon);
-            samp++;
+            ++samp;
+        }
+    }
+}
+
+void latinHypercube(Float* samples, int nSamples, int nDim, RNG& rng) {
+    // nDim维向量，每个维度采样nSamples个样本
+    Float invNSamples = (Float)1 / nSamples;
+    for (int i = 0; i < nSamples; ++i)
+        for (int j = 0; j < nDim; ++j) {
+            Float sj = (i + (rng.uniformFloat())) * invNSamples;
+            samples[nDim * i + j] = std::min(sj, OneMinusEpsilon);
+        }
+    // 打乱每个维度样本顺序
+    for (int i = 0; i < nDim; ++i) {
+        for (int j = 0; j < nSamples; ++j) {
+            int other = j + rng.uniformUInt32(nSamples - j);
+            std::swap(samples[nDim * j + i], samples[nDim * other + i]);
         }
     }
 }

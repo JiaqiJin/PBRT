@@ -1,5 +1,4 @@
 ﻿#include "sampler.hpp"
-
 #include "camera.hpp"
 
 PALADIN_BEGIN
@@ -36,20 +35,21 @@ void Sampler::request2DArray(int n) {
 }
 
 const Float* Sampler::get1DArray(int n) {
-    if (_array1DOffset == _sampleArray1D.size()) {
+    if (_array1DOffset == _sampleArray2D.size()) {
         return nullptr;
     }
     CHECK_EQ(_samples1DArraySizes[_array1DOffset], n);
     CHECK_LT(_currentPixelSampleIndex, samplesPerPixel);
-    return &_sampleArray1D[_array1DOffset++][_currentPixelSampleIndex * n];
+    return &(_sampleArray1D[_array1DOffset++][_currentPixelSampleIndex * n]);
 }
 
 const Point2f* Sampler::get2DArray(int n) {
-    if (_array2DOffset == _sampleArray2D.size())
+    if (_array2DOffset == _sampleArray2D.size()) {
         return nullptr;
+    }
     CHECK_EQ(_samples2DArraySizes[_array2DOffset], n);
     CHECK_LT(_currentPixelSampleIndex, samplesPerPixel);
-    return &_sampleArray2D[_array2DOffset++][_currentPixelSampleIndex * n];
+    return &(_sampleArray2D[_array2DOffset++][_currentPixelSampleIndex * n]);
 }
 
 bool Sampler::startNextSample() {
@@ -65,16 +65,14 @@ bool Sampler::setSampleNumber(int64_t sampleNum) {
 
 // PixelSampler
 PixelSampler::PixelSampler(int64_t samplesPerPixel, int nSampledDimensions)
-    :Sampler(samplesPerPixel)
-{
-    for (int i = 0; i < nSampledDimensions; ++i)
-    {
+    : Sampler(samplesPerPixel) {
+    for (int i = 0; i < nSampledDimensions; ++i) {
         _samples1D.push_back(std::vector<Float>(samplesPerPixel));
         _samples2D.push_back(std::vector<Point2f>(samplesPerPixel));
     }
 }
 
-bool PixelSampler::startNextSample(){
+bool PixelSampler::startNextSample() {
     _curDimension1D = _curDimension2D = 0;
     return Sampler::startNextSample();
 }
@@ -90,7 +88,7 @@ Float PixelSampler::get1D() {
         return _samples1D[_curDimension1D++][_currentPixelSampleIndex];
     }
     else {
-
+        return _rng.uniformFloat();
     }
 }
 
@@ -100,7 +98,7 @@ Point2f PixelSampler::get2D() {
         return _samples2D[_curDimension2D++][_currentPixelSampleIndex];
     }
     else {
-        //return Point2f(_rng.uniformFloat(), _rng.uniformFloat());
+        return Point2f(_rng.uniformFloat(), _rng.uniformFloat());
     }
 }
 
@@ -108,15 +106,13 @@ Point2f PixelSampler::get2D() {
 void GlobalSampler::startPixel(const Point2i& p) {
     Sampler::startPixel(p);
     _dimension = 0;
-    _globalIndex = 0;
+    _globalIndex = getIndexForSample(0);
     _arrayEndDim = _arrayStartDim + _sampleArray1D.size() + 2 * _sampleArray2D.size();
 
     // 生成一维样本数组
-    for (size_t i = 0; i < _sampleArray1D.size(); i++)
-    {
+    for (size_t i = 0; i < _samples1DArraySizes.size(); ++i) {
         int nSamples = _samples1DArraySizes[i] * samplesPerPixel;
-        for (int j = 0; j < nSamples; j++)
-        {
+        for (int j = 0; j < nSamples; ++j) {
             int64_t index = getIndexForSample(j);
             _sampleArray1D[i][j] = sampleDimension(index, _arrayStartDim + i);
         }
@@ -124,11 +120,9 @@ void GlobalSampler::startPixel(const Point2i& p) {
 
     // 生成二维样本数组
     int dim = _arrayStartDim + _samples1DArraySizes.size();
-    for (size_t i = 0; i < _samples2DArraySizes.size(); i++)
-    {
+    for (size_t i = 0; i < _samples2DArraySizes.size(); ++i) {
         int nSamples = _samples2DArraySizes[i] * samplesPerPixel;
-        for (int j = 0; j < nSamples; ++j)
-        {
+        for (int j = 0; j < nSamples; ++j) {
             int64_t idx = getIndexForSample(j);
             _sampleArray2D[i][j].x = sampleDimension(idx, dim);
             _sampleArray2D[i][j].y = sampleDimension(idx, dim + 1);
@@ -139,13 +133,13 @@ void GlobalSampler::startPixel(const Point2i& p) {
 }
 
 bool GlobalSampler::startNextSample() {
-    _dimension = 0; 
+    _dimension = 0;
     _globalIndex = getIndexForSample(_currentPixelSampleIndex + 1);
     return Sampler::startNextSample();
 }
 
 bool GlobalSampler::setSampleNumber(int64_t sampleNum) {
-    _dimension = 0; 
+    _dimension = 0;
     _globalIndex = getIndexForSample(sampleNum);
     return Sampler::setSampleNumber(sampleNum);
 }
@@ -168,3 +162,12 @@ Point2f GlobalSampler::get2D() {
 }
 
 PALADIN_END
+
+
+
+
+
+
+
+
+
