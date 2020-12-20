@@ -66,12 +66,6 @@
     <ClCompile Include="core\texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="filters\box.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="filters\sinc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="integrators\path.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -200,12 +194,6 @@
     <ClInclude Include="core\texture.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="filters\box.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="filters\sinc.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="integrators\path.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -312,6 +300,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="samplers\random.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="filters\gaussion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="filters\triangle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="filters\box.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="filters\sinc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="filters\mitchell.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

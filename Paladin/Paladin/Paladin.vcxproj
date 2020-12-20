@@ -161,8 +161,6 @@
     <ClCompile Include="core\shape.cpp" />
     <ClCompile Include="core\spectrum.cpp" />
     <ClCompile Include="core\texture.cpp" />
-    <ClCompile Include="filters\box.cpp" />
-    <ClCompile Include="filters\sinc.cpp" />
     <ClCompile Include="integrators\path.cpp" />
     <ClCompile Include="lights\pointlight.cpp" />
     <ClCompile Include="main.cpp" />
@@ -209,8 +207,11 @@
     <ClInclude Include="core\spectrum.hpp" />
     <ClInclude Include="core\texture.hpp" />
     <ClInclude Include="ext\tinyobj\tiny_obj_loader.h" />
-    <ClInclude Include="filters\box.hpp" />
-    <ClInclude Include="filters\sinc.hpp" />
+    <ClInclude Include="filters\box.h" />
+    <ClInclude Include="filters\gaussion.h" />
+    <ClInclude Include="filters\mitchell.h" />
+    <ClInclude Include="filters\sinc.h" />
+    <ClInclude Include="filters\triangle.h" />
     <ClInclude Include="integrators\path.hpp" />
     <ClInclude Include="lights\pointlight.hpp" />
     <ClInclude Include="materials\matte.hpp" />
