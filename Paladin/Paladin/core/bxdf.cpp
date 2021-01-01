@@ -3,6 +3,33 @@
 
 PALADIN_BEGIN
 
+Float FrDielectric(Float cosThetaI, Float etaI, Float etaT) {
+    cosThetaI = clamp(cosThetaI, -1, 1);
+
+    bool entering = cosThetaI > 0.f;
+    // 如果如果入射角大于90° 
+    // 则法线方向反了，cosThetaI取绝对值，对换两个折射率
+    if (!entering) {
+        std::swap(etaI, cosThetaI);
+    }
+
+    // 用斯涅耳定律计算sinThetaI
+    Float sinThetaI = std::sqrt(std::max((Float)0, 1 - cosThetaI * cosThetaI));
+    Float sinThetaT = etaI / etaT * sinThetaI;
+
+    // 全内部反射情况 Handle total internal reflection
+    if (sinThetaT >= 1) {
+        return 1;
+    }
+    // 套公式
+    Float cosThetaT = std::sqrt(std::max((Float)0, 1 - sinThetaT * sinThetaT));
+    Float Rparl = ((etaT * cosThetaI) - (etaI * cosThetaT))
+        / ((etaT * cosThetaI) + (etaI * cosThetaT));
+    Float Rperp = ((etaI * cosThetaI) - (etaT * cosThetaT))
+        / ((etaI * cosThetaI) + (etaT * cosThetaT));
+    return (Rparl * Rparl + Rperp * Rperp) / 2;
+}
+
 Spectrum BxDF::sample_f(const Vector3f& wo,
     Vector3f* wi,
     const Point2f& sample,

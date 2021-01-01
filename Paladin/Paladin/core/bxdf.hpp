@@ -61,6 +61,66 @@ inline Float cosDPhi(const Vector3f& wa, const Vector3f& wb) {
         -1, 1);
 }
 
+/**
+ * 绝缘体菲涅尔函数
+ *
+ * 			ηt * cosθi - ηi * cosθt
+ * r∥ = -------------------------------
+ * 			ηt * cosθi + ηi * cosθt
+ *
+ * 			ηi * cosθi - ηt * cosθt
+ * r⊥ = ------------------------------
+ * 			ηi * cosθi + ηt * cosθt
+ *
+ * r∥平行偏振光的反射率，r⊥为垂直偏振光的反射率
+ * Fr = 1/2(r∥^2 + r⊥^2)
+ * 如果光线从较高折射率的介质中射向较低介质，并且入射角接近90°
+ * 则无法传播到折射率较低的介质(我们称为入射角大于临界角)
+ *
+ * @param  cosThetaI 入射角的余弦值
+ * @param  etaI      入射介质的折射率
+ * @param  etaT      传播介质的折射率
+ * @return           绝缘体的菲涅尔函数值
+ */
+Float FrDielectric(Float cosThetaI, Float etaI, Float etaT);
+
+/**
+ * η' = η + i*k(有时候光会被材质吸收转化为热量，k表示吸收系数)
+ *
+ *          a^2 + b^2 - 2a * cosθ + (cosθ)^2
+ * r⊥ = ----------------------------------------
+ *          a^2 + b^2 + 2a * cosθ + (cosθ)^2
+ *
+ *              (a^2 + b^2)(cosθ)^2 - 2a * cosθ(sinθ)^2 + (sinθ)^4
+ * r∥ = r⊥ * ----------------------------------------------------------
+ *              (a^2 + b^2)(cosθ)^2 + 2a * cosθ(sinθ)^2 + (sinθ)^4
+ *
+ * 其中 a^2 + b^2 = √[(η^2 - k^2 - (sinθ)^2)^2 + (2ηk)^2]
+ *
+ *             ηt + i * kt
+ * η + i*k = ---------------    3式
+ *             ηi + i * ki
+ *
+ * 由于入射介质为绝缘体，吸收系数k为零，则3式简化后
+ *
+ *             ηt + i * kt
+ * η + i*k = ---------------
+ *                 ηi
+ *
+ * Fr = 1/2(r∥^2 + r⊥^2)
+ *
+ * @param  cosThetaI 入射角余弦值
+ * @param  etaI      入射介质折射率
+ * @param  etaT      物体折射率
+ * @param  k         吸收系数
+ * @return           导体的菲涅尔函数值
+ */
+Spectrum frConductor(Float cosThetaI, const Spectrum& etaI,
+    const Spectrum& etaT, const Spectrum& kt);
+
+/*
+
+*/
 inline Vector3f reflect(const Vector3f& wo, const Vector3f& n) {
     return -wo + 2 * dot(wo, n) * n;
 }
@@ -256,10 +316,23 @@ private:
 };
 
 class Fresnel {
+public:
     virtual ~Fresnel() {
 
     }
+    /**
+    * @param  cosThetaI 入射角余弦值
+    * @return    		 返回对应入射角的菲涅尔函数值
+    */
+    virtual Spectrum evaluate(Float cosI) const = 0;
+
+    virtual std::string toString() const = 0;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const Fresnel& f) {
+    os << f.toString();
+    return os;
+}
 
 PALADIN_END
 
