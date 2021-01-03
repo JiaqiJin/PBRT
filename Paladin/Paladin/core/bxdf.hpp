@@ -82,7 +82,7 @@ inline Float cosDPhi(const Vector3f& wa, const Vector3f& wb) {
  * @param  etaT      传播介质的折射率
  * @return           绝缘体的菲涅尔函数值
  */
-Float FrDielectric(Float cosThetaI, Float etaI, Float etaT);
+Float frDielectric(Float cosThetaI, Float etaI, Float etaT);
 
 /**
  * η' = η + i*k(有时候光会被材质吸收转化为热量，k表示吸收系数)
@@ -333,6 +333,70 @@ inline std::ostream& operator<<(std::ostream& os, const Fresnel& f) {
     os << f.toString();
     return os;
 }
+
+/**
+ * 导体菲涅尔类
+ * evaluate函数将返回对应入射角的菲涅尔函数值
+ */
+class FresnelConductor : public Fresnel {
+
+public:
+    /**
+     * @param  cosThetaI 入射角余弦值
+     * @return    		 返回对应入射角的菲涅尔函数值
+     */
+    virtual Spectrum evaluate(Float cosThetaI) const {
+        return frConductor(std::abs(cosThetaI), _etaI, _etaT, _kt);
+    }
+
+    FresnelConductor(const Spectrum& etaI, const Spectrum& etaT,
+        const Spectrum& kt)
+        : _etaI(etaI), _etaT(etaT), _kt(kt) {
+
+    }
+
+    virtual std::string toString() const {
+        return std::string("[ FresnelConductor etaI: ") + _etaI.ToString() +
+            std::string(" etaT: ") + _etaT.ToString() + std::string(" k: ") +
+            _kt.ToString() + std::string(" ]");
+    }
+
+private:
+    Spectrum _etaI, _etaT, _kt;
+};
+
+/**
+ * 绝缘体菲涅尔类
+ * evaluate函数将返回对应入射角的菲涅尔函数值
+ */
+class FresnelDielectric : public Fresnel {
+
+public:
+    virtual Spectrum evaluate(Float cosThetaI) const {
+        return frDielectric(cosThetaI, _etaI, _etaT);
+    }
+    FresnelDielectric(Float etaI, Float etaT) : _etaI(etaI), _etaT(etaT) {}
+
+    virtual std::string toString() const {
+        return StringPrintf("[ FrenselDielectric etaI: %f etaT: %f ]", _etaI, _etaT);
+    }
+
+private:
+    Float _etaI, _etaT;
+};
+
+/**
+ * 100%反射所有入射光
+ * 尽管这是在物理上不可能的，但确实可以明显减少计算量
+ */
+class FresnelNoOp : public Fresnel {
+public:
+    virtual Spectrum evaluate(Float) const {
+        return Spectrum(1.);
+    }
+};
+
+
 
 PALADIN_END
 
