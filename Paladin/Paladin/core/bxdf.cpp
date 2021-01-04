@@ -10,14 +10,15 @@ Float frDielectric(Float cosThetaI, Float etaI, Float etaT) {
     // 如果如果入射角大于90° 
     // 则法线方向反了，cosThetaI取绝对值，对换两个折射率
     if (!entering) {
-        std::swap(etaI, cosThetaI);
+        std::swap(etaI, etaT);
+        cosThetaI = std::abs(cosThetaI);
     }
 
-    // 用斯涅耳定律计算sinThetaI sin^2θ + cos^2θ = 1
+    // 用斯涅耳定律计算sinThetaI
     Float sinThetaI = std::sqrt(std::max((Float)0, 1 - cosThetaI * cosThetaI));
     Float sinThetaT = etaI / etaT * sinThetaI;
 
-    // 全内部反射情况 Handle total internal reflection
+    // 全内部反射情况
     if (sinThetaT >= 1) {
         return 1;
     }
@@ -31,8 +32,7 @@ Float frDielectric(Float cosThetaI, Float etaI, Float etaT) {
 }
 
 Spectrum frConductor(Float cosThetaI, const Spectrum& etai,
-    const Spectrum& etat, const Spectrum& kt)
-{
+    const Spectrum& etat, const Spectrum& kt) {
     cosThetaI = clamp(cosThetaI, -1, 1);
     Spectrum eta = etat / etai;
     Spectrum etak = kt / etai;
@@ -104,6 +104,5 @@ Spectrum BxDF::rho_hh(int nSamples, const Point2f* samplesWo, const Point2f* sam
 Float BxDF::pdfW(const Vector3f& wo, const Vector3f& wi) const {
     return sameHemisphere(wo, wi) ? absCosTheta(wi) * InvPi : 0;
 }
-
 
 PALADIN_END
