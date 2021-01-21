@@ -4,10 +4,14 @@
 #include "header.h"
 #include "spectrum.hpp"
 #include "material.hpp"
+#include "sampling.hpp"
 
 PALADIN_BEGIN
 
 /**
+ * 参考章节
+ * http://www.pbr-book.org/3ed-2018/Reflection_Models/Specular_Reflection_and_Transmission.html
+ *
  * 依次有斯涅尔定律，菲涅尔定律，镜面反射，镜面折射的内容讲解
  *
  * 描述如何反射或折射的模块
@@ -124,6 +128,31 @@ PALADIN_BEGIN
  * f(wo, wi) = -----------------------
  *                     |cosθr|
  *
+ * -----------------------------------------------------------------------------
+ * 接下来开始讲解Microfacet Models(微面元模型)
+ * 参考资料http://www.pbr-book.org/3ed-2018/Reflection_Models/Microfacet_Models.html
+ * 许多基于几何光学的方法来建模表面反射和透射是将粗糙表面建模为一系列朝向各异的微观小平面的集合
+ * 表面的朝向分布用统计学方式去描述
+ * 基于microfacet的BRDF模型的工作原理是对来自大量的microfacet的光透射进行统计建模
+ * 虽然镜面投射对于模拟半透明材料很有用， Oren–Nayar模型把微面元当成漫反射表面。
+ * 但BRDF最常用的方式还是把微面元的反射当成是理想镜面反射处理
+ *
+ * 先简单介绍一下Oren–Nayar模型
+ * Oren和Nayar观察到自然界中不存在理想的漫反射，尤其是当光照方向接近观察方向时，粗糙表面通常会显得更亮。
+ * 他们建立了一个反射模型，用一个参数σ的球面高斯分布所描述的 v 形微平面来描述粗糙表面，
+ * σ为微平面朝向角的标准差。
+ * 在 v 形假设下，仅考虑相邻的微面即可考虑互反射;
+ * 奥伦和纳亚尔利用这一点推导出了一个BRDF模型，该模型对凹槽集合的总反射进行了建模
+ *
+ * 所得到的模型考虑了微观平面之间的阴影、掩蔽和相互反射，但没有封闭形式的方程(todo，这段翻译的不好)
+ * 他们找到了如下方程去近似
+ *
+ * fr(wi,wo) = R/π(A + Bmax(0,cos(φi-φo))sinαtanβ)
+ * 其中 A = 1 - σ^2 / (2 * σ^2 + 0.33)
+ * 	    B = 0.45σ^2 / (σ^2 + 0.09)
+ *   	α = max(θi,θo)
+ *		β = min(θi,θo)
+ * 这个方程如何来的我也就不凑热闹了，水平有限
  */
 
  // 以下函数都默认一个条件，w为单位向量
@@ -367,6 +396,8 @@ public:
     virtual Spectrum f(const Vector3f& wo, const Vector3f& wi) const = 0;
 
     /**
+     * 这个函数可以理解为:
+     * 该BXDF函数的蒙特卡洛估计的一个样本值
      * 指定出射方向，根据随机样本点采样入射方向
      * 返回radiance，同时通过指针返回入射方向以及该方向的概率密度函数
      * @param  wo          出射方向
@@ -563,6 +594,7 @@ public:
 
 /**
  * 理想镜面反射
+ * 狄拉克delta分布
  */
 class SpecularReflection : public BxDF {
 
@@ -575,7 +607,8 @@ public:
     }
 
     /**
-     * 由于是理想镜面反射，狄拉克函数，需要特殊处理
+     * 由于是理想镜面反射，狄拉克函数
+     * 用常规方式无法采样，需要特殊处理
      * @param  wo 出射方向
      * @param  wi 入射方向
      * @return    0
@@ -586,16 +619,33 @@ public:
 
     /**
      * 理想镜面反射的采样函数，是固定方向采样，首先要计算合适的入射方向
+     * Lo的蒙特卡洛估计表达式如下
+     * 		      1	             fr(p,wo,wi)Li(p,wi)|cosθi|
+     * Lo(wo) = ----- * Σ[i,N] ------------------------------
+     * 		      N 					  p(wi)
+     *
+     * 		      1	             (ρhd(wo)δ(wi-wr)/|cosθi|)Li(p,wi)|cosθi|
+     * Lo(wo) = ----- * Σ[i,N] --------------------------------------------
+     * 		      N 					  		  p(wi)
+     *
+     * p(wi)为狄拉克函数，p(wi) = δ(wi-wr)，两个狄拉克函数可以抵消，
+     *
+     * 最终得到Lo(wo) = ρhd(wo) * Li(p, wr)
+     * 由于是非常规采样，pdf为1
      *
      *                 δ(wi - wr)Fr(wi)
-     * f(wo, wi) = -----------------------
+     * fr(p,wo,wi) = -----------------------   3式
      *                     |cosθr|
      *
-     * @param  wo          [description]
-     * @param  wi          [description]
-     * @param  sample      [description]
-     * @param  pdf         [description]
-     * @param  sampledType [description]
+     * ρhd(wo) = ∫[hemisphere]fr(p,wi,wo)|cosθi|dwi 4式 (ρhd(wo)的定义)
+     *
+     * 联合3,4式可得如下代码
+     *
+     * @param  wo          出射方向
+     * @param  wi          入射方向
+     * @param  sample      在此函数中不需要使用的样本点
+     * @param  pdf         概率密度函数值为1
+     * @param  sampledType 不需要使用的采样类型
      * @return             [description]
      */
     virtual Spectrum sample_f(const Vector3f& wo, Vector3f* wi, const Point2f& sample,
@@ -606,7 +656,8 @@ public:
     }
 
     /**
-     * 由于是理想镜面反射，狄拉克函数，pdf需要特殊处理
+     * 由于是理想镜面反射，狄拉克函数
+     * 用常规方式无法采样，需要特殊处理
      * @param  wo 出射方向
      * @param  wi 入射方向
      * @return    0
@@ -621,12 +672,50 @@ public:
     }
 
 private:
-
+    // 用于缩放颜色频谱
     const Spectrum _R;
+    // 菲涅尔对象指针
     const Fresnel* _fresnel;
 };
 
 /**
+ * 理想镜面透射
+ * 用于建立光线照射在水面上的数学模型
+ *
+ * 先来简单推导一下所用到的表达式
+ * 想象一下光线照射在水面上，一部分光直接反射，另一部分光射入水中，
+ * 反射光的radiance我们可以直接通过菲涅尔函数计算出来
+ * 折射光的radiance就没那么简单，因为在两个介质交界处，光线的微分立体角会发生变化(因为折射率不同)
+ *
+ * 根据能量守恒定律，微分立体角发生变化，radiance也就发生了变化
+ * 我们用τ表示被折射的能量的比率则τ = 1 - Fr(wi)
+ * Φ 表示辐射通量
+ *
+ * dΦo = τ * dΦi
+ * 将radiance带入，得
+ *
+ * Lo * cosθo * dA * dωo = τ(Li * cosθi * dA * dωi)
+ *
+ * 将微分立体角展开，得
+ *
+ * Lo * cosθo * dA * sinθodθodφo = τ * Li * cosθi * dA * sinθidθidφi   2式
+ *
+ * 对斯涅尔定律ηi * sinθi = ηo * sinθo 求导，得
+ *
+ * ηo * cosθodθo = ηi * cosθidθi  3式
+ *
+ * 联合2，3式，得
+ *
+ * Lo * ηi^2 * dφo = τLi * ηo^2 * dφi
+ *
+ * 整理之后，如下
+ *
+ * Lo = τ * Li * (ηo/ηi)^2
+ *
+ * BTDF的表达式如下
+ *                ηo                          δ(wi - T(wo,n))
+ * fr(wo, wi) = (----)^2 * (1 - Fr(wi)) * ----------------------     (T为折射函数，n为法线)
+ *                ηi                            |cosθi|
  *
  */
 class SpecularTransmission : public BxDF {
@@ -647,20 +736,25 @@ public:
     }
 
     /**
-     * [sample_f description]
-     * @param  wo          [description]
-     * @param  wi          [description]
-     * @param  sample      [description]
-     * @param  pdf         [description]
-     * @param  sampledType [description]
-     * @return             [description]
+     * 采样理想镜面透射
+     * BTDF的表达式如下
+     *                ηo                          δ(wi - T(wo,n))
+     * fr(wo, wi) = (----)^2 * (1 - Fr(wi)) * ----------------------
+     *                ηi                            |cosθi|
+     *
+     * 跟镜面反射一样，无法用常规方式采样处理
+     * pdf直接赋值为1，原理与上面的理想镜面反射相同，不再赘述
+     *
      */
     virtual Spectrum sample_f(const Vector3f& wo, Vector3f* wi, const Point2f& sample,
         Float* pdf, BxDFType* sampledType) const {
+        // 首先确定光线是进入或离开折射介质
+        // 对象的法线都是向外的
+        // 如果wo.z > 0，则说明，ray trace工作流的光线从物体外部射入物体
         bool entering = cosTheta(wo) > 0;
         Float etaI = entering ? _etaA : _etaB;
         Float etaT = entering ? _etaB : _etaA;
-
+        // todo，这里代码可以优化一下
         if (!refract(wo, faceforward(Normal3f(0, 0, 1), wo), etaI / etaT, wi)) {
             return 0;
         }
@@ -668,6 +762,7 @@ public:
         *pdf = 1;
         Spectrum ft = _T * (Spectrum(1.) - _fresnel.evaluate(cosTheta(*wi)));
 
+        // 用于处理双向方法的情况，只有从光源射出的光线才需要乘以这个缩放因子
         if (_mode == TransportMode::Radiance) {
             ft *= (etaI * etaI) / (etaT * etaT);
         }
@@ -689,10 +784,14 @@ public:
     }
 
 private:
-
+    // 用于缩放颜色频谱
     const Spectrum _T;
+
+    // _etaA是表面以上介质的折射率 (above)
+    // _etaB是物体表面以下介质的折射率 (below)
     const Float _etaA, _etaB;
     const FresnelDielectric _fresnel;
+    // 记录传输模式(从光源发出or从相机发出)
     const TransportMode _mode;
 };
 
@@ -704,6 +803,7 @@ private:
  */
 class FresnelSpecular : public BxDF {
 public:
+
     FresnelSpecular(const Spectrum& R, const Spectrum& T, Float etaA,
         Float etaB, TransportMode mode)
         : BxDF(BxDFType(BSDF_REFLECTION | BSDF_TRANSMISSION | BSDF_SPECULAR)),
@@ -762,27 +862,47 @@ public:
                 : std::string("IMPORTANCE")) +
             std::string(" ]");
     }
+
 private:
     const Spectrum _R, _T;
     const Float _etaA, _etaB;
     const TransportMode _mode;
 };
 
-/*
-* 朗伯反射又称理想漫反射
+
+/**
+ * 朗伯反射又称理想漫反射
  * 半空间上各个方向的反射率相同
  * 理想漫反射在物理上是不可能的
- * 
+ *
+ * 接下来推导一下朗伯反射的brdf函数
+ *
  * 由能量守恒得 ∫fr(p,wo,wi)|cosθi|dwi = 1
- * 
- * 
-*/
-class LambertianReflection : public BxDF
-{
+ *
+ * 朗伯反射各个方向的brdf函数值相等，假设fr(p,wo,wi) = k，
+ * 又因为入射角不大于π/2，所以cosθi不小于零，得
+ *
+ * ∫kcosθidwi = 1
+ *
+ * 由立体角定义展开dwi，得
+ *
+ * ∫[0,2π]∫[0,π/2]kcosθsinθdθdφ = 1
+ *
+ * 移项，得
+ *
+ * ∫[0,2π]∫[0,π/2]cosθsinθdθdφ = 1/k
+ *
+ * 非常非常简单的定积分计算，求得等号左边的值为π
+ *
+ * 所以 k = 1/π
+ */
+class LambertianReflection : public BxDF {
 public:
     LambertianReflection(const Spectrum& R)
-        :BxDF(BxDFType(BSDF_REFLECTION | BSDF_DIFFUSE)),
-        _R(R) {}
+        : BxDF(BxDFType(BSDF_REFLECTION | BSDF_DIFFUSE)),
+        _R(R) {
+
+    }
 
     // 朗伯反射中任何方向的反射率都相等
     virtual Spectrum f(const Vector3f& wo, const Vector3f& wi) const {
@@ -805,20 +925,23 @@ public:
     }
 
 private:
+    // 反射系数
     const Spectrum _R;
 };
 
+
 /**
- * 朗伯散射
+ * 朗伯透射
  * 原理跟朗伯反射相同，具体推导过程参见朗伯反射
  * 不再赘述
  */
-class LambertianTransmission : public BxDF 
-{
+class LambertianTransmission : public BxDF {
 public:
     LambertianTransmission(const Spectrum& T)
         : BxDF(BxDFType(BSDF_TRANSMISSION | BSDF_DIFFUSE)),
-        _T(T) {}
+        _T(T) {
+
+    }
 
     virtual Spectrum f(const Vector3f& wo, const Vector3f& wi) const {
         return _T * InvPi;
@@ -852,8 +975,67 @@ public:
     }
 
 private:
-    // 散射系数
+    // 透射系数
     Spectrum _T;
+};
+
+
+
+class OrenNayar : public BxDF {
+public:
+    OrenNayar(const Spectrum& R, Float sigma)
+        : BxDF(BxDFType(BSDF_REFLECTION | BSDF_DIFFUSE)),
+        _R(R) {
+        sigma = degree2radian(sigma);
+        Float sigma2 = sigma * sigma;
+        _A = 1.f - (sigma2 / (2.f * (sigma2 + 0.33f)));
+        _B = 0.45f * sigma2 / (sigma2 + 0.09f);
+    }
+
+    /**
+     * 表达式如下，代码照着表达式实现就好
+     * fr(wi,wo) = R/π(A + Bmax(0,cos(φi-φo))sinαtanβ)
+     * 其中 A = 1 - σ^2 / (2 * σ^2 + 0.33)
+     * 	    B = 0.45σ^2 / (σ^2 + 0.09)
+     *   	α = max(θi,θo)
+     *		β = min(θi,θo)
+     */
+    virtual Spectrum f(const Vector3f& wo, const Vector3f& wi) const {
+        Float sinThetaI = sinTheta(wi);
+        Float sinThetaO = sinTheta(wo);
+        // 计算max(0,cos(φi-φo))项
+        // 由于三角函数耗时比较高，这里可以用三角恒等变换展开
+        // cos(φi-φo) = cosφi * cosφo + sinφi * sinφo
+        Float maxCos = 0;
+        if (sinThetaI > 1e-4 && sinThetaO > 1e-4) {
+            Float sinPhiI = sinPhi(wi), cosPhiI = cosPhi(wi);
+            Float sinPhiO = sinPhi(wo), cosPhiO = cosPhi(wo);
+            Float dCos = cosPhiI * cosPhiO + sinPhiI * sinPhiO;
+            maxCos = std::max((Float)0, dCos);
+        }
+
+        Float sinAlpha, tanBeta;
+        if (absCosTheta(wi) > absCosTheta(wo)) {
+            sinAlpha = sinThetaO;
+            tanBeta = sinThetaI / absCosTheta(wi);
+        }
+        else {
+            sinAlpha = sinThetaI;
+            tanBeta = sinThetaO / absCosTheta(wo);
+        }
+        return _R * InvPi * (_A + _B * maxCos * sinAlpha * tanBeta);
+    }
+
+    virtual std::string toString() const {
+        return std::string("[ OrenNayar R: ") + _R.ToString() +
+            StringPrintf(" A: %f B: %f ]", _A, _B);
+    }
+
+private:
+    // 反射系数
+    const Spectrum _R;
+    // 表达式中的常数
+    Float _A, _B;
 };
 
 PALADIN_END
