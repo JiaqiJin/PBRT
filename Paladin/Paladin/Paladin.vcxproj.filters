@@ -138,6 +138,9 @@
     <ClCompile Include="samplers\random.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="core\microfacet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="accelerators\bvh.hpp">
@@ -315,6 +318,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="filters\mitchell.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\microfacet.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

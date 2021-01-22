@@ -153,6 +153,7 @@
     <ClCompile Include="core\light.cpp" />
     <ClCompile Include="core\material.cpp" />
     <ClCompile Include="core\medium.cpp" />
+    <ClCompile Include="core\microfacet.cpp" />
     <ClCompile Include="core\paladin.cpp" />
     <ClCompile Include="core\primitive.cpp" />
     <ClCompile Include="core\sampler.cpp" />
@@ -198,6 +199,7 @@
     <ClInclude Include="core\light.hpp" />
     <ClInclude Include="core\material.hpp" />
     <ClInclude Include="core\medium.hpp" />
+    <ClInclude Include="core\microfacet.hpp" />
     <ClInclude Include="core\paladin.hpp" />
     <ClInclude Include="core\primitive.hpp" />
     <ClInclude Include="core\sampler.hpp" />

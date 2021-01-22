@@ -2,8 +2,7 @@
 #define microfacet_hpp
 
 #include "header.h"
-#include "bxdf.hpp"
-/*添加Beckmann 与 TrowbridgeReitz以及注释说明 …*/
+
 PALADIN_BEGIN
 
 /**
@@ -130,21 +129,7 @@ PALADIN_BEGIN
          * @param  wh 微平面法向量
          * @return
          */
-        Float pdfW(const Vector3f& wo, const Vector3f& wh) const {
-            if (_sampleVisibleArea) {
-                // 如果只计算wo视角可见部分，则需要乘以史密斯遮挡函数再归一化
-                // 归一化方式如下，利用以上3式
-                // cosθo = ∫[hemisphere]G1(ωo,ωh) max(0, ωo · ωh) D(ωh)dωh
-                // 将cos项移到右边，得
-                // 1 = ∫[hemisphere]G1(ωo,ωh) max(0, ωo · ωh) D(ωh) / (cosθo) dωh
-                // 则概率密度函数为 G1(ωo,ωh) max(0, ωo · ωh) D(ωh) / (cosθo) ,代码如下
-                return D(wh) * G1(wo) * absDot(wo, wh) / absCosTheta(wo);
-            }
-            else {
-                // 如果忽略几何遮挡，则概率密度函数值就是D(ωh) * cosθh 
-                return D(wh) * absCosTheta(wh);
-            }
-        }
+        Float pdfW(const Vector3f& wo, const Vector3f& wh) const;
 
         virtual std::string toString() const = 0;
 
@@ -199,7 +184,7 @@ PALADIN_BEGIN
  * 我们为了避免调用std::erf() 与 std::exp()两个消耗较高的函数
  * 而采用有理多项式去逼近Λ(ω)函数
  *
- *
+ * sample_wh函数的采样方式会在函数注释中介绍
  *
  */
 class BeckmannDistribution : public MicrofacetDistribution {
@@ -220,29 +205,83 @@ public:
 
     /**
      * 各向异性法线分布函数
+     * 当αx = αy时，为各向同性
      *             e^[-(tanθh)^2 ((cosθh)^2/αx^2 + (sinθh)^2/αy^2)]
      * D(ωh) = -------------------------------------------------------
      *                        π αx αy (cosθh)^4
      * @param  wh 微平面法线方向
      * @return    [description]
      */
-    virtual Float D(const Vector3f& wh) const {
-        Float _tan2Theta = tan2Theta(wh);
-        if (std::isinf(_tan2Theta)) {
-            // 当θ为90°时，会出现tan值无穷大的情况，为了避免这种异常发生
-            // 我们返回0
-            return 0.;
-        }
-        Float cos4Theta = cos2Theta(wh) * cos2Theta(wh);
-        Float ret = std::exp(-_tan2Theta * (cos2Phi(wh) / (_alphax * _alphax) +
-            sin2Phi(wh) / (_alphay * _alphay))) /
-            (Pi * _alphax * _alphay * cos4Theta);
-        return ret;
-    }
+    virtual Float D(const Vector3f& wh) const;
 
+    /**
+     * 采样wh向量，需要分为两种情况讨论，各向异性跟各向同性
+     * 先来介绍一下忽略遮挡的全采样
+     * 基本思路就是根据法线分布函数分解为θ与φ的分布
+     * 分别独立采样这两个一维变量，然后再计算θ与φ对应的方向向量
+     *
+     * θ与φ相互独立，p(θ,φ) = pθ(θ) * pφ(φ)   1式
+     *
+     * pφ为均匀分布，pφ = 1 / 2π
+     * 假设 a为[0，1)均匀随机变量，则φ = 2πa
+     *
+     * pθ(θ)就比较复杂了
+     * sampling.hpp中4式  p(θ, φ) = sinθ p(ω)   (在这里叫做2式)
+     *
+     * pω(ω) = cosθh * D(ωh)   (显而易见，我就不废话了)  3式
+     *
+     * 以上2，3两式联合可得
+     *
+     * sinθh * cosθh * D(ωh) = p(θ, φ)    4式
+     *
+     * 1，4两式联合可得，
+     *
+     * pθ(θ) = sinθ * cosθ * D(ω) / pφ(φ)   5式
+     *
+     * 将pφ = 1 / 2π带入5式，得
+     *
+     * pθ(θ) = 2π * sinθ * cosθ * D(ω)   6式
+     *
+     * 将已知D(ω)带入6式，得
+     *             2sinθ * e^(-(tanθ)^2 / α^2)
+     * pθ(θ) = -----------------------------------    8式 (我知道这跟pbrbook上的表达式不同，那是pbrbook上写错了)
+     *                    α^2 (cosθ)^3
+     *
+     * 现在已知pdf，要求cdf，对pθ(θ)积分，手算实在是太麻烦(主要是不会😂)，交给wolframalpha吧，可得
+     *
+     * Pθ(θ) = 1 - e^(-(tanθ)^2 / α^2)  9式
+     *
+     * 知道9式之后我们可以用均匀随机变量生成θ了  (逆变换算法不解释！)
+     *
+     * 假设 b为[0，1)均匀随机变量
+     *
+     * b = 1 - e^(-(tanθ)^2 / α^2)
+     *
+     * 则 (tanθ)^2 = -α^2 ln(1-b)
+     *
+     * 又因为b为[0，1)均匀随机变量，可得 (tanθ)^2 = -α^2 ln(b)
+     *
+     * 生成θ与φ之后再转成向量就完事了
+     *
+     * 各向异性的采样函数也可以通过类似的方法推导
+     * 总结来就是以下几个步骤
+     *
+     * 1.把立体角空间的概率密度函数分解为θ与φ两个独立的概率密度函数(以下简称pdf)
+     * 2.分别对θ与φ的pdf积分得到对应的累积分布函数(cdf)
+     * 3.用逆变换算法对cdf的反函数在[0,1)区间进行采样
+     * 4.用生成的θ与φ计算向量
+     * 5.完事！
+     *
+     * TrowbridgeReitzDistribution::sample_wh的采样表达式也可以用上述方式推导出来
+     * 在这里就不再赘述了
+     *
+     */
     virtual Vector3f sample_wh(const Vector3f& wo, const Point2f& u) const;
 
-    virtual std::string toString() const;
+    virtual std::string toString() const {
+        return StringPrintf("[ BeckmannDistribution alphax: %f alphay: %f ]",
+            _alphax, _alphay);
+    }
 
 private:
 
@@ -260,27 +299,14 @@ private:
      * @param  w
      * @return
      */
-    virtual Float lambda(const Vector3f& w) const {
-        Float absTanTheta = std::abs(tanTheta(w));
-        if (std::isinf(absTanTheta)) {
-            // 当θ为90°时，会出现tan值无穷大的情况，为了避免这种异常发生
-            // 我们返回0            
-            return 0.;
-        }
-        // α^2 = (cosθh)^2/αx^2 + (sinθh)^2/αy^2)
-        Float alpha = std::sqrt(cos2Phi(w) * _alphax * _alphax + sin2Phi(w) * _alphay * _alphay);
-        Float a = 1 / (alpha * absTanTheta);
-        if (a >= 1.6f) {
-            return 0;
-        }
-        return (1 - 1.259f * a + 0.396f * a * a) / (3.535f * a + 2.181f * a * a);
-    }
+    virtual Float lambda(const Vector3f& w) const;
 
     const Float _alphax, _alphay;
 };
 
 /**
  * Trowbridge 与 Reitz在 1975年提出的微平面模型
+ * 又由Walter在2007年的时候独立推导出来了，又叫GGX模型
  * 各向异性的法线分布函数为
  *                                             1
  * D(ωh) = ----------------------------------------------------------------------------
@@ -320,23 +346,14 @@ public:
      * @param  wh 微平面法向量
      * @return    [description]
      */
-    virtual Float D(const Vector3f& wh) const {
-        Float _tan2Theta = tan2Theta(wh);
-        if (std::isinf(_tan2Theta)) {
-            // 当θ为90°时，会出现tan值无穷大的情况，为了避免这种异常发生
-            // 我们返回0            
-            return 0.;
-        }
-        const Float cos4Theta = cos2Theta(wh) * cos2Theta(wh);
-        Float e =
-            (cos2Phi(wh) / (_alphax * _alphax) + sin2Phi(wh) / (_alphay * _alphay)) *
-            _tan2Theta;
-        return 1 / (Pi * _alphax * _alphay * cos4Theta * (1 + e) * (1 + e));
-    }
+    virtual Float D(const Vector3f& wh) const;
 
     virtual Vector3f sample_wh(const Vector3f& wo, const Point2f& u) const;
 
-    virtual std::string toString() const;
+    virtual std::string toString() const {
+        return StringPrintf("[ TrowbridgeReitzDistribution alphax: %f alphay: %f ]",
+            _alphax, _alphay);
+    }
 
 private:
 
@@ -346,18 +363,7 @@ private:
      * @param  w [description]
      * @return   [description]
      */
-    virtual Float lambda(const Vector3f& w) const {
-        Float absTanTheta = std::abs(tanTheta(w));
-        if (std::isinf(absTanTheta)) {
-            // 当θ为90°时，会出现tan值无穷大的情况，为了避免这种异常发生
-            // 我们返回0               
-            return 0.;
-        }
-        // α^2 = (cosθh)^2/αx^2 + (sinθh)^2/αy^2)
-        Float alpha = std::sqrt(cos2Phi(w) * _alphax * _alphax + sin2Phi(w) * _alphay * _alphay);
-        Float alpha2Tan2Theta = (alpha * absTanTheta) * (alpha * absTanTheta);
-        return (-1 + std::sqrt(1.f + alpha2Tan2Theta)) / 2;
-    }
+    virtual Float lambda(const Vector3f& w) const;
 
     // todo 这里也是可以优化的
     const Float _alphax, _alphay;
