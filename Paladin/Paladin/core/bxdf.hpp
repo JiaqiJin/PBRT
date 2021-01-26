@@ -442,10 +442,10 @@ class BSDF {
 public:
     BSDF(const SurfaceInteraction& si, Float eta = 1)
         : eta(eta),
-        ns(si.shading.normal),
-        ng(si.normal),
-        ss(normalize(si.shading.dpdu)),
-        ts(cross(ns, ss)) {
+        _sNormal(si.shading.normal),
+        _gNormal(si.normal),
+        _sTangent(normalize(si.shading.dpdu)),
+        _tTangent(cross(_sNormal, _sTangent)) {
 
     }
 
@@ -462,14 +462,19 @@ public:
         return num;
     }
 
+    /**
+     * 根据法线方向，切线向量，付切线向量确定正交基
+     * @param  v [description]
+     * @return   [description]
+     */
     Vector3f worldToLocal(const Vector3f& v) const {
-        return Vector3f(dot(v, ss), dot(v, ts), dot(v, ns));
+        return Vector3f(dot(v, _sTangent), dot(v, _tTangent), dot(v, _sNormal));
     }
 
     Vector3f localToWorld(const Vector3f& v) const {
-        return Vector3f(ss.x * v.x + ts.x * v.y + ns.x * v.z,
-            ss.y * v.x + ts.y * v.y + ns.y * v.z,
-            ss.z * v.x + ts.z * v.y + ns.z * v.z);
+        return Vector3f(_sTangent.x * v.x + _tTangent.x * v.y + _sNormal.x * v.z,
+            _sTangent.y * v.x + _tTangent.y * v.y + _sNormal.y * v.z,
+            _sTangent.z * v.x + _tTangent.z * v.y + _sNormal.z * v.z);
     }
 
     Spectrum f(const Vector3f& woW, const Vector3f& wiW,
@@ -508,13 +513,13 @@ private:
 
     }
     // 几何法线
-    const Normal3f ns;
+    const Normal3f _gNormal;
     // 着色法线，bump贴图，法线贴图之类的
-    const Normal3f ng;
+    const Normal3f _sNormal;
     // 着色切线(s方向，u方向)
-    const Vector3f ss;
+    const Vector3f _sTangent;
     // 着色切线(t方向，v方向)
-    const Vector3f ts;
+    const Vector3f _tTangent;
     // BXDF组件的数量
     int nBxDFs = 0;
     // BXDF组件的最大数量
@@ -1180,9 +1185,25 @@ private:
  *         4cosθh
  * 但在 MicrofacetTransmission中，这两者的关系式是不同的
  * 关系式如下
- *                 ηo^2 |ωo · ωi| dωo
+ *                 ηo^2 |ωo · ωh| dωo
  *    dωh = --------------------------------            1式   (这个没有手动推过，比较羞耻，todo，有空一定要搞搞)
  *            [ηi(ωh · ωi) + ηo(ωo · ωh)]^2
+ *
+ * 补上1式推导的思路，我们需要求的是dωh/dωo，实际上可以把ωi指定为基准向量(θ为零)，ωi向量方向不变
+ * 我们可以计算ωh向量变化时，对应ωo的变化率，实际上就是dωh/dωo的倒数，则
+ * θi为入射角，θo为折射角
+ * 又因为ωi指定为基准向量，ωh与ωi的夹角 = π + θi - θo，ωo与ωi的夹角 = π - θo
+ * 由立体角定义展开如下
+ *
+ *              sin(π + θi - θo)d(π + θi - θo)dφh
+ * dωh/dωo = ------------------------------------    (φh = φo，可以约分)
+ *                   sin(π - θo)d(π - θo)dφo
+ *
+ * 上述有两个未知量θi，θo，又由斯涅尔定律  ηi * sinθi = ηo * sinθo
+ * 用斯涅尔定律表达式带入dωh/dωo表达式，各种换元法，求导。。。。。。应该就可以推导出1式了
+ * (计算量太大了，暂未尝试，先欠着)
+ *
+ *
  *
  *                 (1 - Fr(ωo)) Li(ωi) dωi D(ωh) dωh dA cosθh
  *    Lo(ωo) = ------------------------------------------------   2式 (MicrofacetReflection中的7式修改而来)
@@ -1232,9 +1253,9 @@ public:
 
     /**
      * dωh 与 dωi的关系式
-     *                        等待手动实现推导，todo
-     * dωh / dωi = ------------------------------------
-     *
+     *                   ηi^2 |ωi · ωh|
+     * dωh/dωi = --------------------------------    (推导思路与dωh/dωo类似)
+     *            [ηo(ωh · ωo) + ηi(ωi · ωh)]^2
      *
      *  又由sampling.hpp 中 1 式 py(y) * dy/dx = px(x) 可得
      *
