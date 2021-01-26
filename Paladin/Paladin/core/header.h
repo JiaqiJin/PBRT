@@ -128,6 +128,8 @@ struct CameraSample;
 template <typename T>
 class Texture;
 
+class MixMaterial;
+
 PALADIN_END
 
 inline uint32_t floatToBits(float f) {

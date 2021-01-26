@@ -6,7 +6,7 @@
 #include "material.hpp"
 #include "sampling.hpp"
 #include "microfacet.hpp"
-//实现微面元投射22 Sep 2019
+
 PALADIN_BEGIN
 
 /**
@@ -331,21 +331,6 @@ enum BxDFType {
     | BSDF_TRANSMISSION,
 };
 
-class BSDF {
-
-public:
-
-private:
-    ~BSDF() {}
-
-    const Normal3f ns, ng;
-    const Vector3f ss, ts;
-    int nBxDFs = 0;
-    static CONSTEXPR int MaxBxDFs = 8;
-    BxDF* bxdfs[MaxBxDFs];
-    friend class MixMaterial;
-};
-
 /**
  * BRDF(Bidirectional Reflectance Distribution Function)
  * 双向反射分布函数，定义给定入射方向上的辐射照度（irradiance）如何影响给定出射方向上的辐射率（radiance）
@@ -372,7 +357,7 @@ public:
 
     }
 
-    bool MatchesFlags(BxDFType t) const {
+    bool matchesFlags(BxDFType t) const {
         return (type & t) == type;
     }
 
@@ -445,6 +430,100 @@ inline std::ostream& operator<<(std::ostream& os, const BxDF& f) {
     os << f.toString();
     return os;
 }
+
+/**
+ * BSDF类
+ * 通常物体表面都不止一种反射属性，所以需要一个类把各种BRDF，BTDF管理起来
+ * 于是，就有了BSDF
+ * 除了储存各种BXDF组件，还有该点微分几何信息
+ *
+ */
+class BSDF {
+public:
+    BSDF(const SurfaceInteraction& si, Float eta = 1)
+        : eta(eta),
+        ns(si.shading.normal),
+        ng(si.normal),
+        ss(normalize(si.shading.dpdu)),
+        ts(cross(ns, ss)) {
+
+    }
+
+    void add(BxDF* b) {
+        CHECK_LT(nBxDFs, MaxBxDFs);
+        bxdfs[nBxDFs++] = b;
+    }
+
+    int numComponents(BxDFType flags = BSDF_ALL) const {
+        int num = 0;
+        for (int i = 0; i < nBxDFs; ++i) {
+            if (bxdfs[i]->matchesFlags(flags)) ++num;
+        }
+        return num;
+    }
+
+    Vector3f worldToLocal(const Vector3f& v) const {
+        return Vector3f(dot(v, ss), dot(v, ts), dot(v, ns));
+    }
+
+    Vector3f localToWorld(const Vector3f& v) const {
+        return Vector3f(ss.x * v.x + ts.x * v.y + ns.x * v.z,
+            ss.y * v.x + ts.y * v.y + ns.y * v.z,
+            ss.z * v.x + ts.z * v.y + ns.z * v.z);
+    }
+
+    Spectrum f(const Vector3f& woW, const Vector3f& wiW,
+        BxDFType flags = BSDF_ALL) const;
+
+    /**
+     * 跟BXDF的rho_hh函数相同，不再赘述
+     */
+    Spectrum rho_hh(int nSamples, const Point2f* samples1, const Point2f* samples2,
+        BxDFType flags = BSDF_ALL) const;
+
+    /**
+     * 跟BXDF的rho_hd函数相同，不再赘述
+     */
+    Spectrum rho_hd(const Vector3f& wo, int nSamples, const Point2f* samples,
+        BxDFType flags = BSDF_ALL) const;
+
+    Spectrum sample_f(const Vector3f& wo, Vector3f* wi, const Point2f& u,
+        Float* pdf, BxDFType type = BSDF_ALL,
+        BxDFType* sampledType = nullptr) const;
+
+    /**
+     * 跟BXDF的pdfW函数相同，不再赘述
+     */
+    Float pdfW(const Vector3f& wo, const Vector3f& wi,
+        BxDFType flags = BSDF_ALL) const;
+
+    std::string toString() const;
+
+    // 折射率，对于不透明物体，这是不用的
+    const Float eta;
+
+private:
+
+    ~BSDF() {
+
+    }
+    // 几何法线
+    const Normal3f ns;
+    // 着色法线，bump贴图，法线贴图之类的
+    const Normal3f ng;
+    // 着色切线(s方向，u方向)
+    const Vector3f ss;
+    // 着色切线(t方向，v方向)
+    const Vector3f ts;
+    // BXDF组件的数量
+    int nBxDFs = 0;
+    // BXDF组件的最大数量
+    static CONSTEXPR int MaxBxDFs = 8;
+    // BXDF列表
+    BxDF* bxdfs[MaxBxDFs];
+
+    friend class MixMaterial;
+};
 
 /**
  * 如果想针对一个特定的BxDF执行缩放
@@ -642,12 +721,7 @@ public:
      * @return             [description]
      */
     virtual Spectrum sample_f(const Vector3f& wo, Vector3f* wi, const Point2f& sample,
-        Float* pdf, BxDFType* sampledType) const {
-        *wi = Vector3f(-wo.x, -wo.y, wo.z);
-        *pdf = 1;
-        return _fresnel->evaluate(cosTheta(*wi)) * _R / absCosTheta(*wi);
-    }
-
+        Float* pdf, BxDFType* sampledType) const;
     /**
      * 由于是理想镜面反射，狄拉克函数
      * 用常规方式无法采样，需要特殊处理
@@ -659,10 +733,7 @@ public:
         return 0;
     }
 
-    virtual std::string toString() const {
-        return std::string("[ SpecularReflection R: ") + _R.ToString() +
-            std::string(" fresnel: ") + _fresnel->toString() + std::string(" ]");
-    }
+    virtual std::string toString() const;
 
 private:
     // 用于缩放颜色频谱
@@ -740,41 +811,13 @@ public:
      *
      */
     virtual Spectrum sample_f(const Vector3f& wo, Vector3f* wi, const Point2f& sample,
-        Float* pdf, BxDFType* sampledType) const {
-        // 首先确定光线是进入或离开折射介质
-        // 对象的法线都是向外的
-        // 如果wo.z > 0，则说明，ray trace工作流的光线从物体外部射入物体
-        bool entering = cosTheta(wo) > 0;
-        Float etaI = entering ? _etaA : _etaB;
-        Float etaT = entering ? _etaB : _etaA;
-        // todo，这里代码可以优化一下
-        if (!refract(wo, faceforward(Normal3f(0, 0, 1), wo), etaI / etaT, wi)) {
-            return 0;
-        }
-
-        *pdf = 1;
-        Spectrum ft = _T * (Spectrum(1.) - _fresnel.evaluate(cosTheta(*wi)));
-
-        // 用于处理双向方法的情况，只有从光源射出的光线才需要乘以这个缩放因子
-        if (_mode == TransportMode::Radiance) {
-            ft *= (etaI * etaI) / (etaT * etaT);
-        }
-        return ft / absCosTheta(*wi);
-    }
+        Float* pdf, BxDFType* sampledType) const;
 
     virtual Float pdfW(const Vector3f& wo, const Vector3f& wi) const {
         return 0;
     }
 
-    virtual std::string toString() const {
-        return std::string("[ SpecularTransmission: T: ") + _T.ToString() +
-            StringPrintf(" etaA: %f etaB: %f ", _etaA, _etaB) +
-            std::string(" fresnel: ") + _fresnel.toString() +
-            std::string(" mode : ") +
-            (_mode == TransportMode::Radiance ? std::string("RADIANCE")
-                : std::string("IMPORTANCE")) +
-            std::string(" ]");
-    }
+    virtual std::string toString() const;
 
 private:
     // 用于缩放颜色频谱
@@ -789,7 +832,7 @@ private:
 };
 
 /**
- * 菲涅尔镜面
+ * 菲涅尔高光
  * 其实就是镜面反射与镜面折射的组合
  * 采样时根据随机样本点去选择，采样折射还是反射
  * 具体推导过程不再赘述
@@ -813,48 +856,13 @@ public:
     }
 
     virtual Spectrum sample_f(const Vector3f& wo, Vector3f* wi, const Point2f& u,
-        Float* pdf, BxDFType* sampledType) const {
-        Float F = frDielectric(cosTheta(wo), _etaA, _etaB);
-        if (u[0] < F) {
-            *wi = Vector3f(-wo.x, -wo.y, wo.z);
-            if (sampledType)
-                *sampledType = BxDFType(BSDF_SPECULAR | BSDF_REFLECTION);
-            *pdf = F;
-            return F * _R / absCosTheta(*wi);
-        }
-        else {
-            bool entering = cosTheta(wo) > 0;
-            Float etaI = entering ? _etaA : _etaB;
-            Float etaT = entering ? _etaB : _etaA;
-
-            if (!refract(wo, faceforward(Normal3f(0, 0, 1), wo), etaI / etaT, wi))
-                return 0;
-            Spectrum ft = _T * (1 - F);
-
-            if (_mode == TransportMode::Radiance) {
-                ft *= (etaI * etaI) / (etaT * etaT);
-            }
-            if (sampledType) {
-                *sampledType = BxDFType(BSDF_SPECULAR | BSDF_TRANSMISSION);
-            }
-            *pdf = 1 - F;
-            return ft / absCosTheta(*wi);
-        }
-    }
+        Float* pdf, BxDFType* sampledType) const;
 
     virtual Float pdfW(const Vector3f& wo, const Vector3f& wi) const {
         return 0;
     }
 
-    virtual std::string toString() const {
-        return std::string("[ FresnelSpecular R: ") + _R.ToString() +
-            std::string(" T: ") + _T.ToString() +
-            StringPrintf(" etaA: %f etaB: %f ", _etaA, _etaB) +
-            std::string(" mode : ") +
-            (_mode == TransportMode::Radiance ? std::string("RADIANCE")
-                : std::string("IMPORTANCE")) +
-            std::string(" ]");
-    }
+    virtual std::string toString() const;
 
 private:
     const Spectrum _R, _T;
@@ -949,23 +957,11 @@ public:
     }
 
     virtual Spectrum sample_f(const Vector3f& wo, Vector3f* wi, const Point2f& u,
-        Float* pdf, BxDFType* sampledType) const {
-        *wi = cosineSampleHemisphere(u);
-        if (wo.z > 0) {
-            wi->z *= -1;
-        }
-        *pdf = pdfW(wo, *wi);
-        return f(wo, *wi);
-    }
+        Float* pdf, BxDFType* sampledType) const;
 
-    virtual Float pdfW(const Vector3f& wo, const Vector3f& wi) const {
-        return sameHemisphere(wo, wi) ? 0 : absCosTheta(wi) * InvPi;
-    }
+    virtual Float pdfW(const Vector3f& wo, const Vector3f& wi) const;
 
-    virtual std::string toString() const {
-        return std::string("[ LambertianTransmission T: ") + _T.ToString() +
-            std::string(" ]");
-    }
+    virtual std::string toString() const;
 
 private:
     // 透射系数
@@ -1013,36 +1009,9 @@ public:
      *   	α = max(θi,θo)
      *		β = min(θi,θo)
      */
-    virtual Spectrum f(const Vector3f& wo, const Vector3f& wi) const {
-        Float sinThetaI = sinTheta(wi);
-        Float sinThetaO = sinTheta(wo);
-        // 计算max(0,cos(φi-φo))项
-        // 由于三角函数耗时比较高，这里可以用三角恒等变换展开
-        // cos(φi-φo) = cosφi * cosφo + sinφi * sinφo
-        Float maxCos = 0;
-        if (sinThetaI > 1e-4 && sinThetaO > 1e-4) {
-            Float sinPhiI = sinPhi(wi), cosPhiI = cosPhi(wi);
-            Float sinPhiO = sinPhi(wo), cosPhiO = cosPhi(wo);
-            Float dCos = cosPhiI * cosPhiO + sinPhiI * sinPhiO;
-            maxCos = std::max((Float)0, dCos);
-        }
+    virtual Spectrum f(const Vector3f& wo, const Vector3f& wi) const;
 
-        Float sinAlpha, tanBeta;
-        if (absCosTheta(wi) > absCosTheta(wo)) {
-            sinAlpha = sinThetaO;
-            tanBeta = sinThetaI / absCosTheta(wi);
-        }
-        else {
-            sinAlpha = sinThetaI;
-            tanBeta = sinThetaO / absCosTheta(wo);
-        }
-        return _R * InvPi * (_A + _B * maxCos * sinAlpha * tanBeta);
-    }
-
-    virtual std::string toString() const {
-        return std::string("[ OrenNayar R: ") + _R.ToString() +
-            StringPrintf(" A: %f B: %f ]", _A, _B);
-    }
+    virtual std::string toString() const;
 
 private:
     // 反射系数
@@ -1074,11 +1043,11 @@ private:
  *
  * 将3式带入2式
  *
- *      d􏰀Φh = Li(ωi) dω cosθh D(ωh) dωh dA     4式
+ *      dΦh = Li(ωi) dω cosθh D(ωh) dωh dA     4式
  *
  * 我们假设各个微平面根据菲涅尔定律独立反射光线，则出射辐射通量flux为
  *
- *      d􏰀Φo = Fr(ωo) d􏰀Φh   5式    (这里理解得不是很好，菲涅尔函数表示的就是有多少能量没被吸收，直接反射出来了)
+ *      dΦo = Fr(ωo) dΦh   5式    (这里理解得不是很好，菲涅尔函数表示的就是有多少能量没被吸收，直接反射出来了)
  *
  * 再由radiance的定义
  *                     dΦo
@@ -1091,7 +1060,7 @@ private:
  *      Lo(ωo) = ---------------------------------------------          7式
  *                              cosθo dωo dA
  *
- * 这里直接使用一个结论表达式(在文末给出推导过程)
+ * 这里直接使用一个结论表达式(在pdfW方法的注释中给出推导过程)
  *
  *      dωo = 4 cosθh dωh       8式
  *
@@ -1130,10 +1099,6 @@ private:
  * 由以上表达式，自然可以得出一个结论fr的量纲为1/sr（sr为立体角）
  * 感觉自己说得也不清晰
  *
- * 来来来，推导一下8式
- *
- *
- *
  */
 class MicrofacetReflection : public BxDF {
 public:
@@ -1155,20 +1120,7 @@ public:
      * @param  wi 入射方向
      * @return    [description]
      */
-    Spectrum f(const Vector3f& wo, const Vector3f& wi) const {
-        Float cosThetaO = absCosTheta(wo), cosThetaI = absCosTheta(wi);
-        if (cosThetaI == 0 || cosThetaO == 0) {
-            return Spectrum(0.);
-        }
-        Vector3f wh = wi + wo;
-        if (wh.x == 0 && wh.y == 0 && wh.z == 0) {
-            return Spectrum(0.);
-        }
-        wh = normalize(wh);
-        Spectrum F = _fresnel->evaluate(dot(wi, wh));
-        return _R * _distribution->D(wh) * _distribution->G(wo, wi) * F /
-            (4 * cosThetaI * cosThetaO);
-    }
+    Spectrum f(const Vector3f& wo, const Vector3f& wi) const;
 
     /**
      * 函数的样本值，并返回该样本的概率密度函数值
@@ -1180,34 +1132,23 @@ public:
      * @return             [description]
      */
     Spectrum sample_f(const Vector3f& wo, Vector3f* wi, const Point2f& u,
-        Float* pdf, BxDFType* sampledType) const {
-        if (wo.z == 0) {
-            return 0.;
-        }
-        Vector3f wh = _distribution->sample_wh(wo, u);
-        *wi = reflect(wo, wh);
-        if (!sameHemisphere(wo, *wi)) {
-            return Spectrum(0.f);
-        }
-
-        *pdf = _distribution->pdfW(wo, wh) / (4 * dot(wo, wh));
-        return f(wo, *wi);
-    }
+        Float* pdf, BxDFType* sampledType) const;
 
     /**
      * 采样wi概率密度函数，
      * 在MicrofacetDistribution中我们只实现了wh的概率密度函数
      * 这里要将wh的分布转换到wi的分布
-     * θi为ωi与ωo的夹角，θh为ωh与ωo的夹角，可以开始推导了
+     * θi为ωi与ωo的夹角，θh为ωh与ωo的夹角，ωo方向不变，ωh的改变会引起ωi的变换，
+     * 知道以上信息之后，可以开始推导了
      *
-     *      θi = 2θh,  φi = φh
+     *      θi = 2θh,  dφi = dφh
      *
      *                 sinθh dθh dφh
-     * dωh / dωi = -------------------- =
+     * dωh / dωi = --------------------
      *                 sinθi dθi dφi
      *
      *                 sinθh dθh            sinθh           1
-     * dωh / dωi = -------------------- = ---------- = ----------
+     * dωh / dωi = -------------------- = ---------- = ---------- = dωh / dωo
      *                sin2θh d2θh          2sin2θh       4cosθh
      *
      * 又由sampling.hpp 中 1 式 py(y) * dy/dx = px(x) 可得
@@ -1218,19 +1159,9 @@ public:
      * @param  wi 入射方向
      * @return    [description]
      */
-    Float pdfW(const Vector3f& wo, const Vector3f& wi) const {
-        if (!sameHemisphere(wo, wi)) {
-            return 0;
-        }
-        Vector3f wh = normalize(wo + wi);
-        return _distribution->pdfW(wo, wh) / (4 * dot(wo, wh));
-    }
+    Float pdfW(const Vector3f& wo, const Vector3f& wi) const;
 
-    std::string toString() const {
-        return std::string("[ MicrofacetReflection R: ") + _R.ToString() +
-            std::string(" distribution: ") + _distribution->toString() +
-            std::string(" fresnel: ") + _fresnel->toString() + std::string(" ]");
-    }
+    std::string toString() const;
 
 private:
     // 反射率
@@ -1239,6 +1170,152 @@ private:
     const MicrofacetDistribution* _distribution;
     // 菲涅尔
     const Fresnel* _fresnel;
+};
+
+/**
+ * 微面元透射 BTDF MicrofacetTransmission
+ * 我们在实现 MicrofacetReflection类的时候已经推导过dωo与dωh的关系式
+ *           dωo
+ * dωh = ----------
+ *         4cosθh
+ * 但在 MicrofacetTransmission中，这两者的关系式是不同的
+ * 关系式如下
+ *                 ηo^2 |ωo · ωi| dωo
+ *    dωh = --------------------------------            1式   (这个没有手动推过，比较羞耻，todo，有空一定要搞搞)
+ *            [ηi(ωh · ωi) + ηo(ωo · ωh)]^2
+ *
+ *                 (1 - Fr(ωo)) Li(ωi) dωi D(ωh) dωh dA cosθh
+ *    Lo(ωo) = ------------------------------------------------   2式 (MicrofacetReflection中的7式修改而来)
+ *                          cosθo dωo dA
+ *
+ *                             dLo(p, ωo)               dLo(p, ωo)
+ * 由BTDF定义 fr(p, ωo, ωi) = ------------------ = ------------------------   3式(MicrofacetReflection中的10式)
+ *                              dE(p, ωi)           Li(p, ωi) cosθi dωi
+ *
+ * 联合1，2，3式，再加入几何遮挡函数
+ *
+ *                 η^2 (1 - Fr(ωo)) D(ωh) G(ωi,ωo)   |ωi · ωh||ωo · ωh|
+ * fr(ωo, ωi) = ---------------------------------------------------------
+ *                   [(ωh · ωo) + η(ωi · ωh)]^2   cosθo cosθi
+ *
+ * 其中 η = ηi/ηo , ωh = ωo + ηωi
+ *
+ */
+class MicrofacetTransmission : public BxDF {
+public:
+    MicrofacetTransmission(const Spectrum& T,
+        MicrofacetDistribution* distribution, Float etaA,
+        Float etaB, TransportMode mode)
+        : BxDF(BxDFType(BSDF_TRANSMISSION | BSDF_GLOSSY)),
+        _T(T),
+        _distribution(distribution),
+        _etaA(etaA),
+        _etaB(etaB),
+        _fresnel(etaA, etaB),
+        _mode(mode) {
+
+    }
+
+    /**
+     * BTDF 函数值
+     *                η^2 (1 - Fr(ωo)) D(ωh) G(ωi,ωo)   |ωi · ωh||ωo · ωh|
+     * fr(ωo, ωi) = ---------------------------------------------------------
+     *                   [(ωh · ωo) + η(ωi · ωh)]^2    cosθo cosθi
+     * @param  wo 出射向量
+     * @param  wi 入射向量
+     * @return    BTDF函数值
+     */
+    virtual Spectrum f(const Vector3f& wo, const Vector3f& wi) const;
+
+    virtual Spectrum sample_f(const Vector3f& wo, Vector3f* wi, const Point2f& u,
+        Float* pdf, BxDFType* sampledType) const;
+
+    /**
+     * dωh 与 dωi的关系式
+     *                        等待手动实现推导，todo
+     * dωh / dωi = ------------------------------------
+     *
+     *
+     *  又由sampling.hpp 中 1 式 py(y) * dy/dx = px(x) 可得
+     *
+     * pωi(ωi) = dωh / dωi * pωh(ωh)
+     *
+     * @param  wo [description]
+     * @param  wi [description]
+     * @return    [description]
+     */
+    virtual Float pdfW(const Vector3f& wo, const Vector3f& wi) const;
+
+    virtual std::string toString() const;
+
+private:
+
+    const Spectrum _T;
+    const MicrofacetDistribution* _distribution;
+    const Float _etaA, _etaB;
+    const FresnelDielectric _fresnel;
+    const TransportMode _mode;
+};
+
+/**
+ * 菲涅尔混合
+ * 用于模拟漫反射物体表面有一层光泽反射层
+ *
+ *                            D(ωh) F(ωo)
+ * fr(p, ωo, ωi) = ------------------------------------
+ *                   4(ωh · ωi) * max((n,ωi), (n,ωo))
+ *
+ * 根据BRDF互换性，能量守恒
+ *
+ * Fr(cosθ) = R +(1 - R)(1 - cosθ)^5   (这个表达式是近似)
+ *
+ *
+ *                  28 Rd
+ * fr(p, ωo, ωi) = ------- (1 - Rs) (1 - (1 - (n · ωi)/2)^5) (1 - (1 - (n · ωo)/2)^5)
+ *                   23π
+ *
+ * 第一个表达式待推导一遍todo，后面两个还是暂时认怂吧
+ *
+ */
+class FresnelBlend : public BxDF {
+public:
+    FresnelBlend(const Spectrum& Rd, const Spectrum& Rs,
+        MicrofacetDistribution* distrib)
+        : BxDF(BxDFType(BSDF_REFLECTION | BSDF_GLOSSY)),
+        _Rd(Rd),
+        _Rs(Rs),
+        _distribution(distrib) {
+
+    }
+
+    /**
+     *                  28 Rd
+     * fr(p, ωo, ωi) = ------- (1 - Rs) (1 - (1 - (n · ωi)/2)^5) (1 - (1 - (n · ωo)/2)^5)
+     *                   23π
+     * @param  wo 出射方向
+     * @param  wi 入射方向
+     */
+    virtual Spectrum f(const Vector3f& wo, const Vector3f& wi) const;
+
+    /**
+     * Fr(cosθ) = R +(1 - R)(1 - cosθ)^5
+     */
+    Spectrum schlickFresnel(Float _cosTheta) const;
+
+    /**
+     * 这个函数的分布转换需要再搞搞，todo
+     */
+    virtual Spectrum sample_f(const Vector3f& wo, Vector3f* wi,
+        const Point2f& uOrig, Float* pdf,
+        BxDFType* sampledType) const;
+
+    virtual Float pdfW(const Vector3f& wo, const Vector3f& wi) const;
+
+    virtual std::string toString() const;
+
+private:
+    const Spectrum _Rd, _Rs;
+    MicrofacetDistribution* _distribution;
 };
 
 PALADIN_END
