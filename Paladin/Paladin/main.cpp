@@ -1,8 +1,8 @@
-#include <iostream>
+﻿#include <iostream>
 #include "core/paladin.hpp"
 
 #include "math/lowdiscrepancy.hpp"
-
+//实现matte材质
 USING_PALADIN
 
 USING_STD

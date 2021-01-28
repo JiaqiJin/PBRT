@@ -165,7 +165,11 @@
     <ClCompile Include="integrators\path.cpp" />
     <ClCompile Include="lights\pointlight.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="materials\glass.cpp" />
     <ClCompile Include="materials\matte.cpp" />
+    <ClCompile Include="materials\metal.cpp" />
+    <ClCompile Include="materials\mirror.cpp" />
+    <ClCompile Include="materials\plastic.cpp" />
     <ClCompile Include="math\animatedtransform.cpp" />
     <ClCompile Include="math\lowdiscrepancy.cpp" />
     <ClCompile Include="math\quaternion.cpp" />
@@ -216,7 +220,11 @@
     <ClInclude Include="filters\triangle.h" />
     <ClInclude Include="integrators\path.hpp" />
     <ClInclude Include="lights\pointlight.hpp" />
+    <ClInclude Include="materials\glass.hpp" />
     <ClInclude Include="materials\matte.hpp" />
+    <ClInclude Include="materials\metal.hpp" />
+    <ClInclude Include="materials\mirror.hpp" />
+    <ClInclude Include="materials\plastic.hpp" />
     <ClInclude Include="math\animatedtransform.hpp" />
     <ClInclude Include="math\bounds.h" />
     <ClInclude Include="math\lowdiscrepancy.hpp" />

@@ -30,6 +30,17 @@ SurfaceInteraction::SurfaceInteraction(
     }
 }
 
+void SurfaceInteraction::computeDifferentials(const RayDifferential& ray) const {
+    if (ray.hasDifferentials) {
+
+    }
+    else {
+        dudx = dvdx = 0;
+        dudy = dvdy = 0;
+        dpdx = dpdy = Vector3f(0, 0, 0);
+    }
+}
+
 void SurfaceInteraction::setShadingGeometry(const Vector3f& dpdus,
     const Vector3f& dpdvs,
     const Normal3f& dndus,
