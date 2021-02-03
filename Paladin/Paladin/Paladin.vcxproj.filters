@@ -102,9 +102,6 @@
     <ClCompile Include="shapes\triangle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="textures\constant.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="tools\fileio.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -151,6 +148,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="materials\plastic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="textures\bilerp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="textures\imagemap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -263,9 +266,6 @@
     <ClInclude Include="shapes\triangle.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="textures\constant.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="tools\errfloat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -345,6 +345,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="materials\plastic.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="textures\bilerp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="textures\constant.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="textures\scale.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="textures\mix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="textures\imagemap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -57,9 +57,10 @@ public:
     const Medium *medium;
 };
 
-/*
-Contain two auxiliar rays : camera rays offset by one sample in the  and  direction
-*/
+/**
+ * 从相机从生成的光线微分，辅助光线的起点与主光线起点相同，
+ * 经过高光反射或高光投射之后会渐渐偏离
+ */
 class RayDifferential : public Ray {
 public:
     RayDifferential() {
@@ -99,13 +100,12 @@ public:
     Vector3f rxDirection, ryDirection;
 };
 
-/*
- 由于计算出的交点可能会有误差，如果直接把pos作为光线的起点，可能取到的是shape内部的点
- 如果从内部的点发出光线，则可能产生自相交，为了避免这种情况，通常会对pos做一定的偏移
- 基本思路：
- 以计算出的交点p为中心，误差偏移量为包围盒的一个顶点，组成一个最小包围盒b
- 过p点做垂直于法线的平面s，将s沿着法线方向推到于b相交的最远位置，此时s与法线相交的点p'作为光线起点
- http://www.pbr-book.org/3ed-2018/Shapes/Managing_Rounding_Error.html#sec:generating-rays
+/**
+ * 由于计算出的交点可能会有误差，如果直接把pos作为光线的起点，可能取到的是shape内部的点
+ * 如果从内部的点发出光线，则可能产生自相交，为了避免这种情况，通常会对pos做一定的偏移
+ * 基本思路：
+ * 以计算出的交点p为中心，误差偏移量为包围盒的一个顶点，组成一个最小包围盒b
+ * 过p点做垂直于法线的平面s，将s沿着法线方向推到于b相交的最远位置，此时s与法线相交的点p'作为光线起点
  */
 static Point3f offsetRayOrigin(const Point3f &p, const Vector3f &pError,
                                const Normal3f &n, const Vector3f &w) {

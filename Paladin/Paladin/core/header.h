@@ -316,6 +316,15 @@ inline Float Erf(Float x) {
 
 PALADIN_BEGIN
 
+inline Float sphericalTheta(const Vector3f& v) {
+    return std::acos(clamp(v.z, -1, 1));
+}
+
+inline Float sphericalPhi(const Vector3f& v) {
+    Float p = std::atan2(v.y, v.x);
+    return (p < 0) ? (p + 2 * Pi) : p;
+}
+
 inline Vector3f sphericalDirection(Float sinTheta, Float cosTheta, Float phi) {
     return Vector3f(sinTheta * std::cos(phi), sinTheta * std::sin(phi),
         cosTheta);

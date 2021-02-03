@@ -101,6 +101,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>E:\VisualStudio\PBRTStudy\Paladin\Paladin\core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -133,6 +134,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>E:\VisualStudio\PBRTStudy\Paladin\Paladin\core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -185,7 +187,8 @@
     <ClCompile Include="shapes\disk.cpp" />
     <ClCompile Include="shapes\sphere.cpp" />
     <ClCompile Include="shapes\triangle.cpp" />
-    <ClCompile Include="textures\constant.cpp" />
+    <ClCompile Include="textures\bilerp.cpp" />
+    <ClCompile Include="textures\imagemap.cpp" />
     <ClCompile Include="tools\fileio.cpp" />
     <ClCompile Include="tools\memory.cpp" />
   </ItemGroup>
@@ -246,7 +249,11 @@
     <ClInclude Include="shapes\disk.hpp" />
     <ClInclude Include="shapes\sphere.hpp" />
     <ClInclude Include="shapes\triangle.hpp" />
-    <ClInclude Include="textures\constant.hpp" />
+    <ClInclude Include="textures\bilerp.h" />
+    <ClInclude Include="textures\constant.h" />
+    <ClInclude Include="textures\imagemap.hpp" />
+    <ClInclude Include="textures\mix.h" />
+    <ClInclude Include="textures\scale.h" />
     <ClInclude Include="tools\errfloat.h" />
     <ClInclude Include="tools\fileio.hpp" />
     <ClInclude Include="tools\macro.h" />
