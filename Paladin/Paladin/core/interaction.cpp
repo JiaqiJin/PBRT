@@ -33,11 +33,11 @@ SurfaceInteraction::SurfaceInteraction(
 void SurfaceInteraction::computeDifferentials(const RayDifferential& ray) const {
     if (ray.hasDifferentials) {
         // 平面方程为 ax + by + cz = d
-      // 法向量为n(a,b,c),平面上的点p(x,y,z)
-      // d = n · p
-      // 已知平面方程，射线参数，求交点，表达式如下
-      // a(ox + t dirX) + b(oy + t dirX) + c(oz + t dirZ) = d
-      // 整理得t = (d - (a,b,c) · o) / (a,b,c) · dir
+        // 法向量为n(a,b,c),平面上的点p(x,y,z)
+        // d = n · p
+        // 已知平面方程，射线参数，求交点，表达式如下
+        // a(ox + t dirX) + b(oy + t dirX) + c(oz + t dirZ) = d
+        // 整理得t = (d - (a,b,c) · o) / (a,b,c) · dir
         Float d = dot(normal, Vector3f(pos));
         Float tx = (d - dot(normal, Vector3f(ray.rxOrigin))) / dot(normal, ray.rxDirection);
         if (std::isinf(tx) || std::isnan(tx)) {
@@ -104,6 +104,7 @@ void SurfaceInteraction::computeDifferentials(const RayDifferential& ray) const 
         if (!solveLinearSystem2x2(A, By, &dudy, &dvdy)) {
             dudy = dvdy = 0;
         }
+
     }
     else {
     fail:
@@ -112,6 +113,7 @@ void SurfaceInteraction::computeDifferentials(const RayDifferential& ray) const 
         dpdx = dpdy = Vector3f(0, 0, 0);
     }
 }
+
 
 void SurfaceInteraction::setShadingGeometry(const Vector3f& dpdus,
     const Vector3f& dpdvs,
