@@ -171,6 +171,7 @@
     <ClCompile Include="materials\matte.cpp" />
     <ClCompile Include="materials\metal.cpp" />
     <ClCompile Include="materials\mirror.cpp" />
+    <ClCompile Include="materials\mix.cpp" />
     <ClCompile Include="materials\plastic.cpp" />
     <ClCompile Include="math\animatedtransform.cpp" />
     <ClCompile Include="math\lowdiscrepancy.cpp" />
@@ -227,6 +228,7 @@
     <ClInclude Include="materials\matte.hpp" />
     <ClInclude Include="materials\metal.hpp" />
     <ClInclude Include="materials\mirror.hpp" />
+    <ClInclude Include="materials\mix.hpp" />
     <ClInclude Include="materials\plastic.hpp" />
     <ClInclude Include="math\animatedtransform.hpp" />
     <ClInclude Include="math\bounds.h" />

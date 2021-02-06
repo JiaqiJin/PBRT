@@ -156,6 +156,9 @@
     <ClCompile Include="textures\imagemap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="materials\mix.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="accelerators\bvh.hpp">
@@ -360,6 +363,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="textures\imagemap.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="materials\mix.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -2,7 +2,7 @@
 #include "core/paladin.hpp"
 
 #include "math/lowdiscrepancy.hpp"
-//实现10.3章代码
+//实现mix材质
 USING_PALADIN
 
 USING_STD
