@@ -1,10 +1,15 @@
-#ifndef plastic_hpp
+﻿#ifndef plastic_hpp
 #define plastic_hpp
 
 #include "material.hpp"
 
 PALADIN_BEGIN
-
+/**
+ * 塑料材质
+ * 由高光反射与漫反射构成
+ * 漫反射部分为Lambertian
+ * 高光反射为MicrofacetReflection
+ */
 class PlasticMaterial : Material {
 public:
     PlasticMaterial(const std::shared_ptr<Texture<Spectrum>>& Kd,

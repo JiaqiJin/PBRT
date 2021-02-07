@@ -667,6 +667,9 @@ public:
     virtual Spectrum evaluate(Float) const {
         return Spectrum(1.);
     }
+    virtual std::string toString() const {
+        return "[ FresnelNoOp ]";
+    }
 };
 
 /**

@@ -5,7 +5,11 @@
 #include "material.hpp"
 
 PALADIN_BEGIN
-
+/**
+ * 无光的粗糙的材质
+ * 如果粗糙度为零，则使用lambertian反射
+ * 否则使用OrenNayar反射模型
+ */
 class MatteMaterial : public Material
 {
 public:
