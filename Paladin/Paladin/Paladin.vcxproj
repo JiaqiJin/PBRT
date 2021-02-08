@@ -208,6 +208,7 @@
     <ClInclude Include="core\material.hpp" />
     <ClInclude Include="core\medium.hpp" />
     <ClInclude Include="core\microfacet.hpp" />
+    <ClInclude Include="core\mipmap.h" />
     <ClInclude Include="core\paladin.hpp" />
     <ClInclude Include="core\primitive.hpp" />
     <ClInclude Include="core\sampler.hpp" />

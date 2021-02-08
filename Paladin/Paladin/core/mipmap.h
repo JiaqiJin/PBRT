@@ -43,11 +43,11 @@ public:
         return _pyramid.size();
     }
 
-    const T& texel(int level, int s, int t) const;
+    //const T& texel(int level, int s, int t) const;
 
-    T lookup(const Point2f& st, Float width = 0.f) const;
+    //T lookup(const Point2f& st, Float width = 0.f) const;
 
-    T lookup(const Point2f& st, Vector2f dstdx, Vector2f dstdy) const;
+    //T lookup(const Point2f& st, Vector2f dstdx, Vector2f dstdy) const;
 
 private:
 

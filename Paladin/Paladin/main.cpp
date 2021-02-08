@@ -2,7 +2,7 @@
 #include "core/paladin.hpp"
 
 #include "math/lowdiscrepancy.hpp"
-//实现玻璃，镜面材质
+//添加光源类
 USING_PALADIN
 
 USING_STD

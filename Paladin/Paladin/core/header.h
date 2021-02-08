@@ -17,6 +17,7 @@
 #include <vector>
 #include <atomic>
 #include <mutex>
+#include <functional>
 
 #ifdef __GNUC__
     //fix 'numeric_limits' is not a member of 'std' for linux
