@@ -83,5 +83,11 @@
     <ClInclude Include="tools\errfloat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="tools\stringprint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ext\json.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

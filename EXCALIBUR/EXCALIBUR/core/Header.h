@@ -17,6 +17,12 @@
 #include <mutex>
 #include <cctype>
 
+#include "../ext/json.hpp"
+typedef nlohmann::json nloJson;
+
+#include "../tools/stringprint.h"
+#include "../tools/macro.h"
+
 namespace Rendering
 {
 	template<typename T>
@@ -131,6 +137,138 @@ namespace Rendering
 
 	class EnvironmentMap;
 }
+
+inline uint32_t floatToBits(float f) {
+	uint32_t ui;
+	memcpy(&ui, &f, sizeof(float));
+	return ui;
+}
+
+inline int32_t floatToInt(float f) {
+	int32_t i;
+	memcpy(&i, &f, sizeof(float));
+	return i;
+}
+
+inline float bitsToFloat(uint32_t ui) {
+	float f;
+	memcpy(&f, &ui, sizeof(uint32_t));
+	return f;
+}
+
+inline float intToFloat(int32_t i) {
+	float f;
+	memcpy(&f, &i, sizeof(int32_t));
+	return f;
+}
+
+inline uint64_t floatToBits(double f) {
+	uint64_t ui;
+	memcpy(&ui, &f, sizeof(double));
+	return ui;
+}
+
+inline int64_t floatToInt(double f) {
+	int64_t i;
+	memcpy(&i, &f, sizeof(double));
+	return i;
+}
+
+
+inline double bitsToFloat(uint64_t ui) {
+	double f;
+	memcpy(&f, &ui, sizeof(uint64_t));
+	return f;
+}
+
+inline double intToFloat(int64_t i) {
+	double f;
+	memcpy(&f, &i, sizeof(int64_t));
+	return f;
+}
+
+inline float nextFloatUp(float v) {
+	if (std::isinf(v) && v > 0.) return v;
+	if (v == -0.f) v = 0.f;
+	uint32_t ui = floatToBits(v);
+	if (v >= 0)
+		++ui;
+	else
+		--ui;
+	return bitsToFloat(ui);
+}
+
+inline float nextFloatDown(float v) {
+	if (std::isinf(v) && v < 0.) return v;
+	if (v == 0.f) v = -0.f;
+	uint32_t ui = floatToBits(v);
+	if (v > 0)
+		--ui;
+	else
+		++ui;
+	return bitsToFloat(ui);
+}
+
+inline double nextFloatUp(double v, int delta = 1) {
+	if (std::isinf(v) && v > 0.) return v;
+	if (v == -0.f) v = 0.f;
+	uint64_t ui = floatToBits(v);
+	if (v >= 0.)
+		ui += delta;
+	else
+		ui -= delta;
+	return bitsToFloat(ui);
+}
+
+inline double nextFloatDown(double v, int delta = 1) {
+	if (std::isinf(v) && v < 0.) return v;
+	if (v == 0.f) v = -0.f;
+	uint64_t ui = floatToBits(v);
+	if (v > 0.)
+		ui -= delta;
+	else
+		ui += delta;
+	return bitsToFloat(ui);
+}
+
+template <typename T>
+inline T Mod(T a, T b) {
+	T result = a - (a / b) * b;
+	return (T)((result < 0) ? result + b : result);
+}
+
+template <>
+inline Float Mod(Float a, Float b) {
+	return std::fmod(a, b);
+}
+
+inline Float gammaCorrect(Float value) {
+	if (value <= 0.0031308f) {
+		return 12.92f * value;
+	}
+	return 1.055f * std::pow(value, (Float)(1.f / 2.4f)) - 0.055f;
+}
+
+inline Float inverseGammaCorrect(Float value) {
+	if (value <= 0.04045f) {
+		return value * 1.f / 12.92f;
+	}
+	return std::pow((value + 0.055f) * 1.f / 1.055f, (Float)2.4f);
+}
+
+// std的log是以e为底数 log2(x) = lnx / ln2
+inline Float Log2(Float x) {
+	const Float invLog2 = 1.442695040888963387004650940071;
+	return std::log(x) * invLog2;
+}
+
+template <typename T>
+inline CONSTEXPR bool isPowerOf2(T v) {
+	return v && !(v & (v - 1));
+}
+
+#define ALLOCA(TYPE, COUNT) (TYPE *) alloca((COUNT) * sizeof(TYPE))
+
 
 #include "../math/mathutil.h"
 
