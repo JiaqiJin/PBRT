@@ -107,5 +107,8 @@
     <ClInclude Include="core\Interaction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="tools\errofloat.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

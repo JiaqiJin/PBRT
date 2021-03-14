@@ -176,6 +176,7 @@
     <ClInclude Include="parallel\Parallel.h" />
     <ClInclude Include="tools\classFactory.h" />
     <ClInclude Include="tools\errfloat.h" />
+    <ClInclude Include="tools\errofloat.h" />
     <ClInclude Include="tools\macro.h" />
     <ClInclude Include="tools\memory.h" />
     <ClInclude Include="tools\stringprint.h" />

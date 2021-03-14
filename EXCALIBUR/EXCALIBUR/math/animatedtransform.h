@@ -1,11 +1,15 @@
-﻿#pragma once
+﻿#ifndef animatedtransform_h
+#define animatedtransform_h
 
 #include "transform.h"
 #include "quaternion.h"
 
 RENDERING_BEGIN
 
-struct Interval {
+/**
+ * 区间结构，包含一个最大值一个最小值
+ */
+    struct Interval {
     Interval(Float v) : low(v), high(v) {}
     Interval(Float v0, Float v1)
         : low(std::min(v0, v1)), high(std::max(v0, v1)) {}
@@ -63,6 +67,21 @@ inline Interval cos(const Interval& i) {
     return Interval(cosLow, cosHigh);
 }
 
+
+/**
+ * 牛顿迭代法求出零点
+ * 牛顿迭代法公式为 x[i+1] = xi + f(xi) / f'(xi)
+ * 牛顿迭代法思路f(x) = 0，x=r为精确解，x0作为近似解
+ * 过点(x0, f(x0))做切线L，L的方程为 y = f(x0) + f'(x0) * (x - x0)
+ * L与x轴的交点为 x1 = x0 - f(x0) / f'(x0)，反复迭代求出近似解
+ *
+ * 设 p' = f(t)
+ * t_i+1 = ti - f'(t)/f''(t)
+ *
+ * 原始公式，
+ * f'(t) = dp'/dt = c1 + (c2 + c3 * t) * cos(2θt) + (c4 + c5 * t) * sin(2θt)
+ * f''(t) = (c3 + 2θ(c4 + c5 * t)) * cos(2θt) + (c5 - 2θ(c2 + c3 * t)) * sin(2θt);
+ */
 inline void intervalFindZeros(Float c1, Float c2, Float c3, Float c4, Float c5,
     Float theta, Interval tInterval, Float* zeros,
     int* zeroCount, int depth = 8) {
@@ -109,10 +128,14 @@ inline void intervalFindZeros(Float c1, Float c2, Float c3, Float c4, Float c5,
     }
 }
 
+/*
+两个变换之间的过度，用于实现动态模糊
+进行变换的顺序为缩放旋转平移 M = TRS
+*/
 class AnimatedTransform {
 
 public:
-   
+ 
     AnimatedTransform(const Transform* startTransform, Float startTime,
         const Transform* endTransform, Float endTime);
 
@@ -127,13 +150,55 @@ public:
 
     RayDifferential exec(const RayDifferential& r) const;
 
-    /*
-     获取一个包围盒对象，返回运动过程中包围盒扫过的范围的包围盒
+    Point3f exec(Float time, const Point3f& p) const {
+        if (time <= _startTime || !_actuallyAnimated) {
+            return _startTransform->exec(p);
+        }
+        if (time >= _endTime) {
+            return _endTransform->exec(p);
+        }
+        return interpolate(time).exec(p);
+    }
+
+    Vector3f exec(Float time, const Vector3f& v) const {
+        if (time <= _startTime || !_actuallyAnimated) {
+            return _startTransform->exec(v);
+        }
+        if (time >= _endTime) {
+            return _endTransform->exec(v);
+        }
+        return interpolate(time).exec(v);
+    }
+
+    Normal3f exec(Float time, const Normal3f& n) const {
+        if (time <= _startTime || !_actuallyAnimated) {
+            return _startTransform->exec(n);
+        }
+        if (time >= _endTime) {
+            return _endTransform->exec(n);
+        }
+        return interpolate(time).exec(n);
+    }
+
+    bool hasScale() const {
+        return _startTransform->hasScale() || _endTransform->hasScale();
+    }
+
+    const Transform* getStartTransform() const {
+        return _startTransform;
+    }
+
+    const Transform* getEndTransform() const {
+        return _endTransform;
+    }
+
+    /**
+     * 获取一个包围盒对象，返回运动过程中包围盒扫过的范围的包围盒
      */
     AABB3f motionAABB(const AABB3f& b) const;
 
-    /*
-     获取点对象，返回运动过程中点扫过的范围的包围盒
+    /**
+     * 获取点对象，返回运动过程中点扫过的范围的包围盒
      */
     AABB3f boundPointMotion(const Point3f& p) const;
 
@@ -148,6 +213,7 @@ private:
     bool _hasRotation;
     Vector3f _T[2];
     Quaternion _R[2];
+    // todo 觉得缩放分量也可以用向量表示而不需要矩阵，暂时还不知道pbrt为何这样用
     Matrix4x4 _S[2];
 
     struct DerivativeTerm {
@@ -164,3 +230,5 @@ private:
 };
 
 RENDERING_END
+
+#endif 

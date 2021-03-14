@@ -167,6 +167,19 @@ bool Matrix4x4::isIdentity() const {
         _m[3][3] == 1.f);
 }
 
+// Transform
+
+Transform Transform::operator * (const Transform& other) const {
+    return Transform(_mat * other._mat, other._matInv * _matInv);
+}
+
+
+
+SurfaceInteraction Transform::exec(const Rendering::SurfaceInteraction& isect) const {
+    SurfaceInteraction ret;
+    return ret;
+}
+
 Transform Transform::translate(const Vector3f& delta) {
     Float a[16] = {
         1, 0, 0, delta.x,
