@@ -272,6 +272,23 @@ inline CONSTEXPR bool isPowerOf2(T v) {
 
 #include "../math/mathutil.h"
 
+template <typename Predicate>
+int findInterval(int size, const Predicate& pred) {
+	int first = 0, len = size;
+	while (len > 0) {
+		int half = len >> 1, middle = first + half;
+		// 二分法查找
+		if (pred(middle)) {
+			first = middle + 1;
+			len -= half + 1;
+		}
+		else {
+			len = half;
+		}
+	}
+	return Rendering::clamp(first - 1, 0, size - 2);
+}
+
 #include "../math/vector.h"
 #include "../math/point.h"
 #include "../math/ray.h"

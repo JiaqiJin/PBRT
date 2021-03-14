@@ -147,6 +147,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="core\Interaction.cpp" />
+    <ClCompile Include="core\spectrum.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math\animatedtransform.cpp" />
     <ClCompile Include="math\quaternion.cpp" />
@@ -157,6 +159,7 @@
   <ItemGroup>
     <ClInclude Include="core\cobject.h" />
     <ClInclude Include="core\Header.h" />
+    <ClInclude Include="core\Interaction.h" />
     <ClInclude Include="core\spectrum.h" />
     <ClInclude Include="ext\json.hpp" />
     <ClInclude Include="ext\tinyobj\tiny_obj_loader.h" />
