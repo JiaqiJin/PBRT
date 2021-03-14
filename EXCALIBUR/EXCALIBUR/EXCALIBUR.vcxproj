@@ -151,9 +151,11 @@
     <ClCompile Include="math\animatedtransform.cpp" />
     <ClCompile Include="math\quaternion.cpp" />
     <ClCompile Include="math\transform.cpp" />
+    <ClCompile Include="tools\classFactory.cpp" />
     <ClCompile Include="tools\memory.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="core\cobject.h" />
     <ClInclude Include="core\Header.h" />
     <ClInclude Include="core\spectrum.h" />
     <ClInclude Include="ext\json.hpp" />
@@ -169,6 +171,7 @@
     <ClInclude Include="math\transform.h" />
     <ClInclude Include="math\vector.h" />
     <ClInclude Include="parallel\Parallel.h" />
+    <ClInclude Include="tools\classFactory.h" />
     <ClInclude Include="tools\errfloat.h" />
     <ClInclude Include="tools\macro.h" />
     <ClInclude Include="tools\memory.h" />

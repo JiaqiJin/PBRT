@@ -57,7 +57,7 @@ namespace Rendering
 
 	class CObject;
 
-#ifdef PALADIN_SAMPLED_SPECTRUM
+#ifdef RENDERING_SAMPLED_SPECTRUM
 	typedef SampledSpectrum Spectrum;
 #else
 	typedef RGBSpectrum Spectrum;
@@ -279,6 +279,7 @@ inline CONSTEXPR bool isPowerOf2(T v) {
 #include "../tools/memory.h"
 #include "../tools/errfloat.h"
 #include "spectrum.h"
+#include "cobject.h"
 
 namespace Rendering 
 {
