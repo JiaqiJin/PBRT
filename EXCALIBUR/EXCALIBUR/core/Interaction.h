@@ -83,7 +83,40 @@ struct Interaction {
 };
 
 class SurfaceInteraction : public Interaction {
+    // 用于着色的参数结构
+    struct Shading {
+        Normal3f normal;
+        Vector3f dpdu, dpdv;
+        Normal3f dndu, dndv;
+    };
+public:
+    SurfaceInteraction() {}
 
+    SurfaceInteraction(const Point3f& p, const Vector3f& pError,
+        const Point2f& uv, const Vector3f& wo,
+        const Vector3f& dpdu, const Vector3f& dpdv,
+        const Normal3f& dndu, const Normal3f& dndv, Float time,
+        const Shape* sh,
+        int faceIndex = 0);
+    // 表面坐标
+    Point2f uv;
+    Vector3f dpdu, dpdv;
+    Normal3f dndu, dndv;
+
+    const Shape* shape = nullptr;
+    Shading shading;
+
+    BSDF* bsdf = nullptr;
+    BSSRDF* bssrdf = nullptr;
+
+    mutable Vector3f dpdx, dpdy;
+
+    mutable Float dudx = 0, dvdx = 0, dudy = 0, dvdy = 0;
+
+    int faceIndex = 0;
+
+    uint32_t shapeIdx;
+    uint32_t primIdx;
 };
 
 RENDERING_END

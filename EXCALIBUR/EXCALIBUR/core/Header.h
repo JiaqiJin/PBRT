@@ -300,6 +300,26 @@ int findInterval(int size, const Predicate& pred) {
 
 namespace Rendering 
 {
+	inline Float sphericalTheta(const Vector3f& v) {
+		return std::acos(clamp(v.z, -1, 1));
+	}
+
+	inline Float sphericalPhi(const Vector3f& v) {
+		Float p = std::atan2(v.y, v.x);
+		return (p < 0) ? (p + 2 * Pi) : p;
+	}
+
+	inline Vector3f sphericalDirection(Float sinTheta, Float cosTheta, Float phi) {
+		return Vector3f(sinTheta * std::cos(phi), sinTheta * std::sin(phi),
+			cosTheta);
+	}
+
+	inline Vector3f sphericalDirection(Float sinTheta, Float cosTheta, Float phi,
+		const Vector3f& x, const Vector3f& y,
+		const Vector3f& z) {
+		return sinTheta * std::cos(phi) * x + sinTheta * std::sin(phi) * y + cosTheta * z;
+	}
+
 	enum TransportMode 
 	{
 		Radiance,

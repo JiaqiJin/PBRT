@@ -1,4 +1,5 @@
 ﻿#include "Interaction.h"
+#include "Shape.h"
 
 RENDERING_BEGIN
 
@@ -22,6 +23,33 @@ Ray Interaction::spawnRayTo(const Interaction& it) const {
     Point3f target = offsetRay(it.pos, it.normal, origin - it.pos);
     Vector3f d = target - origin;
     return Ray(origin, d, 1 - ShadowEpsilon, time, getMedium(d));
+}
+
+SurfaceInteraction::SurfaceInteraction(
+    const Point3f& p, const Vector3f& pError, const Point2f& uv,
+    const Vector3f& wo, const Vector3f& dpdu, const Vector3f& dpdv,
+    const Normal3f& dndu, const Normal3f& dndv, Float time, const Shape* shape,
+    int faceIndex)
+    : Interaction(p, Normal3f(normalize(cross(dpdu, dpdv))), pError, wo, time, nullptr),
+    uv(uv),
+    dpdu(dpdu),
+    dpdv(dpdv),
+    dndu(dndu),
+    dndv(dndv),
+    shape(shape),
+    faceIndex(faceIndex) {
+
+    shading.normal = normal;
+    shading.dpdu = dpdu;
+    shading.dpdv = dpdv;
+    shading.dndu = dndu;
+    shading.dndv = dndv;
+
+    if (shape &&
+        (shape->reverseOrientation ^ shape->transformSwapsHandedness)) {
+        normal *= -1;
+        shading.normal *= -1;
+    }
 }
 
 RENDERING_END

@@ -118,6 +118,34 @@ inline Point3f offsetRay(const Point3f& p, Normal3f n, const Vector3f& w) {
     );
 }
 
+inline Point3f offsetRayOrigin(const Point3f& p, const Vector3f& pError,
+    const Normal3f& n, const Vector3f& w) {
+
+    Float d = dot(abs(n), pError);
+#ifdef FLOAT_AS_DOUBLE
+    // 暂时不理解pbrt为何要这样写
+    d *= 1024.;
+#endif
+    Vector3f offset = d * Vector3f(n);
+
+    if (dot(w, n) < 0) {
+        // 判断发射方向是向内还是向外
+        offset = -offset;
+    }
+
+    Point3f po = p + offset;
+    // 计算更加保守的值
+    for (int i = 0; i < 3; ++i) {
+        if (offset[i] > 0) {
+            po[i] = nextFloatUp(po[i]);
+        }
+        else if (offset[i] < 0) {
+            po[i] = nextFloatDown(po[i]);
+        }
+    }
+    return po;
+}
+
 RENDERING_END
 
 #endif /* ray_h */
