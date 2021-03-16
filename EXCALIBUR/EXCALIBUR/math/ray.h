@@ -86,6 +86,37 @@ public:
     Vector3f rxDirection, ryDirection;
 };
 
+constexpr float origin() {
+    return 1.f / 32.f;
+}
+
+constexpr float floatScale() {
+    return 1.f / 65536.f;
+}
+
+constexpr float intScale() {
+    return 256.f;
+}
+
+// ray起点偏移函数，实现参见ray tracing gems chapter 6
+inline Point3f offsetRay(const Point3f& p, Normal3f n, const Vector3f& w) {
+
+    n = dot(n, w) > 0 ? n : -n;
+
+    Vector3i of_i(intScale() * n.x, intScale() * n.y, intScale() * n.z);
+
+    Vector3f p_i(
+        intToFloat(floatToInt(p.x) + (p.x < 0 ? -of_i.x : of_i.x)),
+        intToFloat(floatToInt(p.y) + (p.y < 0 ? -of_i.y : of_i.y)),
+        intToFloat(floatToInt(p.z) + (p.z < 0 ? -of_i.z : of_i.z))
+    );
+
+    return Point3f(
+        fabsf(p.x) < origin() ? p.x + floatScale() * n.x : p_i.x,
+        fabsf(p.y) < origin() ? p.y + floatScale() * n.y : p_i.y,
+        fabsf(p.z) < origin() ? p.z + floatScale() * n.z : p_i.z
+    );
+}
 
 RENDERING_END
 

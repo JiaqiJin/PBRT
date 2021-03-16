@@ -148,9 +148,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="core\Interaction.cpp" />
+    <ClCompile Include="core\Material.cpp" />
+    <ClCompile Include="core\Medium.cpp" />
+    <ClCompile Include="core\Sampling.cpp" />
+    <ClCompile Include="core\Shape.cpp" />
     <ClCompile Include="core\spectrum.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math\animatedtransform.cpp" />
+    <ClCompile Include="math\lowdiscrepancy.cpp" />
     <ClCompile Include="math\quaternion.cpp" />
     <ClCompile Include="math\transform.cpp" />
     <ClCompile Include="tools\classFactory.cpp" />
@@ -160,11 +165,16 @@
     <ClInclude Include="core\cobject.h" />
     <ClInclude Include="core\Header.h" />
     <ClInclude Include="core\Interaction.h" />
+    <ClInclude Include="core\Material.h" />
+    <ClInclude Include="core\Medium.h" />
+    <ClInclude Include="core\Sampling.h" />
+    <ClInclude Include="core\Shape.h" />
     <ClInclude Include="core\spectrum.h" />
     <ClInclude Include="ext\json.hpp" />
     <ClInclude Include="ext\tinyobj\tiny_obj_loader.h" />
     <ClInclude Include="math\animatedtransform.h" />
     <ClInclude Include="math\bounds.h" />
+    <ClInclude Include="math\lowdiscrepancy.h" />
     <ClInclude Include="math\mathutil.h" />
     <ClInclude Include="math\matrix.h" />
     <ClInclude Include="math\point.h" />
