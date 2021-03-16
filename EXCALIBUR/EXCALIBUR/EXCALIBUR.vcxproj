@@ -150,6 +150,7 @@
     <ClCompile Include="core\Interaction.cpp" />
     <ClCompile Include="core\Material.cpp" />
     <ClCompile Include="core\Medium.cpp" />
+    <ClCompile Include="core\primitive.cpp" />
     <ClCompile Include="core\Shape.cpp" />
     <ClCompile Include="core\spectrum.cpp" />
     <ClCompile Include="main.cpp" />
@@ -172,6 +173,7 @@
     <ClInclude Include="core\Interaction.h" />
     <ClInclude Include="core\Material.h" />
     <ClInclude Include="core\Medium.h" />
+    <ClInclude Include="core\primitive.h" />
     <ClInclude Include="core\Sampling.h" />
     <ClInclude Include="core\Shape.h" />
     <ClInclude Include="core\spectrum.h" />

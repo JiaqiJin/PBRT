@@ -123,7 +123,6 @@ inline Point3f offsetRayOrigin(const Point3f& p, const Vector3f& pError,
 
     Float d = dot(abs(n), pError);
 #ifdef FLOAT_AS_DOUBLE
-    // 暂时不理解pbrt为何要这样写
     d *= 1024.;
 #endif
     Vector3f offset = d * Vector3f(n);

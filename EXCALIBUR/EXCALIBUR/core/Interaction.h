@@ -98,11 +98,17 @@ public:
         const Normal3f& dndu, const Normal3f& dndv, Float time,
         const Shape* sh,
         int faceIndex = 0);
+
+    void setShadingGeometry(const Vector3f& dpdu, const Vector3f& dpdv,
+        const Normal3f& dndu, const Normal3f& dndv,
+        bool orientationIsAuthoritative);
+
     // 表面坐标
     Point2f uv;
     Vector3f dpdu, dpdv;
     Normal3f dndu, dndv;
 
+    const Primitive* primitive = nullptr;
     const Shape* shape = nullptr;
     Shading shading;
 
