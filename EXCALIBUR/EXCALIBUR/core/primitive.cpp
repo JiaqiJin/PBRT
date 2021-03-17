@@ -1,4 +1,4 @@
-#include "primitive.h"
+﻿#include "primitive.h"
 #include "Shape.h"
 
 RENDERING_BEGIN
@@ -60,5 +60,39 @@ void GeometricPrimitive::computeScatteringFunctions(
     }
     CHECK_GE(dot(isect->normal, isect->shading.normal), 0.);
 }
+
+TransformedPrimitive::TransformedPrimitive(std::shared_ptr<Primitive>& primitive,
+    const AnimatedTransform& PrimitiveToWorld) :
+    _primitive(primitive),
+    _primitiveToWorld(PrimitiveToWorld) {
+
+}
+
+bool TransformedPrimitive::intersect(const Ray& r,
+    SurfaceInteraction* isect) const {
+    // 插值获取primitive到world的变换
+    Transform InterpolatedPrimToWorld = _primitiveToWorld.interpolate(r.time);
+    // 将局部坐标转换为世界坐标
+    Ray ray = InterpolatedPrimToWorld.getInverse().exec(r);
+
+    if (!_primitive->intersect(ray, isect)) {
+        return false;
+    }
+    // 更新tMax
+    r.tMax = ray.tMax;
+
+    if (!InterpolatedPrimToWorld.isIdentity()) {
+        *isect = InterpolatedPrimToWorld.exec(*isect);
+    }
+    CHECK_GE(dot(isect->normal, isect->shading.normal), 0);
+    return true;
+}
+
+bool TransformedPrimitive::intersectP(const Ray& r) const {
+    Transform InterpolatedPrimToWorld = _primitiveToWorld.interpolate(r.time);
+    Transform InterpolatedWorldToPrim = InterpolatedPrimToWorld.getInverse();
+    return _primitive->intersectP(InterpolatedWorldToPrim.exec(r));
+}
+
 
 RENDERING_END

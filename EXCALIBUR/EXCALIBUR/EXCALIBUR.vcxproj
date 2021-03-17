@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="accelerators\bvh.cpp" />
     <ClCompile Include="core\Interaction.cpp" />
     <ClCompile Include="core\Material.cpp" />
     <ClCompile Include="core\Medium.cpp" />
@@ -168,6 +169,7 @@
     <ClCompile Include="tools\memory.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="accelerators\bvh.h" />
     <ClInclude Include="core\cobject.h" />
     <ClInclude Include="core\Header.h" />
     <ClInclude Include="core\Interaction.h" />

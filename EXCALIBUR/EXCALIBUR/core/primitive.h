@@ -47,4 +47,56 @@ private:
     MediumInterface _mediumInterface;
 };
 
+class TransformedPrimitive : public Primitive {
+public:
+
+    TransformedPrimitive(std::shared_ptr<Primitive>& primitive,
+        const AnimatedTransform& PrimitiveToWorld);
+
+    virtual bool intersect(const Ray& r, SurfaceInteraction* in) const;
+
+    virtual bool intersectP(const Ray& r) const;
+
+    virtual const AreaLight* getAreaLight() const {
+        return nullptr;
+    }
+
+    virtual const Material* getMaterial() const {
+        return nullptr;
+    }
+
+    virtual void computeScatteringFunctions(SurfaceInteraction* isect,
+        MemoryArena& arena, TransportMode mode,
+        bool allowMultipleLobes) const {
+        COUT <<
+            "TransformedPrimitive::ComputeScatteringFunctions() shouldn't be "
+            "called";
+    }
+
+    virtual AABB3f WorldBound() const {
+        return _primitiveToWorld.motionAABB(_primitive->worldBound());
+    }
+
+private:
+    std::shared_ptr<Primitive> _primitive;
+    const AnimatedTransform _primitiveToWorld;
+};
+
+class Aggregate : public Primitive {
+public:
+    virtual const AreaLight* getAreaLight() const {
+        DCHECK(false);
+        return nullptr;
+    }
+    virtual const Material* getMaterial() const {
+        DCHECK(false);
+        return nullptr;
+    }
+    virtual void computeScatteringFunctions(SurfaceInteraction* isect,
+        MemoryArena& arena, TransportMode mode,
+        bool allowMultipleLobes) const {
+        DCHECK(false);
+    }
+};
+
 RENDERING_END
