@@ -158,11 +158,13 @@
     <ClCompile Include="core\sampler.cpp" />
     <ClCompile Include="core\Shape.cpp" />
     <ClCompile Include="core\spectrum.cpp" />
+    <ClCompile Include="filters\gaussian.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="math\animatedtransform.cpp" />
     <ClCompile Include="math\lowdiscrepancy.cpp" />
     <ClCompile Include="math\quaternion.cpp" />
     <ClCompile Include="math\transform.cpp" />
+    <ClCompile Include="samplers\randomSampler.cpp" />
     <ClCompile Include="shapes\cone.cpp" />
     <ClCompile Include="shapes\cube.cpp" />
     <ClCompile Include="shapes\curve.cpp" />
@@ -189,6 +191,7 @@
     <ClInclude Include="core\spectrum.h" />
     <ClInclude Include="ext\json.hpp" />
     <ClInclude Include="ext\tinyobj\tiny_obj_loader.h" />
+    <ClInclude Include="filters\gaussian.h" />
     <ClInclude Include="math\animatedtransform.h" />
     <ClInclude Include="math\bounds.h" />
     <ClInclude Include="math\lowdiscrepancy.h" />
@@ -201,6 +204,7 @@
     <ClInclude Include="math\transform.h" />
     <ClInclude Include="math\vector.h" />
     <ClInclude Include="parallel\Parallel.h" />
+    <ClInclude Include="samplers\randomSampler.h" />
     <ClInclude Include="shapes\cone.h" />
     <ClInclude Include="shapes\cube.h" />
     <ClInclude Include="shapes\curve.h" />
