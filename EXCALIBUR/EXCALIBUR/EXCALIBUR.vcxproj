@@ -148,10 +148,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="accelerators\bvh.cpp" />
+    <ClCompile Include="core\camera.cpp" />
+    <ClCompile Include="core\film.cpp" />
+    <ClCompile Include="core\filter.cpp" />
     <ClCompile Include="core\Interaction.cpp" />
     <ClCompile Include="core\Material.cpp" />
     <ClCompile Include="core\Medium.cpp" />
     <ClCompile Include="core\primitive.cpp" />
+    <ClCompile Include="core\sampler.cpp" />
     <ClCompile Include="core\Shape.cpp" />
     <ClCompile Include="core\spectrum.cpp" />
     <ClCompile Include="main.cpp" />
@@ -170,12 +174,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="accelerators\bvh.h" />
+    <ClInclude Include="core\camera.h" />
     <ClInclude Include="core\cobject.h" />
+    <ClInclude Include="core\film.h" />
+    <ClInclude Include="core\filter.h" />
     <ClInclude Include="core\Header.h" />
     <ClInclude Include="core\Interaction.h" />
     <ClInclude Include="core\Material.h" />
     <ClInclude Include="core\Medium.h" />
     <ClInclude Include="core\primitive.h" />
+    <ClInclude Include="core\sampler.h" />
     <ClInclude Include="core\Sampling.h" />
     <ClInclude Include="core\Shape.h" />
     <ClInclude Include="core\spectrum.h" />
