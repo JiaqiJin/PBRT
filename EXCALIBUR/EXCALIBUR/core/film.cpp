@@ -45,15 +45,33 @@ AABB2f Film::GetPhysicalExtent() const {
     return AABB2f(Point2f(-x / 2, -y / 2), Point2f(x / 2, y / 2));
 }
 
-//std::unique_ptr<FilmTile> Film::GetFilmTile(const AABB2i& sampleBounds) {
-//    std::unique_ptr<FilmTile> tile;
-//
-//    return tile;
-//}
-//
-//void Film::MergeFilmTile(std::unique_ptr<FilmTile> tile) {
-//
-//}
+std::unique_ptr<FilmTile> Film::GetFilmTile(const AABB2i& sampleBounds) {
+    Vector2f halfPixel = Vector2f(0.5f, 0.5f);
+    AABB2f floatBounds = (AABB2f)sampleBounds;
+    Point2i p0 = (Point2i)Rendering::ceil(floatBounds.pMin - halfPixel -
+        filter->radius);
+    Point2i p1 = (Point2i)Rendering::floor(floatBounds.pMax - halfPixel +
+        filter->radius) + Point2i(1, 1);
+
+    AABB2i tilePixelBounds = intersect(AABB2i(p0, p1), croppedPixelBounds);
+
+    return std::unique_ptr<FilmTile>(new FilmTile(tilePixelBounds,
+        filter->radius, filterTable, filterTableWidth));
+}
+
+void Film::MergeFilmTile(std::unique_ptr<FilmTile> tile) {
+    INFO("Merging film tile", tile->pixelBounds);
+    std::lock_guard<std::mutex> lock(mutex);
+    for (Point2i pixel : tile->GetPixelBounds()) {
+        // Merge _pixel_ into _Film::pixels_
+        const FilmTilePixel& tilePixel = tile->GetPixel(pixel);
+        Pixel& mergePixel = GetPixel(pixel);
+        float xyz[3];
+        tilePixel.contribSum.ToXYZ(xyz);
+        for (int i = 0; i < 3; i++) mergePixel.xyz[i] += xyz[i];
+        mergePixel.filterWeightSum += tilePixel.filterWeightSum;
+    }
+}
 
 void Film::SetImage(const Spectrum* img) const {
     int nPixels = croppedPixelBounds.area();
@@ -66,7 +84,18 @@ void Film::SetImage(const Spectrum* img) const {
 }
 
 void Film::AddSplat(const Point2f& p, Spectrum v) {
-
+    if (!insideExclusive((Point2i)p, croppedPixelBounds)) {
+        return;
+    }
+    if (v.y() > maxSampleLuminance) {
+        v *= maxSampleLuminance / v.y();
+    }
+    Float xyz[3];
+    v.ToXYZ(xyz);
+    Pixel& pixel = GetPixel((Point2i)p);
+    for (int i = 0; i < 3; ++i) {
+        pixel.splatXYZ[i].add(xyz[i]);
+    }
 }
 
 void Film::WriteImage(Float splatScale) {
