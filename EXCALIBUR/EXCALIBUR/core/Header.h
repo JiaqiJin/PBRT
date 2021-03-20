@@ -16,6 +16,7 @@
 #include <atomic>
 #include <mutex>
 #include <cctype>
+#include "../tools/Logging.h"
 
 #include "../ext/json.hpp"
 typedef nlohmann::json nloJson;
@@ -136,6 +137,8 @@ namespace Rendering
 	struct PositionSamplingRecord;
 
 	class EnvironmentMap;
+
+
 }
 
 inline uint32_t floatToBits(float f) {

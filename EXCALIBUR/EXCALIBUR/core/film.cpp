@@ -1,0 +1,118 @@
+﻿#include "film.h"
+#include "../tools/fileio.h"
+
+RENDERING_BEGIN
+
+Film::Film(const Point2i& resolution, const AABB2i& cropWindow,
+    std::unique_ptr<Filter> filt, Float diagonal,
+    const std::string& filename, Float scale, Float maxSampleLuminance)
+    : fullResolution(resolution),
+    diagonal(diagonal * .001),
+    filter(std::move(filt)),
+    filename(filename),
+    scale(scale),
+    maxSampleLuminance(maxSampleLuminance) {
+    croppedPixelBounds = 
+        AABB2i(Point2i(std::ceil(fullResolution.x * cropWindow.pMin.x), std::ceil(fullResolution.y * cropWindow.pMin.y)),
+        Point2i(std::ceil(fullResolution.x * cropWindow.pMax.x), std::ceil(fullResolution.y * cropWindow.pMax.y)));
+
+    pixels = std::unique_ptr<Pixel[]>(new Pixel[croppedPixelBounds.area()]);
+
+    int offset = 0;
+    for (int y = 0; y < filterTableWidth; ++y) {
+        for (int x = 0; x < filterTableWidth; ++x, ++offset) {
+            Point2f p;
+            p.x = (x + 0.5f) * filter->radius.x / filterTableWidth;
+            p.y = (y + 0.5f) * filter->radius.y / filterTableWidth;
+            filterTable[offset] = filter->Evaluate(p);
+        }
+    }
+}
+
+AABB2i Film::GetSampleBounds() const {
+    AABB2f floatBounds(
+        Rendering::floor(Point2f(croppedPixelBounds.pMin) + Vector2f(0.5f, 0.5f) -
+            filter->radius),
+        Rendering::ceil(Point2f(croppedPixelBounds.pMax) - Vector2f(0.5f, 0.5f) +
+            filter->radius));
+    return (AABB2i)floatBounds;
+}
+
+AABB2f Film::GetPhysicalExtent() const {
+    Float aspect = (Float)fullResolution.y / (Float)fullResolution.x;
+    Float x = std::sqrt(diagonal * diagonal / (1 + aspect * aspect));
+    Float y = aspect * x;
+    return AABB2f(Point2f(-x / 2, -y / 2), Point2f(x / 2, y / 2));
+}
+
+//std::unique_ptr<FilmTile> Film::GetFilmTile(const AABB2i& sampleBounds) {
+//    std::unique_ptr<FilmTile> tile;
+//
+//    return tile;
+//}
+//
+//void Film::MergeFilmTile(std::unique_ptr<FilmTile> tile) {
+//
+//}
+
+void Film::SetImage(const Spectrum* img) const {
+    int nPixels = croppedPixelBounds.area();
+    for (int i = 0; i < nPixels; ++i) {
+        Pixel& p = pixels[i];
+        img[i].ToXYZ(p.xyz);
+        p.filterWeightSum = 1;
+        p.splatXYZ[0] = p.splatXYZ[1] = p.splatXYZ[2] = 0;
+    }
+}
+
+void Film::AddSplat(const Point2f& p, Spectrum v) {
+
+}
+
+void Film::WriteImage(Float splatScale) {
+    std::unique_ptr<Float[]> rgb(new Float[3 * croppedPixelBounds.area()]);
+    int offset = 0;
+    for (Point2i p : croppedPixelBounds) {
+        // 将xyz转成rgb
+        Pixel& pixel = GetPixel(p);
+        XYZToRGB(pixel.xyz, &rgb[3 * offset]);
+
+        // I(x,y) = (∑f(x-xi,y-yi)w(xi,yi)L(xi,yi)) / (∑f(x-xi,y-yi))
+        // 再列一遍过滤表达式
+        Float filterWeightNum = pixel.filterWeightSum;
+        if (filterWeightNum != 0) {
+            Float invWeight = (Float)1 / filterWeightNum;
+            rgb[3 * offset] = std::max((Float)0, rgb[3 * offset] * invWeight);
+            rgb[3 * offset + 1] = std::max((Float)0, rgb[3 * offset + 1] * invWeight);
+            rgb[3 * offset + 2] = std::max((Float)0, rgb[3 * offset + 2] * invWeight);
+        }
+
+        // 这里splat是双向方法用的，暂时不理
+        Float splatRGB[3];
+        Float splatXYZ[3] = { pixel.splatXYZ[0],
+                            pixel.splatXYZ[1],
+                            pixel.splatXYZ[2] };
+        XYZToRGB(splatXYZ, splatRGB);
+
+        rgb[3 * offset] += splatScale * splatRGB[0];
+        rgb[3 * offset + 1] += splatScale * splatRGB[1];
+        rgb[3 * offset + 2] += splatScale * splatRGB[2];
+
+        rgb[3 * offset] *= scale;
+        rgb[3 * offset + 1] *= scale;
+        rgb[3 * offset + 2] *= scale;
+        ++offset;
+    }
+}
+
+void Film::Clear() {
+    for (Point2i p : croppedPixelBounds) {
+        Pixel& pixel = GetPixel(p);
+        for (int i = 0; i < 3; ++i) {
+            pixel.xyz[i] = pixel.splatXYZ[i] = 0;
+        }
+        pixel.filterWeightSum = 0;
+    }
+}
+
+RENDERING_END

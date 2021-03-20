@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <future>
 #include <vector>
@@ -12,6 +12,46 @@
 
 namespace Rendering
 {
+	class AtomicFloat {
+	public:
+
+		explicit AtomicFloat(Float v = 0) {
+			_bits = floatToBits(v);
+		}
+
+		operator Float() const {
+			return bitsToFloat(_bits);
+		}
+
+		Float operator=(Float v) {
+			_bits = floatToBits(v);
+			return v;
+		}
+
+		void add(Float v) {
+#ifdef RENDERING_FLOAT_AS_DOUBLE
+			uint64_t oldBits = _bits, newBits;
+#else
+			uint32_t oldBits = _bits, newBits;
+#endif
+			do {
+				newBits = floatToBits(bitsToFloat(oldBits) + v);
+			} while (!_bits.compare_exchange_weak(oldBits, newBits));
+			// 如果oldBits与_bits不相等，则把oldBits改为_bits的值，返回false
+			// 如果oldBits与_bits相等，则把_bit的值改为newBits，返回true
+		}
+
+	private:
+
+#ifdef RENDERING_FLOAT_AS_DOUBLE
+		std::atomic<uint64_t> _bits;
+#else
+		std::atomic<uint32_t> _bits;
+#endif
+	};
+
+	// ----------------- paralleL ---------------------------
+
 	constexpr size_t kZeroSize = 0;
 
 	//! Execution policy tag.
