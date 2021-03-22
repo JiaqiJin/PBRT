@@ -148,6 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="accelerators\bvh.cpp" />
+    <ClCompile Include="cameras\perspective.cpp" />
     <ClCompile Include="core\camera.cpp" />
     <ClCompile Include="core\film.cpp" />
     <ClCompile Include="core\filter.cpp" />
@@ -181,6 +182,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="accelerators\bvh.h" />
+    <ClInclude Include="cameras\perspective.h" />
     <ClInclude Include="core\camera.h" />
     <ClInclude Include="core\cobject.h" />
     <ClInclude Include="core\film.h" />

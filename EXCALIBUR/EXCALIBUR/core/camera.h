@@ -48,4 +48,40 @@ public:
     const Medium* medium;
 };
 
+class ProjectiveCamera : public Camera {
+public:
+    ProjectiveCamera(const AnimatedTransform& CameraToWorld,
+        const Transform& cameraToScreen,
+        const AABB2f& screenWindow, Float shutterOpen,
+        Float shutterClose, Float lensr, Float focalDistance, std::shared_ptr<Film> film,
+        const Medium* medium)
+        : Camera(CameraToWorld, shutterOpen, shutterClose, film, medium),
+        _cameraToScreen(cameraToScreen) {
+
+        _lensRadius = lensr;
+        _focalDistance = focalDistance;
+
+        // 屏幕空间(0,0)为胶片平面矩形的中点
+        _screenToRaster = Transform::scale(film->fullResolution.x, film->fullResolution.y, 1)
+            * Transform::scale(1 / (screenWindow.pMax.x - screenWindow.pMin.x),
+                1 / (screenWindow.pMin.y - screenWindow.pMax.y), 1)
+            * Transform::translate(Vector3f(-screenWindow.pMin.x, -screenWindow.pMax.y, 0));
+        _rasterToScreen = _screenToRaster.getInverse();
+        _rasterToCamera = _cameraToScreen.getInverse() * _rasterToScreen;
+    }
+
+    Transform getCameraToScreen() const {
+        return _cameraToScreen;
+    }
+
+protected:
+    Transform _cameraToScreen, _rasterToCamera;
+    Transform _screenToRaster, _rasterToScreen;
+
+    // 透镜半径
+    Float _lensRadius;
+    //通常 _focalDistance 由两个参数决定，透镜的焦距，以及film到透镜的实际距离
+    Float _focalDistance;
+};
+
 RENDERING_END
