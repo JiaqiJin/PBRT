@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Header.h"
 #include "../spectrum.h"
@@ -171,6 +171,58 @@ public:
 private:
     BxDF* _bxdf;
     Spectrum _scale;
+};
+
+// 菲涅尔基类
+class Fresnel {
+public:
+    virtual ~Fresnel() {}
+
+    virtual Spectrum evaluate(Float cosI) const = 0;
+    virtual std::string toString() const = 0;
+};
+
+inline std::ostream& operator<<(std::ostream& os, const Fresnel& f) {
+    os << f.toString();
+    return os;
+}
+
+class FresnelDielectric : public Fresnel {
+public:
+    virtual Spectrum evaluate(Float cosThetaI) const {
+        return FrDielectric(cosThetaI, _etaI, _etaT);
+    }
+
+    FresnelDielectric(Float etaI, Float etaT) : _etaI(etaI), _etaT(etaT) {}
+
+    virtual std::string toString() const {
+        return StringPrintf("[ FrenselDielectric etaI: %f etaT: %f ]", _etaI, _etaT);
+    }
+
+private:
+    Float _etaI, _etaT;
+};
+
+class FresnelConductor : public Fresnel {
+public:
+    virtual Spectrum evaluate(Float cosThetaI) const {
+        return FrConductor(std::abs(cosThetaI), _etaI, _etaT, _kt);
+    }
+
+    FresnelConductor(const Spectrum& etaI, const Spectrum& etaT,
+        const Spectrum& kt)
+        : _etaI(etaI), _etaT(etaT), _kt(kt) {
+
+    }
+
+    virtual std::string toString() const {
+        return std::string("[ FresnelConductor etaI: ") + _etaI.ToString() +
+            std::string(" etaT: ") + _etaT.ToString() + std::string(" k: ") +
+            _kt.ToString() + std::string(" ]");
+    }
+
+private:
+    Spectrum _etaI, _etaT, _kt;
 };
 
 RENDERING_END
