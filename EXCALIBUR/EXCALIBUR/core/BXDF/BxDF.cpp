@@ -82,4 +82,36 @@ Float BxDF::pdfDir(const Vector3f& wo, const Vector3f& wi) const {
     return sameHemisphere(wo, wi) ? absCosTheta(wi) * InvPi : 0;
 }
 
+// OrenNayar fr(wi,wo) = R/π(A + Bmax(0,cos(φi-φo))sinαtanβ)
+Spectrum OrenNayar::f(const Vector3f& wo, const Vector3f& wi) const {
+    Float sinThetaI = sinTheta(wi);
+    Float sinThetaO = sinTheta(wo);
+    // 计算max(0,cos(φi-φo))项
+    // 由于三角函数耗时比较高，这里可以用三角恒等变换展开
+    // cos(φi-φo) = cosφi * cosφo + sinφi * sinφo
+    Float maxCos = 0;
+    if (sinThetaI > 1e-4 && sinThetaO > 1e-4) {
+        Float sinPhiI = sinPhi(wi), cosPhiI = cosPhi(wi);
+        Float sinPhiO = sinPhi(wo), cosPhiO = cosPhi(wo);
+        Float dCos = cosPhiI * cosPhiO + sinPhiI * sinPhiO;
+        maxCos = std::max((Float)0, dCos);
+    }
+
+    Float sinAlpha, tanBeta;
+    if (absCosTheta(wi) > absCosTheta(wo)) {
+        sinAlpha = sinThetaO;
+        tanBeta = sinThetaI / absCosTheta(wi);
+    }
+    else {
+        sinAlpha = sinThetaI;
+        tanBeta = sinThetaO / absCosTheta(wo);
+    }
+    return _R * InvPi * (A + B * maxCos * sinAlpha * tanBeta);
+}
+
+std::string OrenNayar::toString() const {
+    return std::string("[ OrenNayar R: ") + _R.ToString() +
+        StringPrintf(" A: %f B: %f ]", A, B);
+}
+
 RENDERING_END

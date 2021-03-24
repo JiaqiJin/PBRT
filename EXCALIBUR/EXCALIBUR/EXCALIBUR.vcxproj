@@ -150,6 +150,9 @@
     <ClCompile Include="accelerators\bvh.cpp" />
     <ClCompile Include="cameras\perspective.cpp" />
     <ClCompile Include="core\BXDF\BxDF.cpp" />
+    <ClCompile Include="core\BXDF\Lambertian.cpp" />
+    <ClCompile Include="core\BXDF\microfacete\MicrofacetDistribution.cpp" />
+    <ClCompile Include="core\BXDF\Specular.cpp" />
     <ClCompile Include="core\camera.cpp" />
     <ClCompile Include="core\film.cpp" />
     <ClCompile Include="core\filter.cpp" />
@@ -185,6 +188,9 @@
     <ClInclude Include="accelerators\bvh.h" />
     <ClInclude Include="cameras\perspective.h" />
     <ClInclude Include="core\BXDF\BxDF.h" />
+    <ClInclude Include="core\BXDF\Lambertian.h" />
+    <ClInclude Include="core\BXDF\microfacete\MicrofacetDistribution.h" />
+    <ClInclude Include="core\BXDF\Specular.h" />
     <ClInclude Include="core\camera.h" />
     <ClInclude Include="core\cobject.h" />
     <ClInclude Include="core\film.h" />

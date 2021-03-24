@@ -225,4 +225,29 @@ private:
     Spectrum _etaI, _etaT, _kt;
 };
 
+class OrenNayar : public BxDF {
+public:
+    OrenNayar(const Spectrum& R, Float sigma)
+        :BxDF(BxDFType(BSDF_REFLECTION | BSDF_DIFFUSE)),
+        _R(R) {
+        sigma = degree2radian(sigma);
+        Float sigma2 = sigma * sigma;
+        A = 1.f - (sigma2 / (2.f * (sigma2 + 0.33f)));
+        B = 0.45f * sigma2 / (sigma2 + 0.09f);
+    }
+
+    // fr(wi,wo) = R/π(A + Bmax(0,cos(φi-φo))sinαtanβ)
+    virtual Spectrum f(const Vector3f &wo, const Vector3f &wi) const ;
+    
+    virtual std::string toString() const;
+
+    FORCEINLINE void setReflection(const Spectrum &R) {
+        _R = R;
+    }
+
+private:
+    Spectrum _R;
+    Float A, B;
+};
+
 RENDERING_END

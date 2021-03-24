@@ -13,4 +13,7 @@ int main()
 /*
 Camera 
 BxDf
+
+http://bgrawi.com/Fourier-Visualizations/ fourier
+ Monte carlo https://zhuanlan.zhihu.com/p/61611088
 */

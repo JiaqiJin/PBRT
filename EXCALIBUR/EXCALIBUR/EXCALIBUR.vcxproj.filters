@@ -114,6 +114,15 @@
     <ClCompile Include="core\BXDF\BxDF.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="core\BXDF\Specular.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\BXDF\Lambertian.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\BXDF\microfacete\MicrofacetDistribution.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ext\tinyobj\tiny_obj_loader.h">
@@ -264,6 +273,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="core\BXDF\BxDF.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\BXDF\Specular.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\BXDF\Lambertian.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\BXDF\microfacete\MicrofacetDistribution.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
