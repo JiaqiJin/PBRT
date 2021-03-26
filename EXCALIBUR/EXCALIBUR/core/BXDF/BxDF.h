@@ -32,7 +32,7 @@ inline Float tanTheta(const Vector3f& w) {
     return sinTheta(w) / cosTheta(w);
 }
 
-inline Float tan2Theta(const Vector3f& w) {
+inline Float tanTheta2(const Vector3f& w) {
     return sin2Theta(w) / cos2Theta(w);
 }
 
@@ -60,6 +60,8 @@ inline Float cosDPhi(const Vector3f& wa, const Vector3f& wb) {
             (wb.x * wb.x + wb.y * wb.y)),
         -1, 1);
 }
+
+inline Float AbsCosTheta(const Vector3f& w) { return std::abs(w.z); }
 
 Float FrDielectric(Float cosThetaI, Float etaI, Float etaT);
 
