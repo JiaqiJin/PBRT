@@ -123,6 +123,12 @@
     <ClCompile Include="core\BXDF\microfacete\MicrofacetDistribution.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="core\BXDF\microfacete\MicrofacetReflection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\BXDF\microfacete\MicrofacetTransmission.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ext\tinyobj\tiny_obj_loader.h">
@@ -282,6 +288,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="core\BXDF\microfacete\MicrofacetDistribution.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\BXDF\microfacete\MicrofacetReflection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\BXDF\microfacete\MicrofacetTransmission.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

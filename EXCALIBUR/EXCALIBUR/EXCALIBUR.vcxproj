@@ -152,6 +152,8 @@
     <ClCompile Include="core\BXDF\BxDF.cpp" />
     <ClCompile Include="core\BXDF\Lambertian.cpp" />
     <ClCompile Include="core\BXDF\microfacete\MicrofacetDistribution.cpp" />
+    <ClCompile Include="core\BXDF\microfacete\MicrofacetReflection.cpp" />
+    <ClCompile Include="core\BXDF\microfacete\MicrofacetTransmission.cpp" />
     <ClCompile Include="core\BXDF\Specular.cpp" />
     <ClCompile Include="core\camera.cpp" />
     <ClCompile Include="core\film.cpp" />
@@ -190,6 +192,8 @@
     <ClInclude Include="core\BXDF\BxDF.h" />
     <ClInclude Include="core\BXDF\Lambertian.h" />
     <ClInclude Include="core\BXDF\microfacete\MicrofacetDistribution.h" />
+    <ClInclude Include="core\BXDF\microfacete\MicrofacetReflection.h" />
+    <ClInclude Include="core\BXDF\microfacete\MicrofacetTransmission.h" />
     <ClInclude Include="core\BXDF\Specular.h" />
     <ClInclude Include="core\camera.h" />
     <ClInclude Include="core\cobject.h" />
