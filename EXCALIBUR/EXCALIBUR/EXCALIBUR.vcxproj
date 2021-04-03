@@ -149,7 +149,9 @@
   <ItemGroup>
     <ClCompile Include="accelerators\bvh.cpp" />
     <ClCompile Include="cameras\perspective.cpp" />
+    <ClCompile Include="core\BXDF\BSDF.cpp" />
     <ClCompile Include="core\BXDF\BxDF.cpp" />
+    <ClCompile Include="core\BXDF\Fourierbsdf.cpp" />
     <ClCompile Include="core\BXDF\Lambertian.cpp" />
     <ClCompile Include="core\BXDF\microfacete\MicrofacetDistribution.cpp" />
     <ClCompile Include="core\BXDF\microfacete\MicrofacetReflection.cpp" />
@@ -189,7 +191,9 @@
   <ItemGroup>
     <ClInclude Include="accelerators\bvh.h" />
     <ClInclude Include="cameras\perspective.h" />
+    <ClInclude Include="core\BXDF\BSDF.h" />
     <ClInclude Include="core\BXDF\BxDF.h" />
+    <ClInclude Include="core\BXDF\Fourierbsdf.h" />
     <ClInclude Include="core\BXDF\Lambertian.h" />
     <ClInclude Include="core\BXDF\microfacete\MicrofacetDistribution.h" />
     <ClInclude Include="core\BXDF\microfacete\MicrofacetReflection.h" />

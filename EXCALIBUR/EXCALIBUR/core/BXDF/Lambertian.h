@@ -24,7 +24,7 @@ public:
     }
 
     virtual std::string toString() const override {
-        return std::string("[ LambertianReflection R: ") + _R.ToString() +
+        return std::string("[ LambertianReflection R: ") + R.ToString() +
             std::string(" ]");
     }
 private:
