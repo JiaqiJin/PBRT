@@ -167,6 +167,7 @@
     <ClCompile Include="core\sampler.cpp" />
     <ClCompile Include="core\Shape.cpp" />
     <ClCompile Include="core\spectrum.cpp" />
+    <ClCompile Include="core\texture.cpp" />
     <ClCompile Include="ext\stb_image.cpp" />
     <ClCompile Include="filters\gaussian.cpp" />
     <ClCompile Include="filters\mitchell.cpp" />
@@ -182,6 +183,8 @@
     <ClCompile Include="shapes\cylinder.cpp" />
     <ClCompile Include="shapes\disk.cpp" />
     <ClCompile Include="shapes\sphere.cpp" />
+    <ClCompile Include="textures\constant.cpp" />
+    <ClCompile Include="textures\scale.cpp" />
     <ClCompile Include="tools\classFactory.cpp" />
     <ClCompile Include="tools\fileio.cpp" />
     <ClCompile Include="tools\fileutil.cpp" />
@@ -212,6 +215,7 @@
     <ClInclude Include="core\Sampling.h" />
     <ClInclude Include="core\Shape.h" />
     <ClInclude Include="core\spectrum.h" />
+    <ClInclude Include="core\texture.h" />
     <ClInclude Include="ext\json.hpp" />
     <ClInclude Include="ext\stb_image.h" />
     <ClInclude Include="ext\stb_image_write.h" />
@@ -237,6 +241,8 @@
     <ClInclude Include="shapes\cylinder.h" />
     <ClInclude Include="shapes\disk.h" />
     <ClInclude Include="shapes\sphere.h" />
+    <ClInclude Include="textures\constant.h" />
+    <ClInclude Include="textures\scale.h" />
     <ClInclude Include="tools\classFactory.h" />
     <ClInclude Include="tools\errfloat.h" />
     <ClInclude Include="tools\errofloat.h" />
