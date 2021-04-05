@@ -103,6 +103,13 @@ public:
         const Normal3f& dndu, const Normal3f& dndv,
         bool orientationIsAuthoritative);
 
+    void computeDifferentials(const RayDifferential& ray) const;
+
+    void computeScatteringFunctions(const RayDifferential& ray,
+        MemoryArena& arena,
+        bool allowMultipleLobes = false,
+        TransportMode mode = TransportMode::Radiance);
+
     // 表面坐标
     Point2f uv;
     Vector3f dpdu, dpdv;
