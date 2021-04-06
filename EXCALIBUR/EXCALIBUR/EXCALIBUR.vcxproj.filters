@@ -326,5 +326,8 @@
     <ClInclude Include="textures\scale.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="textures\mixtex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

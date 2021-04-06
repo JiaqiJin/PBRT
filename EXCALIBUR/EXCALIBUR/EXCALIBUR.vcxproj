@@ -242,6 +242,7 @@
     <ClInclude Include="shapes\disk.h" />
     <ClInclude Include="shapes\sphere.h" />
     <ClInclude Include="textures\constant.h" />
+    <ClInclude Include="textures\mixtex.h" />
     <ClInclude Include="textures\scale.h" />
     <ClInclude Include="tools\classFactory.h" />
     <ClInclude Include="tools\errfloat.h" />
