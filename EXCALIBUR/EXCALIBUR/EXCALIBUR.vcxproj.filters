@@ -144,6 +144,18 @@
     <ClCompile Include="textures\scale.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="textures\bilerp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="textures\imagemap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="materials\MatteMaterial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="materials\PlasticMaterial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ext\tinyobj\tiny_obj_loader.h">
@@ -327,6 +339,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="textures\mixtex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="textures\bilerp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="textures\imagemap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="materials\MatteMaterial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="materials\PlasticMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

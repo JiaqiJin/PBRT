@@ -90,6 +90,8 @@ private:
     static CONSTEXPR int MaxBxDFs = 8;
     // BXDF列表
     BxDF* bxdfs[MaxBxDFs];
+
+    friend class MixMaterial;
 };
 
 RENDERING_END

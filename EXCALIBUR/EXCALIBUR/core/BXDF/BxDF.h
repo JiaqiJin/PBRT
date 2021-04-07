@@ -5,6 +5,7 @@
 #include "../Material.h"
 #include "../sampler.h"
 #include "../Interaction.h"
+#include "microfacete/MicrofacetDistribution.h"
 
 RENDERING_BEGIN
 

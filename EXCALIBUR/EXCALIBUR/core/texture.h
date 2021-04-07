@@ -59,6 +59,7 @@ private:
 
 template<typename T>
 class Texture {
+public:
 	virtual T evaluate(const SurfaceInteraction&) const = 0;
 
 	virtual ~Texture() { }

@@ -59,4 +59,49 @@ private:
 	const Float _alphax, _alphay;
 };
 
+class TrowbridgeReitzDistribution : public MicrofacetDistribution{
+public:
+    /**
+     * 粗糙度转α参数，代码直接照搬pbrt
+     * @param  roughness 粗糙度
+     * @return           α值
+     */
+    static inline Float RoughnessToAlpha(Float roughness) {
+        roughness = std::max(roughness, (Float)1e-3);
+        Float x = std::log(roughness);
+        return 1.62142f + 0.819955f * x + 0.1734f * x * x + 0.0171201f * x * x * x +
+        0.000640711f * x * x * x * x;
+    }
+
+    TrowbridgeReitzDistribution(Float alphax, Float alphay,
+                                bool samplevis = true)
+    : MicrofacetDistribution(samplevis),
+    _alphax(alphax),
+    _alphay(alphay) {
+
+    }
+
+    /*
+     * 法线分布函数
+     *                                             1
+     * D(ωh) = -----------------------------------------------------------------------------
+     *             π αx αy (cosθh)^4 [1 + (tanθh)^2 ((cosθh)^2/αx^2 + (sinθh)^2/αy^2)]^2
+    */
+    virtual Float D(const Vector3f & wh) const;
+
+    virtual Vector3f sample_wh(const Vector3f& wo, const Point2f& u) const;
+
+    virtual std::string toString() const {
+        return StringPrintf("[ TrowbridgeReitzDistribution alphax: %f alphay: %f ]",
+                            _alphax, _alphay);
+    }
+
+private:
+    virtual Float Lambda(const Vector3f& w) const;
+
+    // todo 这里也是可以优化的
+    const Float _alphax, _alphay;
+};
+
+
 RENDERING_END

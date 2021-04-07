@@ -15,6 +15,10 @@ Camera
 BxDf
 BeckmannDistribution -> sample_wh
 BSDF -> sample_f pdf
+Material::Bump
+
+
+implementation : imagetexture
 
 http://bgrawi.com/Fourier-Visualizations/ fourier
  Monte carlo https://zhuanlan.zhihu.com/p/61611088

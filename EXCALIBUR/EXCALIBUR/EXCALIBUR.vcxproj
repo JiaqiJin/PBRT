@@ -172,6 +172,8 @@
     <ClCompile Include="filters\gaussian.cpp" />
     <ClCompile Include="filters\mitchell.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="materials\MatteMaterial.cpp" />
+    <ClCompile Include="materials\PlasticMaterial.cpp" />
     <ClCompile Include="math\animatedtransform.cpp" />
     <ClCompile Include="math\lowdiscrepancy.cpp" />
     <ClCompile Include="math\quaternion.cpp" />
@@ -183,7 +185,9 @@
     <ClCompile Include="shapes\cylinder.cpp" />
     <ClCompile Include="shapes\disk.cpp" />
     <ClCompile Include="shapes\sphere.cpp" />
+    <ClCompile Include="textures\bilerp.cpp" />
     <ClCompile Include="textures\constant.cpp" />
+    <ClCompile Include="textures\imagemap.cpp" />
     <ClCompile Include="textures\scale.cpp" />
     <ClCompile Include="tools\classFactory.cpp" />
     <ClCompile Include="tools\fileio.cpp" />
@@ -222,6 +226,8 @@
     <ClInclude Include="ext\tinyobj\tiny_obj_loader.h" />
     <ClInclude Include="filters\gaussian.h" />
     <ClInclude Include="filters\mitchell.h" />
+    <ClInclude Include="materials\MatteMaterial.h" />
+    <ClInclude Include="materials\PlasticMaterial.h" />
     <ClInclude Include="math\animatedtransform.h" />
     <ClInclude Include="math\bounds.h" />
     <ClInclude Include="math\lowdiscrepancy.h" />
@@ -241,7 +247,9 @@
     <ClInclude Include="shapes\cylinder.h" />
     <ClInclude Include="shapes\disk.h" />
     <ClInclude Include="shapes\sphere.h" />
+    <ClInclude Include="textures\bilerp.h" />
     <ClInclude Include="textures\constant.h" />
+    <ClInclude Include="textures\imagemap.h" />
     <ClInclude Include="textures\mixtex.h" />
     <ClInclude Include="textures\scale.h" />
     <ClInclude Include="tools\classFactory.h" />
