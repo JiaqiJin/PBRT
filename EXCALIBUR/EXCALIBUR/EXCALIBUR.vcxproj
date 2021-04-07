@@ -173,6 +173,7 @@
     <ClCompile Include="filters\mitchell.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="materials\MatteMaterial.cpp" />
+    <ClCompile Include="materials\MixMaterial.cpp" />
     <ClCompile Include="materials\PlasticMaterial.cpp" />
     <ClCompile Include="math\animatedtransform.cpp" />
     <ClCompile Include="math\lowdiscrepancy.cpp" />
@@ -227,6 +228,7 @@
     <ClInclude Include="filters\gaussian.h" />
     <ClInclude Include="filters\mitchell.h" />
     <ClInclude Include="materials\MatteMaterial.h" />
+    <ClInclude Include="materials\MixMaterial.h" />
     <ClInclude Include="materials\PlasticMaterial.h" />
     <ClInclude Include="math\animatedtransform.h" />
     <ClInclude Include="math\bounds.h" />
