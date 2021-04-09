@@ -2,7 +2,7 @@
 
 #include "../core/Header.h"
 #include <thread>
-#include "../tools/stats.h"
+
 namespace Rendering
 {
     class AtomicFloat {

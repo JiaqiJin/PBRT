@@ -23,6 +23,7 @@ typedef nlohmann::json nloJson;
 
 #include "../tools/stringprint.h"
 #include "../tools/macro.h"
+#include "../tools/stats.h"
 
 namespace Rendering
 {
