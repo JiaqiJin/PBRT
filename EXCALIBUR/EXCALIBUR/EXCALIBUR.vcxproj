@@ -179,6 +179,7 @@
     <ClCompile Include="math\lowdiscrepancy.cpp" />
     <ClCompile Include="math\quaternion.cpp" />
     <ClCompile Include="math\transform.cpp" />
+    <ClCompile Include="parallel\Parallel.cpp" />
     <ClCompile Include="samplers\randomSampler.cpp" />
     <ClCompile Include="shapes\cone.cpp" />
     <ClCompile Include="shapes\cube.cpp" />
@@ -195,6 +196,7 @@
     <ClCompile Include="tools\fileutil.cpp" />
     <ClCompile Include="tools\Logging.cpp" />
     <ClCompile Include="tools\memory.cpp" />
+    <ClCompile Include="tools\stats.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="accelerators\bvh.h" />
@@ -215,6 +217,7 @@
     <ClInclude Include="core\Interaction.h" />
     <ClInclude Include="core\Material.h" />
     <ClInclude Include="core\Medium.h" />
+    <ClInclude Include="core\mipmap.h" />
     <ClInclude Include="core\primitive.h" />
     <ClInclude Include="core\sampler.h" />
     <ClInclude Include="core\Sampling.h" />
@@ -262,6 +265,7 @@
     <ClInclude Include="tools\Logging.h" />
     <ClInclude Include="tools\macro.h" />
     <ClInclude Include="tools\memory.h" />
+    <ClInclude Include="tools\stats.h" />
     <ClInclude Include="tools\stringprint.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

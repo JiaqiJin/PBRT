@@ -65,4 +65,7 @@ public:
 	virtual ~Texture() { }
 };
 
+// 过滤函数
+Float lanczos(Float x, Float tau);
+
 RENDERING_END

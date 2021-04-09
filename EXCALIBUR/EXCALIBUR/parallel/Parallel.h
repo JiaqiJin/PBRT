@@ -1,402 +1,157 @@
 ﻿#pragma once
 
-#include <future>
-#include <vector>
-#include <algorithm>
-#include <functional>
-
-#include <tbb/task.h>
-#include <tbb/parallel_for.h>
-#include <tbb/parallel_sort.h>
-#include <tbb/parallel_reduce.h>
-
+#include "../core/Header.h"
+#include <thread>
+#include "../tools/stats.h"
 namespace Rendering
 {
-	class AtomicFloat {
-	public:
+    class AtomicFloat {
+    public:
 
-		explicit AtomicFloat(Float v = 0) {
-			_bits = floatToBits(v);
-		}
+        explicit AtomicFloat(Float v = 0) {
+            _bits = floatToBits(v);
+        }
 
-		operator Float() const {
-			return bitsToFloat(_bits);
-		}
+        operator Float() const {
+            return bitsToFloat(_bits);
+        }
 
-		Float operator=(Float v) {
-			_bits = floatToBits(v);
-			return v;
-		}
+        Float operator=(Float v) {
+            _bits = floatToBits(v);
+            return v;
+        }
 
-		void add(Float v) {
-#ifdef RENDERING_FLOAT_AS_DOUBLE
-			uint64_t oldBits = _bits, newBits;
+        void add(Float v) {
+#ifdef PALADIN_FLOAT_AS_DOUBLE
+            uint64_t oldBits = _bits, newBits;
 #else
-			uint32_t oldBits = _bits, newBits;
+            uint32_t oldBits = _bits, newBits;
 #endif
-			do {
-				newBits = floatToBits(bitsToFloat(oldBits) + v);
-			} while (!_bits.compare_exchange_weak(oldBits, newBits));
-			// 如果oldBits与_bits不相等，则把oldBits改为_bits的值，返回false
-			// 如果oldBits与_bits相等，则把_bit的值改为newBits，返回true
-		}
+            do {
+                newBits = floatToBits(bitsToFloat(oldBits) + v);
+            } while (!_bits.compare_exchange_weak(oldBits, newBits));
+            // 如果oldBits与_bits不相等，则把oldBits改为_bits的值，返回false
+            // 如果oldBits与_bits相等，则把_bit的值改为newBits，返回true
+        }
 
-	private:
+    private:
 
-#ifdef RENDERING_FLOAT_AS_DOUBLE
-		std::atomic<uint64_t> _bits;
+#ifdef PALADIN_FLOAT_AS_DOUBLE
+        std::atomic<uint64_t> _bits;
 #else
-		std::atomic<uint32_t> _bits;
+        std::atomic<uint32_t> _bits;
 #endif
-	};
+    };
 
-	// ----------------- paralleL ---------------------------
+    /**
+     * 可以理解为栅栏
+     * 保证一切准备就绪之后，所有子线程尽可能的同时开始工作
+     */
+    class Barrier {
+    public:
+        Barrier(int count)
+            : _count(count) {
+            CHECK_GT(_count, 0);
+        }
 
-	constexpr size_t kZeroSize = 0;
+        ~Barrier() {
+            CHECK_EQ(_count, 0);
+        }
 
-	//! Execution policy tag.
-	enum class ExecutionPolicy { kSerial, kParallel };
+        void wait() {
+            std::unique_lock<std::mutex> lock(_mutex);
+            CHECK_GT(_count, 0);
+            if (--_count == 0) {
+                _cv.notify_all();
+            }
+            else {
+                _cv.wait(lock, [this] { return _count == 0; });
+            }
+        }
 
-	//!
-	//! \brief      Fills from \p begin to \p end with \p value in parallel.
-	//!
-	//! This function fills a container specified by begin and end iterators in
-	//! parallel. The order of the filling is not guaranteed due to the nature of
-	//! parallel execution.
-	//!
-	//! \param[in]  begin          The begin iterator of a container.
-	//! \param[in]  end            The end iterator of a container.
-	//! \param[in]  value          The value to fill a container.
-	//! \param[in]  policy         The execution policy (parallel or serial).
-	//!
-	//! \tparam     RandomIterator Random iterator type.
-	//! \tparam     T              Value type of a container.
-	//!
-	template <typename RandomIterator, typename T>
-	void parallelFill(const RandomIterator& begin, const RandomIterator& end,
-		const T& value, ExecutionPolicy policy = ExecutionPolicy::kParallel);
+    private:
+        // 互斥锁
+        std::mutex _mutex;
+        // 当 std::condition_variable 对象的某个 wait 函数被调用的时候，
+        // 它使用 std::unique_lock(通过 std::mutex) 来锁住当前线程。当前线程会一直被阻塞，
+        // 直到另外一个线程在相同的 std::condition_variable 对象上调用了 notification 函数来唤醒当前线程。
+        std::condition_variable _cv;
+        int _count;
+    };
 
-	//!
-	//! \brief      Makes a for-loop from \p beginIndex \p to endIndex in parallel.
-	//!
-	//! This function makes a for-loop specified by begin and end indices in
-	//! parallel. The order of the visit is not guaranteed due to the nature of
-	//! parallel execution.
-	//!
-	//! \param[in]  beginIndex The begin index.
-	//! \param[in]  endIndex   The end index.
-	//! \param[in]  function   The function to call for each index.
-	//! \param[in]  policy     The execution policy (parallel or serial).
-	//!
-	//! \tparam     IndexType  Index type.
-	//! \tparam     Function   Function type.
-	//!
-	template <typename IndexType, typename Function>
-	void parallelFor(IndexType beginIndex, IndexType endIndex,
-		const Function& function, ExecutionPolicy policy = ExecutionPolicy::kParallel);
+    struct ParallelForLoop {
 
-	//!
-	//! \brief      Makes a range-loop from \p beginIndex \p to endIndex in
-	//!             parallel.
-	//!
-	//! This function makes a for-loop specified by begin and end indices in
-	//! parallel. Unlike parallelFor function, the input function object takes range
-	//! instead of single index. The order of the visit is not guaranteed due to the
-	//! nature of parallel execution.
-	//!
-	//! \param[in]  beginIndex The begin index.
-	//! \param[in]  endIndex   The end index.
-	//! \param[in]  function   The function to call for each index range.
-	//! \param[in]  policy     The execution policy (parallel or serial).
-	//!
-	//! \tparam     IndexType  Index type.
-	//! \tparam     Function   Function type.
-	//!
-	template <typename IndexType, typename Function>
-	void parallelRangeFor(IndexType beginIndex, IndexType endIndex,
-		const Function& function, ExecutionPolicy policy = ExecutionPolicy::kParallel);
+    public:
+        ParallelForLoop(std::function<void(int64_t)> func1D, int64_t maxIndex,
+            int chunkSize, uint64_t profilerState)
+            : func1D(std::move(func1D)),
+            maxIndex(maxIndex),
+            chunkSize(chunkSize),
+            profilerState(profilerState) {
 
-	//!
-	//! \brief      Makes a 2D nested for-loop in parallel.
-	//!
-	//! This function makes a 2D nested for-loop specified by begin and end indices
-	//! for each dimension. X will be the inner-most loop while Y is the outer-most.
-	//! The order of the visit is not guaranteed due to the nature of parallel
-	//! execution.
-	//!
-	//! \param[in]  beginIndexX The begin index in X dimension.
-	//! \param[in]  endIndexX   The end index in X dimension.
-	//! \param[in]  beginIndexY The begin index in Y dimension.
-	//! \param[in]  endIndexY   The end index in Y dimension.
-	//! \param[in]  function    The function to call for each index (i, j).
-	//! \param[in]  policy      The execution policy (parallel or serial).
-	//!
-	//! \tparam     IndexType  Index type.
-	//! \tparam     Function   Function type.
-	//!
-	template <typename IndexType, typename Function>
-	void parallelFor(IndexType beginIndexX, IndexType endIndexX,
-		IndexType beginIndexY, IndexType endIndexY,
-		const Function& function, ExecutionPolicy policy = ExecutionPolicy::kParallel);
+        }
 
-	//!
-	//! \brief      Makes a 2D nested range-loop in parallel.
-	//!
-	//! This function makes a 2D nested for-loop specified by begin and end indices
-	//! for each dimension. X will be the inner-most loop while Y is the outer-most.
-	//! Unlike parallelFor function, the input function object takes range instead
-	//! of single index. The order of the visit is not guaranteed due to the nature
-	//! of parallel execution.
-	//!
-	//! \param[in]  beginIndexX The begin index in X dimension.
-	//! \param[in]  endIndexX   The end index in X dimension.
-	//! \param[in]  beginIndexY The begin index in Y dimension.
-	//! \param[in]  endIndexY   The end index in Y dimension.
-	//! \param[in]  function   The function to call for each index range.
-	//! \param[in]  policy      The execution policy (parallel or serial).
-	//!
-	//! \tparam     IndexType  Index type.
-	//! \tparam     Function   Function type.
-	//!
-	template <typename IndexType, typename Function>
-	void parallelRangeFor(IndexType beginIndexX, IndexType endIndexX,
-		IndexType beginIndexY, IndexType endIndexY,
-		const Function& function, ExecutionPolicy policy = ExecutionPolicy::kParallel);
+        ParallelForLoop(const std::function<void(Point2i, int)>& f, const Point2i& count,
+            uint64_t profilerState)
+            : func2D(f),
+            maxIndex(count.x* count.y),
+            chunkSize(1),
+            profilerState(profilerState) {
+            numX = count.x;
+        }
 
-	//!
-	//! \brief      Makes a 3D nested for-loop in parallel.
-	//!
-	//! This function makes a 3D nested for-loop specified by begin and end indices
-	//! for each dimension. X will be the inner-most loop while Z is the outer-most.
-	//! The order of the visit is not guaranteed due to the nature of parallel
-	//! execution.
-	//!
-	//! \param[in]  beginIndexX The begin index in X dimension.
-	//! \param[in]  endIndexX   The end index in X dimension.
-	//! \param[in]  beginIndexY The begin index in Y dimension.
-	//! \param[in]  endIndexY   The end index in Y dimension.
-	//! \param[in]  beginIndexZ The begin index in Z dimension.
-	//! \param[in]  endIndexZ   The end index in Z dimension.
-	//! \param[in]  function    The function to call for each index (i, j, k).
-	//! \param[in]  policy      The execution policy (parallel or serial).
-	//!
-	//! \tparam     IndexType   Index type.
-	//! \tparam     Function    Function type.
-	//!
-	template <typename IndexType, typename Function>
-	void parallelFor(IndexType beginIndexX, IndexType endIndexX,
-		IndexType beginIndexY, IndexType endIndexY,
-		IndexType beginIndexZ, IndexType endIndexZ,
-		const Function& function, ExecutionPolicy policy = ExecutionPolicy::kParallel);
+    public:
+        // 一维变量函数
+        std::function<void(int64_t)> func1D;
+        // 二维变量函数
+        std::function<void(Point2i, int)> func2D;
+        // 最大迭代次数
+        const int64_t maxIndex;
 
-	//!
-	//! \brief      Makes a 3D nested range-loop in parallel.
-	//!
-	//! This function makes a 3D nested for-loop specified by begin and end indices
-	//! for each dimension. X will be the inner-most loop while Z is the outer-most.
-	//! Unlike parallelFor function, the input function object takes range instead
-	//! of single index. The order of the visit is not guaranteed due to the nature
-	//! of parallel execution.
-	//!
-	//! \param[in]  beginIndexX The begin index in X dimension.
-	//! \param[in]  endIndexX   The end index in X dimension.
-	//! \param[in]  beginIndexY The begin index in Y dimension.
-	//! \param[in]  endIndexY   The end index in Y dimension.
-	//! \param[in]  beginIndexZ The begin index in Z dimension.
-	//! \param[in]  endIndexZ   The end index in Z dimension.
-	//! \param[in]  function    The function to call for each index (i, j, k).
-	//! \param[in]  policy      The execution policy (parallel or serial).
-	//!
-	//! \tparam     IndexType   Index type.
-	//! \tparam     Function    Function type.
-	//!
-	template <typename IndexType, typename Function>
-	void parallelRangeFor(IndexType beginIndexX, IndexType endIndexX,
-		IndexType beginIndexY, IndexType endIndexY,
-		IndexType beginIndexZ, IndexType endIndexZ,
-		const Function& function, ExecutionPolicy policy = ExecutionPolicy::kParallel);
+        // 每次迭代的循环次数
+        // 把n个任务分成若干块，每块的大小为chunkSize
+        // 把n个任务分配给子线程也是按块分配
+        const int chunkSize;
 
-	//!
-	//! \brief      Performs reduce operation in parallel.
-	//!
-	//! This function reduces the series of values into a single value using the
-	//! provided reduce function.
-	//!
-	//! \param[in]  beginIndex The begin index.
-	//! \param[in]  endIndex   The end index.
-	//! \param[in]  identity   Identity value for the reduce operation.
-	//! \param[in]  function   The function for reducing subrange.
-	//! \param[in]  reduce     The reduce operator.
-	//! \param[in]  policy     The execution policy (parallel or serial).
-	//!
-	//! \tparam     IndexType  Index type.
-	//! \tparam     Value      Value type.
-	//! \tparam     Function   Reduce function type.
-	//!
-	template <typename IndexType, typename Value, typename Function, typename Reduce>
-	Value parallelReduce(IndexType beginIndex, IndexType endIndex,
-		const Value& identity, const Function& func,
-		const Reduce& reduce, ExecutionPolicy policy = ExecutionPolicy::kParallel);
+        uint64_t profilerState;
+        // 下个迭代索引
+        int64_t nextIndex = 0;
+        // 当前激活worker线程
+        int activeWorkers = 0;
 
-	//!
-	//! \brief      Sorts a container in parallel.
-	//!
-	//! This function sorts a container specified by begin and end iterators.
-	//!
-	//! \param[in]  begin          The begin random access iterator.
-	//! \param[in]  end            The end random access iterator.
-	//! \param[in]  policy         The execution policy (parallel or serial).
-	//!
-	//! \tparam     RandomIterator Iterator type.
-	//!
-	template <typename RandomIterator>
-	void parallelSort(RandomIterator begin, RandomIterator end,
-		ExecutionPolicy policy = ExecutionPolicy::kParallel);
+        ParallelForLoop* next = nullptr;
+        // 二维函数需要用到的属性
+        int numX = -1;
 
-	//!
-	//! \brief      Sorts a container in parallel with a custom compare function.
-	//!
-	//! This function sorts a container specified by begin and end iterators. It
-	//! takes extra compare function which returns true if the first argument is
-	//! less than the second argument.
-	//!
-	//! \param[in]  begin           The begin random access iterator.
-	//! \param[in]  end             The end random access iterator.
-	//! \param[in]  compare         The compare function.
-	//! \param[in]  policy          The execution policy (parallel or serial).
-	//!
-	//! \tparam     RandomIterator  Iterator type.
-	//! \tparam     CompareFunction Compare function type.
-	//!
-	template <typename RandomIterator, typename CompareFunction>
-	void parallelSort(RandomIterator begin, RandomIterator end,
-		CompareFunction compare, ExecutionPolicy policy = ExecutionPolicy::kParallel);
+        bool finished() const {
+            return nextIndex >= maxIndex && activeWorkers == 0;
+        }
+    };
 
-	//! --------------------------------------Definition---------------------------------------------
+    extern thread_local int ThreadIndex;
 
-	template <typename RandomIterator, typename T>
-	void parallelFill(const RandomIterator& begin, const RandomIterator& end, const T& value, ExecutionPolicy policy)
-	{
-		auto diff = end - begin;
-		if (diff <= 0)
-			return;
+    void parallelFor(std::function<void(int64_t)> func, int64_t count, int chunkSize = 1);
 
-		size_t size = static_cast<size_t>(diff);
-		parallelFor(kZeroSize, size, [begin, value](size_t i) { begin[i] = value; }, policy);
-	}
 
-	template <typename IndexType, typename Function>
-	void parallelFor(IndexType start, IndexType end, const Function& func, ExecutionPolicy policy)
-	{
-		if (start > end)
-			return;
-		if (policy == ExecutionPolicy::kParallel)
-			tbb::parallel_for(start, end, func);
-		else
-		{
-			for (auto i = start; i < end; ++i)
-				func(i);
-		}
-	}
+    void parallelFor2D(std::function<void(Point2i, int)> func, const Point2i& count);
 
-	template <typename IndexType, typename Function>
-	void parallelRangeFor(IndexType start, IndexType end, const Function& func, ExecutionPolicy policy)
-	{
-		if (start > end)
-			return;
-		if (policy == ExecutionPolicy::kParallel)
-			tbb::parallel_for(tbb::blocked_range<IndexType>(start, end),
-				[&func](const tbb::blocked_range<IndexType>& range) {
-					func(range.begin(), range.end());
-				});
-		else
-			func(start, end);
-	}
+    inline int numSystemCores() {
+        return std::max(1u, std::thread::hardware_concurrency());
+    }
 
-	template <typename IndexType, typename Function>
-	void parallelFor(IndexType beginIndexX, IndexType endIndexX, IndexType beginIndexY, IndexType endIndexY,
-		const Function& function, ExecutionPolicy policy)
-	{
-		parallelFor(beginIndexY, endIndexY,
-			[&](IndexType j) {
-				for (IndexType i = beginIndexX; i < endIndexX; ++i)
-					function(i, j); },
-			policy);
-	}
+    int maxThreadIndex();
 
-	template <typename IndexType, typename Function>
-	void parallelRangeFor(IndexType beginIndexX, IndexType endIndexX, IndexType beginIndexY, IndexType endIndexY,
-		const Function& function, ExecutionPolicy policy)
-	{
-		parallelRangeFor(beginIndexY, endIndexY,
-			[&](IndexType jBegin, IndexType jEnd) {
-				function(beginIndexX, endIndexX, jBegin, jEnd); },
-			policy);
-	}
+    int getCurThreadIndex();
 
-	template <typename IndexType, typename Function>
-	void parallelFor(IndexType beginIndexX, IndexType endIndexX,
-		IndexType beginIndexY, IndexType endIndexY,
-		IndexType beginIndexZ, IndexType endIndexZ,
-		const Function& function, ExecutionPolicy policy)
-	{
-		parallelFor(beginIndexZ, endIndexZ,
-			[&](IndexType k) {
-				for (IndexType j = beginIndexY; j < endIndexY; ++j)
-					for (IndexType i = beginIndexX; i < endIndexX; ++i)
-						function(i, j, k); },
-			policy);
-	}
+    void setThreadNum(int num);
 
-	template <typename IndexType, typename Function>
-	void parallelRangeFor(IndexType beginIndexX, IndexType endIndexX,
-		IndexType beginIndexY, IndexType endIndexY,
-		IndexType beginIndexZ, IndexType endIndexZ,
-		const Function& function, ExecutionPolicy policy)
-	{
-		parallelRangeFor(beginIndexZ, endIndexZ,
-			[&](IndexType kBegin, IndexType kEnd) {
-				function(beginIndexX, endIndexX, beginIndexY,
-					endIndexY, kBegin, kEnd); },
-			policy);
-	}
+    int getThreadNum();
 
-	template <typename IndexType, typename Value, typename Function, typename Reduce>
-	Value parallelReduce(IndexType start, IndexType end, const Value& identity,
-		const Function& func, const Reduce& reduce, ExecutionPolicy policy)
-	{
-		if (start > end)
-			return identity;
-		if (policy == ExecutionPolicy::kParallel)
-		{
-			return tbb::parallel_reduce(
-				tbb::blocked_range<IndexType>(start, end), identity,
-				[&func](const tbb::blocked_range<IndexType>& range, const Value& init) {
-					return func(range.begin(), range.end(), init); }, reduce);
-		}
-		else
-		{
-			(void)reduce;
-			return func(start, end, identity);
-		}
-	}
+    void parallelInit(int num = 0);
 
-	template <typename RandomIterator, typename CompareFunction>
-	void parallelSort(RandomIterator begin, RandomIterator end, CompareFunction compareFunction, ExecutionPolicy policy)
-	{
-		if (end < begin)
-			return;
-		if (policy == ExecutionPolicy::kParallel)
-			tbb::parallel_sort(begin, end, compareFunction);
-		else
-			std::sort(begin, end, compareFunction);
-	}
+    void parallelCleanup();
 
-	template <typename RandomIterator>
-	void parallelSort(RandomIterator begin, RandomIterator end, ExecutionPolicy policy)
-	{
-		parallelSort(begin, end,
-			std::less<typename std::iterator_traits<RandomIterator>::value_type>(),
-			policy);
-	}
+    void mergeWorkerThreadStats();
+
+
 }

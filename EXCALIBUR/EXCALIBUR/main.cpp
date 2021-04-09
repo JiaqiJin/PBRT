@@ -1,6 +1,6 @@
 #include <iostream>
 #include "core/Header.h"
-
+#include "tools/stats.h"
 int main()
 {
 	Rendering::Log::Init();

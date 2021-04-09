@@ -292,6 +292,124 @@ int findInterval(int size, const Predicate& pred) {
 	return Rendering::clamp(first - 1, 0, size - 2);
 }
 
+inline int32_t roundUpPow2(int32_t v) {
+	v--;
+	v |= v >> 1;
+	v |= v >> 2;
+	v |= v >> 4;
+	v |= v >> 8;
+	v |= v >> 16;
+	return v + 1;
+}
+
+inline int64_t roundUpPow2(int64_t v) {
+	v--;
+	v |= v >> 1;
+	v |= v >> 2;
+	v |= v >> 4;
+	v |= v >> 8;
+	v |= v >> 16;
+	v |= v >> 32;
+	return v + 1;
+}
+
+inline Float ErfInv(Float x) {
+	Float w, p;
+	x = Rendering::clamp(x, -.99999f, .99999f);
+	w = -std::log((1 - x) * (1 + x));
+	if (w < 5) {
+		w = w - 2.5f;
+		p = 2.81022636e-08f;
+		p = 3.43273939e-07f + p * w;
+		p = -3.5233877e-06f + p * w;
+		p = -4.39150654e-06f + p * w;
+		p = 0.00021858087f + p * w;
+		p = -0.00125372503f + p * w;
+		p = -0.00417768164f + p * w;
+		p = 0.246640727f + p * w;
+		p = 1.50140941f + p * w;
+	}
+	else {
+		w = std::sqrt(w) - 3;
+		p = -0.000200214257f;
+		p = 0.000100950558f + p * w;
+		p = 0.00134934322f + p * w;
+		p = -0.00367342844f + p * w;
+		p = 0.00573950773f + p * w;
+		p = -0.0076224613f + p * w;
+		p = 0.00943887047f + p * w;
+		p = 1.00167406f + p * w;
+		p = 2.83297682f + p * w;
+	}
+	return p * x;
+}
+
+inline Float Erf(Float x) {
+	// constants
+	Float a1 = 0.254829592f;
+	Float a2 = -0.284496736f;
+	Float a3 = 1.421413741f;
+	Float a4 = -1.453152027f;
+	Float a5 = 1.061405429f;
+	Float p = 0.3275911f;
+
+	// Save the sign of x
+	int sign = 1;
+	if (x < 0) sign = -1;
+	x = std::abs(x);
+
+	// A&S formula 7.1.26
+	Float t = 1 / (1 + p * x);
+	Float y =
+		1 -
+		(((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * std::exp(-x * x);
+
+	return sign * y;
+}
+
+// 当粗糙度低到一个阈值以下时，渲染效果不好，故做此校正
+inline Float correctRoughness(Float roughness) {
+	return std::max(roughness, (Float)0.001);
+}
+
+inline int Log2Int(uint32_t v) {
+#if defined(_MSC_VER)
+	unsigned long lz = 0;
+	if (_BitScanReverse(&lz, v)) {
+		return lz;
+	}
+	return 0;
+#else
+	return 31 - __builtin_clz(v);
+#endif
+}
+
+inline int Log2Int(int32_t v) {
+	return Log2Int((uint32_t)v);
+}
+
+inline int Log2Int(uint64_t v) {
+#if defined(_MSC_VER)
+	unsigned long lz = 0;
+#if defined(_WIN64)
+	_BitScanReverse64(&lz, v);
+#else
+	if (_BitScanReverse(&lz, v >> 32))
+		lz += 32;
+	else
+		_BitScanReverse(&lz, v & 0xffffffff);
+#endif 
+	return lz;
+#else
+	return 63 - __builtin_clzll(v);
+#endif
+}
+
+inline int Log2Int(int64_t v) {
+	return Log2Int((uint64_t)v);
+}
+
+
 #include "../math/vector.h"
 #include "../math/point.h"
 #include "../math/ray.h"

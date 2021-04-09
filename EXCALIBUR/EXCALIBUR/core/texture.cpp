@@ -61,4 +61,18 @@ Point3f TransformMapping3D::map(const SurfaceInteraction& si, Vector3f* dpdx,
     return _worldToTexture.exec(si.pos);
 }
 
+Float lanczos(Float x, Float tau) {
+    x = std::abs(x);
+    if (x < 1e-5f) {
+        return 1;
+    }
+    if (x > 1.f) {
+        return 0;
+    }
+    x *= Pi;
+    Float s = std::sin(x * tau) / (x * tau);
+    Float lanczos = std::sin(x) / x;
+    return s * lanczos;
+}
+
 RENDERING_END
