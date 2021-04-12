@@ -16,7 +16,7 @@ BxDf
 BeckmannDistribution -> sample_wh
 BSDF -> sample_f pdf
 Material::Bump
-
+BSSRDF sub class
 
 implementation : imagetexture
 
