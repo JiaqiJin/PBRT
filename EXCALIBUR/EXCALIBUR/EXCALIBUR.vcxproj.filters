@@ -165,6 +165,9 @@
     <ClCompile Include="tools\stats.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="medium\homogeneous.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ext\tinyobj\tiny_obj_loader.h">
@@ -369,6 +372,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="tools\stats.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="medium\homogeneous.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

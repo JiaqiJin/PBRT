@@ -110,6 +110,10 @@ public:
         bool allowMultipleLobes = false,
         TransportMode mode = TransportMode::Radiance);
 
+    inline void faceForward() {
+        normal = faceforward(normal, shading.normal);
+    }
+
     // 表面坐标
     Point2f uv;
     Vector3f dpdu, dpdv;
@@ -130,6 +134,25 @@ public:
 
     uint32_t shapeIdx;
     uint32_t primIdx;
+};
+
+class MediumInteraction : public Interaction {
+public:
+    MediumInteraction() : phase(nullptr) {
+
+    }
+
+    MediumInteraction(const Point3f& p, const Vector3f& wo, Float time,
+        const Medium* medium, const PhaseFunction* phase)
+        : Interaction(p, wo, time, medium), phase(phase) {
+
+    }
+
+    bool isValid() const {
+        return phase != nullptr;
+    }
+
+    const PhaseFunction* phase;
 };
 
 RENDERING_END

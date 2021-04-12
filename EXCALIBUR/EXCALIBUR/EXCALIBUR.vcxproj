@@ -179,6 +179,7 @@
     <ClCompile Include="math\lowdiscrepancy.cpp" />
     <ClCompile Include="math\quaternion.cpp" />
     <ClCompile Include="math\transform.cpp" />
+    <ClCompile Include="medium\homogeneous.cpp" />
     <ClCompile Include="parallel\Parallel.cpp" />
     <ClCompile Include="samplers\randomSampler.cpp" />
     <ClCompile Include="shapes\cone.cpp" />
@@ -244,6 +245,7 @@
     <ClInclude Include="math\rng.h" />
     <ClInclude Include="math\transform.h" />
     <ClInclude Include="math\vector.h" />
+    <ClInclude Include="medium\homogeneous.h" />
     <ClInclude Include="parallel\Parallel.h" />
     <ClInclude Include="samplers\randomSampler.h" />
     <ClInclude Include="shapes\cone.h" />
