@@ -150,6 +150,7 @@
     <ClCompile Include="accelerators\bvh.cpp" />
     <ClCompile Include="cameras\perspective.cpp" />
     <ClCompile Include="core\BXDF\BSDF.cpp" />
+    <ClCompile Include="core\BXDF\BSSRDF.cpp" />
     <ClCompile Include="core\BXDF\BxDF.cpp" />
     <ClCompile Include="core\BXDF\Fourierbsdf.cpp" />
     <ClCompile Include="core\BXDF\Lambertian.cpp" />
@@ -161,6 +162,7 @@
     <ClCompile Include="core\film.cpp" />
     <ClCompile Include="core\filter.cpp" />
     <ClCompile Include="core\Interaction.cpp" />
+    <ClCompile Include="core\light.cpp" />
     <ClCompile Include="core\Material.cpp" />
     <ClCompile Include="core\Medium.cpp" />
     <ClCompile Include="core\primitive.cpp" />
@@ -203,6 +205,7 @@
     <ClInclude Include="accelerators\bvh.h" />
     <ClInclude Include="cameras\perspective.h" />
     <ClInclude Include="core\BXDF\BSDF.h" />
+    <ClInclude Include="core\BXDF\BSSRDF.h" />
     <ClInclude Include="core\BXDF\BxDF.h" />
     <ClInclude Include="core\BXDF\Fourierbsdf.h" />
     <ClInclude Include="core\BXDF\Lambertian.h" />
@@ -216,6 +219,7 @@
     <ClInclude Include="core\filter.h" />
     <ClInclude Include="core\Header.h" />
     <ClInclude Include="core\Interaction.h" />
+    <ClInclude Include="core\light.h" />
     <ClInclude Include="core\Material.h" />
     <ClInclude Include="core\Medium.h" />
     <ClInclude Include="core\mipmap.h" />

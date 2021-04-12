@@ -250,4 +250,87 @@ void ReportProfilerResults(FILE* dest);
 void ClearProfiler();
 void CleanupProfiler();
 
+// Statistics Macros
+#define STAT_COUNTER(title, var)                           \
+    static THREAD_LOCAL int64_t var;                  \
+    static void STATS_FUNC##var(StatsAccumulator &accum) { \
+        accum.ReportCounter(title, var);                   \
+        var = 0;                                           \
+    }                                                      \
+    static StatRegisterer STATS_REG##var(STATS_FUNC##var)
+#define STAT_MEMORY_COUNTER(title, var)                    \
+    static THREAD_LOCAL int64_t var;                  \
+    static void STATS_FUNC##var(StatsAccumulator &accum) { \
+        accum.ReportMemoryCounter(title, var);             \
+        var = 0;                                           \
+    }                                                      \
+    static StatRegisterer STATS_REG##var(STATS_FUNC##var)
+
+#ifndef RENDERING_HAVE_CONSTEXPR
+#define STATS_INT64_T_MIN LLONG_MAX
+#define STATS_INT64_T_MAX _I64_MIN
+#define STATS_DBL_T_MIN DBL_MAX
+#define STATS_DBL_T_MAX -DBL_MAX
+#else
+#define STATS_INT64_T_MIN std::numeric_limits<int64_t>::max()
+#define STATS_INT64_T_MAX std::numeric_limits<int64_t>::lowest()
+#define STATS_DBL_T_MIN std::numeric_limits<double>::max()
+#define STATS_DBL_T_MAX std::numeric_limits<double>::lowest()
+#endif
+
+#define STAT_INT_DISTRIBUTION(title, var)                                  \
+    static THREAD_LOCAL int64_t var##sum;                             \
+    static THREAD_LOCAL int64_t var##count;                           \
+    static THREAD_LOCAL int64_t var##min = (STATS_INT64_T_MIN);       \
+    static THREAD_LOCAL int64_t var##max = (STATS_INT64_T_MAX);       \
+    static void STATS_FUNC##var(StatsAccumulator &accum) {                 \
+        accum.ReportIntDistribution(title, var##sum, var##count, var##min, \
+                                    var##max);                             \
+        var##sum = 0;                                                      \
+        var##count = 0;                                                    \
+        var##min = std::numeric_limits<int64_t>::max();                    \
+        var##max = std::numeric_limits<int64_t>::lowest();                 \
+    }                                                                      \
+    static StatRegisterer STATS_REG##var(STATS_FUNC##var)
+
+#define STAT_FLOAT_DISTRIBUTION(title, var)                                  \
+    static THREAD_LOCAL double var##sum;                                \
+    static THREAD_LOCAL int64_t var##count;                             \
+    static THREAD_LOCAL double var##min = (STATS_DBL_T_MIN);            \
+    static THREAD_LOCAL double var##max = (STATS_DBL_T_MAX);            \
+    static void STATS_FUNC##var(StatsAccumulator &accum) {                   \
+        accum.ReportFloatDistribution(title, var##sum, var##count, var##min, \
+                                      var##max);                             \
+        var##sum = 0;                                                        \
+        var##count = 0;                                                      \
+        var##min = std::numeric_limits<double>::max();                       \
+        var##max = std::numeric_limits<double>::lowest();                    \
+    }                                                                        \
+    static StatRegisterer STATS_REG##var(STATS_FUNC##var)
+
+#define ReportValue(var, value)                                   \
+    do {                                                          \
+        var##sum += value;                                        \
+        var##count += 1;                                          \
+        var##min = std::min(var##min, decltype(var##min)(value)); \
+        var##max = std::max(var##max, decltype(var##min)(value)); \
+    } while (0)
+
+#define STAT_PERCENT(title, numVar, denomVar)                 \
+    static THREAD_LOCAL int64_t numVar, denomVar;        \
+    static void STATS_FUNC##numVar(StatsAccumulator &accum) { \
+        accum.ReportPercentage(title, numVar, denomVar);      \
+        numVar = denomVar = 0;                                \
+    }                                                         \
+    static StatRegisterer STATS_REG##numVar(STATS_FUNC##numVar)
+
+#define STAT_RATIO(title, numVar, denomVar)                   \
+    static THREAD_LOCAL int64_t numVar, denomVar;        \
+    static void STATS_FUNC##numVar(StatsAccumulator &accum) { \
+        accum.ReportRatio(title, numVar, denomVar);           \
+        numVar = denomVar = 0;                                \
+    }                                                         \
+    static StatRegisterer STATS_REG##numVar(STATS_FUNC##numVar)
+
+
 RENDERING_END

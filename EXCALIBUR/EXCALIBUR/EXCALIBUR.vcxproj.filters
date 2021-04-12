@@ -168,6 +168,12 @@
     <ClCompile Include="medium\homogeneous.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="core\BXDF\BSSRDF.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="core\light.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ext\tinyobj\tiny_obj_loader.h">
@@ -375,6 +381,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="medium\homogeneous.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\BXDF\BSSRDF.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="core\light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
