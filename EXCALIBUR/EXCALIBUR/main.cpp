@@ -17,7 +17,7 @@ BeckmannDistribution -> sample_wh
 BSDF -> sample_f pdf
 Material::Bump
 BSSRDF sub class
-
+Scene todo 
 implementation : imagetexture
 
 http://bgrawi.com/Fourier-Visualizations/ fourier

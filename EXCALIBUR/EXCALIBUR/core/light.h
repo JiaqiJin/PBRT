@@ -42,6 +42,16 @@ public:
         return isDeltaLight(flags);
     }
 
+    virtual Spectrum sampleLi(const Interaction& ref, const Point2f& u,
+        Vector3f* wi, Float* pdf,
+        VisibilityTester* vis) const = 0;
+
+    // 辐射通量，也就是功率
+    virtual Spectrum power() const = 0;
+
+    virtual void preprocess(const Scene& scene) {
+
+    }
 
     // LightFlags
     const int flags;
@@ -52,6 +62,22 @@ public:
 
 protected:
     const Transform _lightToWorld, _worldToLight;
+};
+
+/**
+ * 可见测试器
+ * 测试两个指定位置之间有没有阻挡
+ */
+class VisibilityTester {
+public:
+    VisibilityTester(const Interaction& p0, const Interaction& p1)
+        : _p0(p0), _p1(p1) { }
+    const Interaction& P0() const { return _p0; }
+    const Interaction& P1() const { return _p1; }
+    bool Unoccluded(const Scene& scene) const;
+    Spectrum Tr(const Scene& scene, Sampler& sampler) const;
+private:
+    Interaction _p0, _p1;
 };
 
 RENDERING_END
