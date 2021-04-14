@@ -99,6 +99,8 @@ public:
         const Shape* sh,
         int faceIndex = 0);
 
+    Spectrum Le(const Vector3f& w) const;
+
     void setShadingGeometry(const Vector3f& dpdu, const Vector3f& dpdv,
         const Normal3f& dndu, const Normal3f& dndv,
         bool orientationIsAuthoritative);

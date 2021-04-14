@@ -1,6 +1,7 @@
 ﻿#include "Interaction.h"
 #include "Shape.h"
 #include "primitive.h"
+#include "light.h"
 
 RENDERING_BEGIN
 
@@ -50,6 +51,11 @@ SurfaceInteraction::SurfaceInteraction(
         normal *= -1;
         shading.normal *= -1;
     }
+}
+
+Spectrum SurfaceInteraction::Le(const Vector3f& w) const {
+    const AreaLight* area = primitive->getAreaLight();
+    return area ? area->L(*this, w) : Spectrum(0.f);
 }
 
 void SurfaceInteraction::setShadingGeometry(const Vector3f& dpdus,

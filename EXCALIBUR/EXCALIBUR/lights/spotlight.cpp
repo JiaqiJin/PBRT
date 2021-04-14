@@ -26,7 +26,7 @@ Spectrum SpotLight::sample_Li(const Interaction& ref, const Point2f& u,
 Spectrum SpotLight::sample_Le(const Point2f& u1, const Point2f& u2,
     Float time, Ray* ray, Normal3f* nLight,
     Float* pdfPos, Float* pdfDir) const {
-    return _I;
+    return _I; //TODO
 }
 
 void SpotLight::pdf_Le(const Ray& ray, const Normal3f& nLight,

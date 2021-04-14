@@ -180,6 +180,12 @@
     <ClCompile Include="lights\pointlight.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="lights\spotlight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lights\diffuse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ext\tinyobj\tiny_obj_loader.h">
@@ -399,6 +405,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="lights\pointlight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lights\spotlight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lights\diffuse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -174,7 +174,9 @@
     <ClCompile Include="ext\stb_image.cpp" />
     <ClCompile Include="filters\gaussian.cpp" />
     <ClCompile Include="filters\mitchell.cpp" />
+    <ClCompile Include="lights\diffuse.cpp" />
     <ClCompile Include="lights\pointlight.cpp" />
+    <ClCompile Include="lights\spotlight.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="materials\MatteMaterial.cpp" />
     <ClCompile Include="materials\MixMaterial.cpp" />
@@ -238,7 +240,9 @@
     <ClInclude Include="ext\tinyobj\tiny_obj_loader.h" />
     <ClInclude Include="filters\gaussian.h" />
     <ClInclude Include="filters\mitchell.h" />
+    <ClInclude Include="lights\diffuse.h" />
     <ClInclude Include="lights\pointlight.h" />
+    <ClInclude Include="lights\spotlight.h" />
     <ClInclude Include="materials\MatteMaterial.h" />
     <ClInclude Include="materials\MixMaterial.h" />
     <ClInclude Include="materials\PlasticMaterial.h" />
