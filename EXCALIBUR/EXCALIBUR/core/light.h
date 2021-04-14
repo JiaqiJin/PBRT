@@ -42,16 +42,25 @@ public:
         return isDeltaLight(flags);
     }
 
-    virtual Spectrum sampleLi(const Interaction& ref, const Point2f& u,
+    virtual Spectrum sample_Li(const Interaction& ref, const Point2f& u,
         Vector3f* wi, Float* pdf,
         VisibilityTester* vis) const = 0;
 
-    // 辐射通量，也就是功率
     virtual Spectrum power() const = 0;
 
-    virtual void preprocess(const Scene& scene) {
+    virtual void preprocess(const Scene& scene) {}
 
+    virtual Spectrum Le(const RayDifferential& r) const { 
+        return Spectrum(0.f); 
     }
+    virtual Float pdf_Li(const Interaction& ref, const Vector3f& wi) const = 0;
+
+    virtual Spectrum sample_Le(const Point2f& u1, const Point2f& u2, Float time,
+        Ray* ray, Normal3f* nLight, Float* pdfPos,
+        Float* pdfDir) const = 0;
+
+    virtual void pdf_Le(const Ray& ray, const Normal3f& nLight, Float* pdfPos,
+        Float* pdfDir) const = 0;
 
     // LightFlags
     const int flags;
@@ -62,6 +71,18 @@ public:
 
 protected:
     const Transform _lightToWorld, _worldToLight;
+};
+
+class AreaLight : public Light {
+public:
+    AreaLight(const Transform& LightToWorld,
+        const MediumInterface& mi,
+        int nSamples)
+        :Light((int)LightFlags::Area, LightToWorld, mi, nSamples) {
+        ++numAreaLights;
+    }
+
+    virtual Spectrum L(const Interaction& intr, const Vector3f& w) const = 0;
 };
 
 /**

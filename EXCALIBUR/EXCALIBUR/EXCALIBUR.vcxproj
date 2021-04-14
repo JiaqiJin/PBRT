@@ -167,12 +167,14 @@
     <ClCompile Include="core\Medium.cpp" />
     <ClCompile Include="core\primitive.cpp" />
     <ClCompile Include="core\sampler.cpp" />
+    <ClCompile Include="core\scene.cpp" />
     <ClCompile Include="core\Shape.cpp" />
     <ClCompile Include="core\spectrum.cpp" />
     <ClCompile Include="core\texture.cpp" />
     <ClCompile Include="ext\stb_image.cpp" />
     <ClCompile Include="filters\gaussian.cpp" />
     <ClCompile Include="filters\mitchell.cpp" />
+    <ClCompile Include="lights\pointlight.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="materials\MatteMaterial.cpp" />
     <ClCompile Include="materials\MixMaterial.cpp" />
@@ -226,6 +228,7 @@
     <ClInclude Include="core\primitive.h" />
     <ClInclude Include="core\sampler.h" />
     <ClInclude Include="core\Sampling.h" />
+    <ClInclude Include="core\scene.h" />
     <ClInclude Include="core\Shape.h" />
     <ClInclude Include="core\spectrum.h" />
     <ClInclude Include="core\texture.h" />
@@ -235,6 +238,7 @@
     <ClInclude Include="ext\tinyobj\tiny_obj_loader.h" />
     <ClInclude Include="filters\gaussian.h" />
     <ClInclude Include="filters\mitchell.h" />
+    <ClInclude Include="lights\pointlight.h" />
     <ClInclude Include="materials\MatteMaterial.h" />
     <ClInclude Include="materials\MixMaterial.h" />
     <ClInclude Include="materials\PlasticMaterial.h" />
