@@ -113,6 +113,56 @@ struct Distribution1D {
         return (int)_func.size();
     }
 
+    Float sampleContinuous(Float u, Float* pdf = nullptr, int* off = nullptr) const {
+        auto predicate = [&](int index) {
+            return _cdf[index] <= u;
+        };
+        int offset = findInterval((int)_cdf.size(), predicate);
+        if (off) {
+            *off = offset;
+        }
+        Float du = u - _cdf[offset];
+        if ((_cdf[offset + 1] - _cdf[offset]) > 0) {
+            CHECK_GT(_cdf[offset + 1], _cdf[offset]);
+            du /= (_cdf[offset + 1] - _cdf[offset]);
+        }
+        DCHECK(!std::isnan(du));
+
+        if (pdf) {
+            *pdf = (_funcInt > 0) ? _func[offset] / _funcInt : 0;
+        }
+        return (offset + du) / count();
+    }
+
+    int sampleDiscrete(Float u, Float* pdf = nullptr, Float* uRemapped = nullptr) const {
+        auto predicate = [&](int index) {
+            return _cdf[index] <= u;
+        };
+        int offset = findInterval((int)_cdf.size(), predicate);
+        if (pdf) {
+            // 保证pdf积分为1，所以比连续形式的pdf多除了一个count
+            *pdf = (_funcInt > 0) ? _func[offset] / (_funcInt * count()) : 0;
+        }
+        if (uRemapped) {
+            *uRemapped = (u - _cdf[offset]) / (_cdf[offset + 1] - _cdf[offset]);
+            DCHECK(*uRemapped >= 0.f && *uRemapped <= 1.f);
+        }
+        return offset;
+    }
+
+    inline Float getFuncInt() const {
+        return _funcInt;
+    }
+
+    inline Float funcAt(size_t idx) const {
+        return _func[idx];
+    }
+
+    Float discretePDF(int index) const {
+        DCHECK(index >= 0 && index < count());
+        return _func[index] / (_funcInt * count());
+    }
+
 private:
     // 指定分布的函数
     std::vector<Float> _func;
@@ -125,7 +175,53 @@ private:
 };
 
 struct Distribution2D {
+public:
+    Distribution2D() {
 
+    }
+
+    void init(const Float* data, int nu, int nv) {
+        _pConditionalV.reserve(nv);
+        // 创建v个长度为u的一维分布，存入列表中
+        for (int v = 0; v < nv; ++v) {
+            _pConditionalV.emplace_back(new Distribution1D(&data[v * nu], nu));
+        }
+        std::vector<Float> _marginalFunc;
+        _marginalFunc.reserve(nv);
+        // 将每个一维分布的积分值存入_pMarginal中作为边缘概率密度
+        for (int v = 0; v < nv; ++v) {
+            _marginalFunc.push_back(_pConditionalV[v]->_funcInt);
+        }
+        _pMarginal.reset(new Distribution1D(&_marginalFunc[0], nv));
+    }
+
+    Distribution2D(const Float* data, int nu, int nv) {
+        init(data, nu, nv);
+    }
+
+    Point2f sampleContinuous(const Point2f& u, Float* pdf = nullptr) const {
+        Float pdfs[2];
+        int v;
+        Float d1 = _pMarginal->sampleContinuous(u[1], &pdfs[1], &v);
+        Float d0 = _pConditionalV[v]->sampleContinuous(u[0], &pdfs[0]);
+        if (pdf) {
+            *pdf = pdfs[0] * pdfs[1];
+        }
+        return Point2f(d0, d1);
+    }
+
+    Float pdf(const Point2f& p) const {
+        int iu = clamp(int(p[0] * _pConditionalV[0]->count()), 0, _pConditionalV[0]->count() - 1);
+        int iv = clamp(int(p[1] * _pMarginal->count()), 0, _pMarginal->count() - 1);
+        return _pConditionalV[iv]->_func[iu] / _pMarginal->_funcInt;
+    }
+
+private:
+    // 长度为v的列表，每个列表储存一个样本数量为u的一维分布对象
+    std::vector<std::unique_ptr<Distribution1D>> _pConditionalV;
+    // u趋向于1时，v的边缘概率密度函数
+    std::unique_ptr<Distribution1D> _pMarginal;
 };
+
 
 RENDERING_END
