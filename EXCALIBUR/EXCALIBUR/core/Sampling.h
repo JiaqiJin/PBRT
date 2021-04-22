@@ -70,6 +70,21 @@ inline Vector3f cosineSampleHemisphere(const Point2f& u) {
     return Vector3f(d.x, d.y, z);
 }
 
+inline Vector3f cosineSampleHemisphere(const Point2f& u) {
+    Point2f d = uniformSampleDisk(u);
+    Float z = std::sqrt(std::max((Float)0, 1 - d.x * d.x - d.y * d.y));
+    return Vector3f(d.x, d.y, z);
+}
+
+inline Float cosineHemispherePdf(Float cosTheta) {
+    return cosTheta * InvPi;
+}
+
+inline Float uniformHemispherePdf() {
+    return Inv2Pi;
+}
+
+
 template <typename T>
 void shuffle(T* samp, int count, int nDimensions, RNG& rng) {
     for (int i = 0; i < count; ++i) {
@@ -80,6 +95,28 @@ void shuffle(T* samp, int count, int nDimensions, RNG& rng) {
         }
     }
 }
+
+__forceinline Float uniformSpherePdf() {
+    return Inv4Pi;
+}
+
+__forceinline Float balanceHeuristic(int nf, Float fPdf, int ng, Float gPdf) {
+    return (nf * fPdf) / (nf * fPdf + ng * gPdf);
+}
+
+__forceinline Float balanceHeuristic(Float fPdf, Float gPdf) {
+    return balanceHeuristic(1, fPdf, 1, gPdf);
+}
+
+__forceinline Float powerHeuristic(int nf, Float fPdf, int ng, Float gPdf) {
+    Float f = nf * fPdf, g = ng * gPdf;
+    return f == 0 ? 0 : (f * f) / (f * f + g * g);
+}
+
+__forceinline Float powerHeuristic(Float fPdf, Float gPdf) {
+    return powerHeuristic(1, fPdf, 1, gPdf);
+}
+
 
 struct Distribution1D {
 
