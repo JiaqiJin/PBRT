@@ -23,4 +23,6 @@ PointLight, Spot
 
 http://bgrawi.com/Fourier-Visualizations/ fourier
  Monte carlo https://zhuanlan.zhihu.com/p/61611088
+
+ http://www.cxyzjd.com/searchArticle?qc=pbrt&page=12
 */

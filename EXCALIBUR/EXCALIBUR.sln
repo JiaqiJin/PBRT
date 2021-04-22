@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EXCALIBUR", "EXCALIBUR\EXCALIBUR.vcxproj", "{DF5B05C8-0AFA-48FE-ABA8-4D08F5BD0294}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "KawaiiMiao", "KawaiiMiao\KawaiiMiao.vcxproj", "{368C7497-14E7-4CD3-8081-8B181922CE80}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{DF5B05C8-0AFA-48FE-ABA8-4D08F5BD0294}.Release|x64.Build.0 = Release|x64
 		{DF5B05C8-0AFA-48FE-ABA8-4D08F5BD0294}.Release|x86.ActiveCfg = Release|Win32
 		{DF5B05C8-0AFA-48FE-ABA8-4D08F5BD0294}.Release|x86.Build.0 = Release|Win32
+		{368C7497-14E7-4CD3-8081-8B181922CE80}.Debug|x64.ActiveCfg = Debug|x64
+		{368C7497-14E7-4CD3-8081-8B181922CE80}.Debug|x64.Build.0 = Debug|x64
+		{368C7497-14E7-4CD3-8081-8B181922CE80}.Debug|x86.ActiveCfg = Debug|Win32
+		{368C7497-14E7-4CD3-8081-8B181922CE80}.Debug|x86.Build.0 = Debug|Win32
+		{368C7497-14E7-4CD3-8081-8B181922CE80}.Release|x64.ActiveCfg = Release|x64
+		{368C7497-14E7-4CD3-8081-8B181922CE80}.Release|x64.Build.0 = Release|x64
+		{368C7497-14E7-4CD3-8081-8B181922CE80}.Release|x86.ActiveCfg = Release|Win32
+		{368C7497-14E7-4CD3-8081-8B181922CE80}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
