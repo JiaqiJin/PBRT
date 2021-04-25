@@ -13,37 +13,6 @@ inline bool isNaN(const T x) { return std::isnan(x); }
 template <>
 inline bool isNaN(const int x) { return false; }
 
-#define rndm 0x100000000LL
-#define rndc 0xB16
-#define rnda 0x5DEECE66DLL
-static unsigned long long seed = 1;
-inline Float drand48(void)
-{
-	seed = (rnda * seed + rndc) & 0xFFFFFFFFFFFFLL;
-	unsigned int x = seed >> 16;
-	return  ((Float)x / (Float)rndm);
-}
-
-inline void srand48(unsigned int i)
-{
-	seed = (((long long int)i) << 16) | rand();
-}
-
-inline Float radians(Float angle)
-{
-	return angle * Pi / 180.0f;
-}
-
-inline Float angles(Float radians)
-{
-	return radians * 180.0f / Pi;
-}
-
-inline bool equal(Float a, Float b)
-{
-	return fabs(a - b) < MachineEpsilon;
-}
-
 // Vector
 template<typename T>
 using Vector2 = glm::vec<2, T>;
@@ -604,38 +573,6 @@ inline bool refract(const Vector3f& wi, const Vector3f& n, Float eta, Vector3f& 
 	Float cosThetaT = glm::sqrt(1 - sin2ThetaT);
 	wt = eta * -wi + (eta * cosThetaI - cosThetaT) * Vector3f(n);
 	return true;
-}
-
-inline Vector3f randomInUnitSphere()
-{
-	Vector3f pos;
-	do
-	{
-		pos = Vector3f(drand48(), drand48(), drand48()) * 2.0f - Vector3f(1.0, 1.0, 1.0);
-	} while (lengthSquared(pos) >= 1.0);
-	return pos;
-}
-
-inline Vector3f randomToSphere(float radius, float distance_squared)
-{
-	float r1 = drand48();
-	float r2 = drand48();
-	float z = 1 + r2 * (glm::sqrt(1 - radius * radius / distance_squared) - 1);
-	float phi = 2 * Pi * r1;
-	float x = glm::cos(phi) * glm::sqrt(1 - z * z);
-	float y = glm::sin(phi) * glm::sqrt(1 - z * z);
-	return Vector3f(x, y, z);
-}
-
-inline Vector3f randomCosineDir()
-{
-	float r1 = drand48();
-	float r2 = drand48();
-	float z = glm::sqrt(1 - r2);
-	float phi = 2 * Pi * r1;
-	float x = glm::cos(phi) * 2 * glm::sqrt(r2);
-	float y = glm::sin(phi) * 2 * glm::sqrt(r2);
-	return Vector3f(x, y, z);
 }
 
 RENDER_END

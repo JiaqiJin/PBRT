@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Core/Rendering.h"
 #include "Math/KMathUtil.h"
+#include "Tool/Parallel.h"
 
 using namespace Render;
 
@@ -11,6 +12,5 @@ int main()
 	
 	Bounds2f bound(a, b);
 	std::cout << bound.m_pMax.x << "  " << bound.m_pMax.y << bound.diagonal();
-
 	return 0;
 }
