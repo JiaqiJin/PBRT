@@ -145,11 +145,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Core\Interaction.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Math\Transform.cpp" />
     <ClCompile Include="Tool\Parallel.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Core\Interaction.h" />
     <ClInclude Include="Core\Rendering.h" />
     <ClInclude Include="Math\KMathUtil.h" />
     <ClInclude Include="Math\Transform.h" />
