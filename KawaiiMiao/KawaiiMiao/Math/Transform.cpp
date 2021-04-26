@@ -97,7 +97,18 @@ Bounds3f Transform::operator()(const Bounds3f& b) const
 SurfaceInteraction Transform::operator()(const SurfaceInteraction& si) const
 {
 	SurfaceInteraction ret;
-	//TODO
+	// Transform _p_ and _pError_ in _SurfaceInteraction_
+	ret.p = (*this)(si.p, 1.0f);
+
+	// Transform remaining members of _SurfaceInteraction_
+	const Transform& trans = *this;
+	ret.normal = normalize(trans(si.normal, 0.0f));
+	ret.wo = normalize(trans(si.wo, 0.0f));
+	ret.uv = si.uv;
+	ret.shape = si.shape;
+	ret.dpdu = trans(si.dpdu, 0.0f);
+	ret.dpdv = trans(si.dpdv, 0.0f);
+	ret.hitable = si.hitable;
 	return ret;
 }
 
