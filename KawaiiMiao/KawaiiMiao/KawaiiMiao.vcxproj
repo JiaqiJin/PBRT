@@ -145,6 +145,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Core\Camera.cpp" />
+    <ClCompile Include="Core\Film.cpp" />
+    <ClCompile Include="Core\Filter.cpp" />
     <ClCompile Include="Core\Interaction.cpp" />
     <ClCompile Include="Core\Shape.cpp" />
     <ClCompile Include="Core\Spectrum.cpp" />
@@ -153,10 +156,15 @@
     <ClCompile Include="Tool\Parallel.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Core\Camera.h" />
+    <ClInclude Include="Core\Film.h" />
+    <ClInclude Include="Core\Filter.h" />
     <ClInclude Include="Core\Interaction.h" />
     <ClInclude Include="Core\Rendering.h" />
     <ClInclude Include="Core\Shape.h" />
     <ClInclude Include="Core\Spectrum.h" />
+    <ClInclude Include="extern\stb_image.h" />
+    <ClInclude Include="extern\stb_image_write.h" />
     <ClInclude Include="Math\KMathUtil.h" />
     <ClInclude Include="Math\Transform.h" />
     <ClInclude Include="Tool\Macro.h" />
