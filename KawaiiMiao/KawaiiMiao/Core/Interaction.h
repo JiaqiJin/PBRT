@@ -14,20 +14,20 @@ public:
 	Interaction(const Vector3f & p, const Vector3f & n, const Vector3f & wo)
 		: p(p), wo(normalize(wo)), normal(n) {}
 
-	inline Ray spawnRay(const Vector3f& dir)
+	inline Ray spawnRay(const Vector3f& dir) const
 	{
 		Vector3f origin = p;
 		return Ray(origin, dir, Infinity);
 	}
 
-	inline Ray spawnRayTo(const Vector3f& p2)
+	inline Ray spawnRayTo(const Vector3f& p2) const
 	{
 		Vector3f origin = p;
 		Vector3f dir = p2 - origin;
 		return Ray(origin, dir, 1 - ShadowEpsilon);
 	}
 
-	inline Ray spawnRayTo(const Interaction& it)
+	inline Ray spawnRayTo(const Interaction& it) const
 	{
 		Vector3f origin = p;
 		Vector3f target = it.p;

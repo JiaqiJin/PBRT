@@ -18,7 +18,7 @@ Spectrum SurfaceInteraction::Le(const Vector3f& w) const
 void SurfaceInteraction::computeScatteringFunctions(const Ray& ray, MemoryArena& arena,
 	bool allowMultipleLobes, TransportMode mode)
 {
-
+	// TODO
 }
 
 RENDER_END

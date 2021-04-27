@@ -14,3 +14,7 @@ int main()
 	std::cout << bound.m_pMax.x << "  " << bound.m_pMax.y << bound.diagonal();
 	return 0;
 }
+
+/*
+Interaction
+*/
