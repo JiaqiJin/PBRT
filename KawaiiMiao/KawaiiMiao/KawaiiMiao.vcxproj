@@ -149,6 +149,8 @@
     <ClCompile Include="Core\Film.cpp" />
     <ClCompile Include="Core\Filter.cpp" />
     <ClCompile Include="Core\Interaction.cpp" />
+    <ClCompile Include="Core\Sampler.cpp" />
+    <ClCompile Include="Core\Sampling.cpp" />
     <ClCompile Include="Core\Shape.cpp" />
     <ClCompile Include="Core\Spectrum.cpp" />
     <ClCompile Include="main.cpp" />
@@ -161,6 +163,9 @@
     <ClInclude Include="Core\Filter.h" />
     <ClInclude Include="Core\Interaction.h" />
     <ClInclude Include="Core\Rendering.h" />
+    <ClInclude Include="Core\Sampling.h" />
+    <ClInclude Include="Math\Rng.h" />
+    <ClInclude Include="Core\Sampler.h" />
     <ClInclude Include="Core\Shape.h" />
     <ClInclude Include="Core\Spectrum.h" />
     <ClInclude Include="extern\stb_image.h" />
