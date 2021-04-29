@@ -93,8 +93,17 @@ public:
 			return 1;
 	}
 
-	inline Vector2<T>& operator[](int i) { return (i == 0) ? m_pMin : m_pMax; }
-	inline const Vector2<T>& operator[](int i) const { return (i == 0) ? m_pMin : m_pMax; }
+	inline Vector2<T>& operator[](int i)
+	{
+		DCHECK(i == 0 || i == 1);
+		return (i == 0) ? m_pMin : m_pMax;
+	}
+
+	inline const Vector2<T>& operator[](int i) const
+	{
+		DCHECK(i == 0 || i == 1);
+		return (i == 0) ? m_pMin : m_pMax;
+	}
 
 	bool operator==(const Bounds2<T>& b) const { return b.m_pMin == m_pMin && b.m_pMax == m_pMax; }
 	bool operator!=(const Bounds2<T>& b) const { return b.m_pMin != m_pMax || b.m_pMax != m_pMax; }
@@ -230,6 +239,70 @@ typedef Bounds2<Float> Bounds2f;
 typedef Bounds2<int> Bounds2i;
 typedef Bounds3<Float> Bounds3f;
 typedef Bounds3<int> Bounds3i;
+
+class Bounds2iIterator : public std::forward_iterator_tag
+{
+public:
+	Bounds2iIterator(const Bounds2i& b, const Vector2i& pt)
+		: p(pt), bounds(&b) {}
+
+	Bounds2iIterator operator++()
+	{
+		advance();
+		return *this;
+	}
+
+	Bounds2iIterator operator++(int)
+	{
+		Bounds2iIterator old = *this;
+		advance();
+		return old;
+	}
+
+	bool operator==(const Bounds2iIterator& bi) const
+	{
+		return p == bi.p && bounds == bi.bounds;
+	}
+
+	bool operator!=(const Bounds2iIterator& bi) const
+	{
+		return p != bi.p || bounds != bi.bounds;
+	}
+
+	Vector2i operator*() const { return p; }
+
+private:
+	void advance()
+	{
+		++p.x;
+		if (p.x == bounds->m_pMax.x)
+		{
+			p.x = bounds->m_pMin.x;
+			++p.y;
+		}
+	}
+
+	Vector2i p;
+	const Bounds2i* bounds;
+};
+
+inline Bounds2iIterator begin(const Bounds2i& b)
+{
+	return Bounds2iIterator(b, b.m_pMin);
+}
+
+inline Bounds2iIterator end(const Bounds2i& b)
+{
+	// Normally, the ending point is at the minimum x value and one past
+	// the last valid y value.
+	Vector2i pEnd(b.m_pMin.x, b.m_pMax.y);
+	// However, if the bounds are degenerate, override the end point to
+	// equal the start point so that any attempt to iterate over the bounds
+	// exits out immediately.
+	if (b.m_pMin.x >= b.m_pMax.x || b.m_pMin.y >= b.m_pMax.y)
+		pEnd = b.m_pMin;
+	return Bounds2iIterator(b, pEnd);
+}
 
 // Ray
 class Ray

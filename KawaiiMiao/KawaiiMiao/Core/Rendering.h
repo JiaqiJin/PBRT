@@ -14,6 +14,8 @@
 #include "../Tool/Macro.h"
 #include "../Tool/stringPrintf.h"
 
+#define ALLOCA(TYPE, COUNT) (TYPE *) alloca((COUNT) * sizeof(TYPE))
+
 RENDER_BEGIN
 
 inline Float lerp(Float t, Float v1, Float v2)
