@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Core\BSDF.cpp" />
     <ClCompile Include="Core\Camera.cpp" />
     <ClCompile Include="Core\Film.cpp" />
     <ClCompile Include="Core\Filter.cpp" />
@@ -159,6 +160,7 @@
     <ClCompile Include="Tool\Parallel.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Core\BSDF.h" />
     <ClInclude Include="Core\Camera.h" />
     <ClInclude Include="Core\Film.h" />
     <ClInclude Include="Core\Filter.h" />
