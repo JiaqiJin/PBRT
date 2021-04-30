@@ -24,7 +24,51 @@ inline bool sameHemisphere(const Vector3f& w, const Vector3f& wp) { return w.z *
 
 class BSDF
 {
+public:
+	typedef std::shared_ptr<BSDF> ptr;
 
+	BSDF(const SurfaceInteraction& si, Float eta = 1)
+		: m_eta(eta), m_ns(si.normal), m_ss(normalize(si.dpdu)), m_ts(cross(m_ns, m_ss)) {}
+
+	~BSDF() = default;
+
+	void add(BxDF * b)
+	{
+		CHECK_LT(m_nBxDFs, NumMaxBxDFs);
+		m_bxdfs[m_nBxDFs++] = b;
+	}
+
+	int numComponents(BxDFType flags = BSDF_ALL) const;
+
+	Vector3f worldToLocal(const Vector3f& v) const
+	{
+		return Vector3f(dot(v, m_ss), dot(v, m_ts), dot(v, m_ns));
+	}
+
+	Vector3f localToWorld(const Vector3f& v) const
+	{
+		return Vector3f(
+			m_ss.x * v.x + m_ts.x * v.y + m_ns.x * v.z,
+			m_ss.y * v.x + m_ts.y * v.y + m_ns.y * v.z,
+			m_ss.z * v.x + m_ts.z * v.y + m_ns.z * v.z);
+	}
+
+	Spectrum f(const Vector3f& woW, const Vector3f& wiW, BxDFType flags = BSDF_ALL) const;
+
+	Spectrum sample_f(const Vector3f& wo, Vector3f& wi, const Vector2f& u, Float& pdf,
+		BxDFType& sampledType, BxDFType type = BSDF_ALL) const;
+
+	Float pdf(const Vector3f& wo, const Vector3f& wi, BxDFType flags = BSDF_ALL) const;
+
+
+	//Refractive index
+	const Float m_eta;
+private:
+	int m_nBxDFs = 0;
+	const Vector3f m_ns, m_ss, m_ts;
+
+	static constexpr int NumMaxBxDFs = 8;
+	BxDF* m_bxdfs[NumMaxBxDFs];
 };
 
 class BxDF
