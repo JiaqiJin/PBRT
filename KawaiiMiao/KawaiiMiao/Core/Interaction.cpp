@@ -1,5 +1,7 @@
 #include "Interaction.h"
 #include "Spectrum.h"
+#include "Primitive.h"
+#include "BSDF.h"
 
 RENDER_BEGIN
 
@@ -18,7 +20,7 @@ Spectrum SurfaceInteraction::Le(const Vector3f& w) const
 void SurfaceInteraction::computeScatteringFunctions(const Ray& ray, MemoryArena& arena,
 	bool allowMultipleLobes, TransportMode mode)
 {
-	// TODO
+	hitable->computeScatteringFunctions(*this, arena, mode, allowMultipleLobes);
 }
 
 RENDER_END
