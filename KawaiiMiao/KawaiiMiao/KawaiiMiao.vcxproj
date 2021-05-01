@@ -155,6 +155,7 @@
     <ClCompile Include="Core\Primitive.cpp" />
     <ClCompile Include="Core\Sampler.cpp" />
     <ClCompile Include="Core\Sampling.cpp" />
+    <ClCompile Include="Core\Scene.cpp" />
     <ClCompile Include="Core\Shape.cpp" />
     <ClCompile Include="Core\Spectrum.cpp" />
     <ClCompile Include="main.cpp" />
@@ -173,6 +174,7 @@
     <ClInclude Include="Core\Primitive.h" />
     <ClInclude Include="Core\Rendering.h" />
     <ClInclude Include="Core\Sampling.h" />
+    <ClInclude Include="Core\Scene.h" />
     <ClInclude Include="Math\Rng.h" />
     <ClInclude Include="Core\Sampler.h" />
     <ClInclude Include="Core\Shape.h" />
