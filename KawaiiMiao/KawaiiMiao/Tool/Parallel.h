@@ -166,6 +166,49 @@ private:
 
 };
 
+//parallel for loop with automic chunking
+template <typename Function>
+void parallelFor(size_t beginIndex, size_t endIndex,
+	const Function& function, ExecutionPolicy policy = ExecutionPolicy::APARALLEL);
+
+//parallel for loop with manual chunking
+template <typename Function>
+void parallelFor(size_t beginIndex, size_t endIndex, size_t grainSize,
+	const Function& function, ExecutionPolicy policy = ExecutionPolicy::APARALLEL);
+
+template <typename Function>
+void parallelFor(size_t start, size_t end, const Function& func, ExecutionPolicy policy)
+{
+	if (start > end)
+		return;
+	if (policy == ExecutionPolicy::APARALLEL)
+	{
+		tbb::parallel_for(start, end, func);
+	}
+	else
+	{
+		for (auto i = start; i < end; ++i)
+			func(i);
+	}
+}
+
+template <typename Function>
+void parallelFor(size_t start, size_t end, size_t grainSize, const Function& func, ExecutionPolicy policy)
+{
+	if (start > end)
+		return;
+	if (policy == ExecutionPolicy::APARALLEL)
+	{
+		tbb::parallel_for(tbb::blocked_range<size_t>(start, end, grainSize),
+			func, tbb::simple_partitioner());
+	}
+	else
+	{
+		tbb::blocked_range<size_t> range(start, end, grainSize);
+		func(range);
+	}
+}
+
 
 //inline int numSystemCores() { return std::max(1u, std::thread::hardware_concurrency()); }
 

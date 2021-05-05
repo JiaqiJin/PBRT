@@ -7,6 +7,8 @@ using namespace Render;
 
 int main()
 {
+	Render::Log::Init();
+	K_INFO("HI");
 	Render::Vector2<float> a(1.0, 2.0);
 	Render::Vector2<float> b(5.0, 3.0);
 	

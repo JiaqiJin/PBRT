@@ -114,7 +114,7 @@
     <ClCompile>
       <WarningLevel>Level1</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>E:\VisualStudio\PBRTStudy\extern\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -131,7 +131,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>E:\VisualStudio\PBRTStudy\extern\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -149,6 +149,7 @@
     <ClCompile Include="Core\Camera.cpp" />
     <ClCompile Include="Core\Film.cpp" />
     <ClCompile Include="Core\Filter.cpp" />
+    <ClCompile Include="Core\Integrator.cpp" />
     <ClCompile Include="Core\Interaction.cpp" />
     <ClCompile Include="Core\Light.cpp" />
     <ClCompile Include="Core\Material.cpp" />
@@ -160,14 +161,17 @@
     <ClCompile Include="Core\Spectrum.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Math\Transform.cpp" />
+    <ClCompile Include="Tool\Logger.cpp" />
     <ClCompile Include="Tool\Memory.cpp" />
     <ClCompile Include="Tool\Parallel.cpp" />
+    <ClCompile Include="Tool\Reporter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\BSDF.h" />
     <ClInclude Include="Core\Camera.h" />
     <ClInclude Include="Core\Film.h" />
     <ClInclude Include="Core\Filter.h" />
+    <ClInclude Include="Core\Integrator.h" />
     <ClInclude Include="Core\Interaction.h" />
     <ClInclude Include="Core\Light.h" />
     <ClInclude Include="Core\Material.h" />
@@ -183,9 +187,11 @@
     <ClInclude Include="extern\stb_image_write.h" />
     <ClInclude Include="Math\KMathUtil.h" />
     <ClInclude Include="Math\Transform.h" />
+    <ClInclude Include="Tool\Logger.h" />
     <ClInclude Include="Tool\Macro.h" />
     <ClInclude Include="Tool\Memory.h" />
     <ClInclude Include="Tool\Parallel.h" />
+    <ClInclude Include="Tool\Reporter.h" />
     <ClInclude Include="Tool\stringPrintf.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

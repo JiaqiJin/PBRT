@@ -13,6 +13,7 @@
 
 #include "../Tool/Macro.h"
 #include "../Tool/stringPrintf.h"
+#include "../Tool/Logger.h"
 
 #define ALLOCA(TYPE, COUNT) (TYPE *) alloca((COUNT) * sizeof(TYPE))
 
@@ -67,7 +68,7 @@ class Camera;
 class Hitable;
 class FilmTile;
 class Sampler;
-class Material;
+class Material; 
 class AreaLight;
 class Transform;
 class Integrator;
