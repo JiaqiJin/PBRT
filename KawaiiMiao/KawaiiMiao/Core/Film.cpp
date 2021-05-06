@@ -5,6 +5,40 @@
 
 RENDER_BEGIN
 
+Film::Film(const Vector2i& resolution, const Bounds2f& cropWindow, std::unique_ptr<Filter> filter,
+	const std::string& filename, Float diagonal, Float scale, Float maxSampleLuminance)
+	: m_resolution(resolution), m_filter(std::move(filter)), m_diagonal(diagonal),
+	m_filename(filename), m_scale(scale), m_maxSampleLuminance(maxSampleLuminance)
+{
+	//Compute film image bounds
+	//Note: cropWindow range [0,1]x[0,1]
+	m_croppedPixelBounds =
+		Bounds2i(
+			Vector2i(glm::ceil(m_resolution.x * cropWindow.m_pMin.x),
+				glm::ceil(m_resolution.y * cropWindow.m_pMin.y)),
+			Vector2i(glm::ceil(m_resolution.x * cropWindow.m_pMax.x),
+				glm::ceil(m_resolution.y * cropWindow.m_pMax.y)));
+	K_INFO("Created film with full resolution ", resolution.x, resolution.y, ". Crop window of ", cropWindow,
+		" -> croppedPixelBounds ", m_croppedPixelBounds);
+
+	m_pixels = std::unique_ptr<APixel[]>(new APixel[m_croppedPixelBounds.area()]);
+
+	//Precompute filter weight table
+	//Note: we assume that filtering function f(x,y)=f(|x|,|y|)
+	//      hence only store values for the positive quadrant of filter offsets.
+	int offset = 0;
+	for (int y = 0; y < filterTableWidth; ++y)
+	{
+		for (int x = 0; x < filterTableWidth; ++x, ++offset)
+		{
+			Vector2f p;
+			p.x = (x + 0.5f) * m_filter->m_radius.x / filterTableWidth;
+			p.y = (y + 0.5f) * m_filter->m_radius.y / filterTableWidth;
+			m_filterTable[offset] = m_filter->evaluate(p);
+		}
+	}
+}
+
 Bounds2i Film::getSampleBounds() const
 {
 	Bounds2f floatBounds(

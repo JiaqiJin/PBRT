@@ -152,7 +152,9 @@
     <ClCompile Include="Core\Integrator.cpp" />
     <ClCompile Include="Core\Interaction.cpp" />
     <ClCompile Include="Core\Light.cpp" />
+    <ClCompile Include="Core\LightDistrib.cpp" />
     <ClCompile Include="Core\Material.cpp" />
+    <ClCompile Include="Core\PathIntegrator.cpp" />
     <ClCompile Include="Core\Primitive.cpp" />
     <ClCompile Include="Core\Sampler.cpp" />
     <ClCompile Include="Core\Sampling.cpp" />
@@ -174,7 +176,9 @@
     <ClInclude Include="Core\Integrator.h" />
     <ClInclude Include="Core\Interaction.h" />
     <ClInclude Include="Core\Light.h" />
+    <ClInclude Include="Core\LightDistrib.h" />
     <ClInclude Include="Core\Material.h" />
+    <ClInclude Include="Core\PathIntegrator.h" />
     <ClInclude Include="Core\Primitive.h" />
     <ClInclude Include="Core\Rendering.h" />
     <ClInclude Include="Core\Sampling.h" />
