@@ -153,12 +153,8 @@ int main()
 
 	WhittedIntegrator integrator(maxDepth, camera, sampler, pixelBound);
 
-	printf("Aurora (built %s at %s) [Detected %d cores]\n",
+	printf("Kawaii (built %s at %s) [Detected %d cores]\n",
 		__DATE__, __TIME__, numSystemCores());
-	printf("Copyright (c)2021-Present Wencong Yang\n");
-	printf(
-		"The source code to Aurora is covered by the MIT License.\n");
-	printf("See the file LICENSE.txt for the conditions of the license.\n");
 
 	integrator.preprocess(*scene, *sampler);
 	integrator.render(*scene);

@@ -1,7 +1,7 @@
 #include "Shape.h"
 
 #include "Interaction.h"
-
+#include "Sampling.h"
 #include <array>
 
 RENDER_BEGIN
@@ -23,16 +23,41 @@ Bounds3f Shape::worldBound() const { return m_objectToWorld(objectBound()); }
 
 Interaction Shape::sample(const Interaction& ref, const Vector2f& u, Float& pdf) const
 {
-	// TODO
-	Interaction it;
-	it.p = Vector3f(0.0f);
-	return it;
+	Interaction intr = sample(u, pdf);
+	Vector3f wi = intr.p - ref.p;
+	if (dot(wi, wi) == 0)
+	{
+		pdf = 0;
+	}
+	else
+	{
+		wi = normalize(wi);
+		// Convert from area measure, as returned by the Sample() call
+		// above, to solid angle measure.
+		pdf *= distanceSquared(ref.p, intr.p) / absDot(intr.normal, -wi);
+		if (std::isinf(pdf))
+			pdf = 0.f;
+	}
+	return intr;
 }
 
 Float Shape::pdf(const Interaction& ref, const Vector3f& wi) const
 {
-	// TODO
-	return 1.0f;
+	// Intersect sample ray with area light geometry
+	Ray ray = ref.spawnRay(wi);
+	Float tHit;
+	SurfaceInteraction isectLight;
+	// Ignore any alpha textures used for trimming the shape when performing
+	// this intersection. Hack for the "San Miguel" scene, where this is used
+	// to make an invisible area light.
+	if (!hit(ray, tHit, isectLight))
+		return 0;
+
+	// Convert light sample weight to solid angle measure
+	Float pdf = distanceSquared(ref.p, isectLight.p) / (absDot(isectLight.normal, -wi) * area());
+	if (std::isinf(pdf))
+		pdf = 0.f;
+	return pdf;
 }
 
 Float Shape::solidAngle(const Vector3f& p, int nSamples) const
@@ -55,24 +80,103 @@ Float SphereShape::area() const { return 4.0f * Pi * m_radius * m_radius; }
 
 Interaction SphereShape::sample(const Vector2f& u, Float& pdf) const
 {
-	//TODO
+	Vector3f pObj = Vector3f(0, 0, 0) + m_radius * uniformSampleSphere(u);
+
 	Interaction it;
-	it.p = Vector3f(0.0f);
+	it.normal = normalize((m_objectToWorld)(pObj, 0.0f));
+
+	pObj *= m_radius / distance(pObj, Vector3f(0, 0, 0));
+	it.p = (m_objectToWorld)(pObj, 1.0f);
+
+	pdf = 1 / area();
 	return it;
 }
 
 Interaction SphereShape::sample(const Interaction& ref, const Vector2f& u, Float& pdf) const
 {
-	//TODO
+	Vector3f pCenter = (m_objectToWorld)(Vector3f(0, 0, 0), 1.0f);
+
+	// Sample uniformly on sphere if $\pt{}$ is inside it
+	Vector3f pOrigin = ref.p;
+	if (distanceSquared(pOrigin, pCenter) <= m_radius * m_radius)
+	{
+		Interaction intr = sample(u, pdf);
+		Vector3f wi = intr.p - ref.p;
+		if (dot(wi, wi) == 0)
+		{
+			pdf = 0;
+		}
+		else
+		{
+			// Convert from area measure returned by Sample() call above to
+			// solid angle measure.
+			wi = normalize(wi);
+			pdf *= distanceSquared(ref.p, intr.p) / absDot(intr.normal, -wi);
+		}
+		if (std::isinf(pdf))
+			pdf = 0.f;
+		return intr;
+	}
+
+	// Sample sphere uniformly inside subtended cone
+
+	// Compute coordinate system for sphere sampling
+	Float dc = distance(ref.p, pCenter);
+	Float invDc = 1 / dc;
+	Vector3f wc = (pCenter - ref.p) * invDc;
+	Vector3f wcX, wcY;
+	coordinateSystem(wc, wcX, wcY);
+
+	// Compute $\theta$ and $\phi$ values for sample in cone
+	Float sinThetaMax = m_radius * invDc;
+	Float sinThetaMax2 = sinThetaMax * sinThetaMax;
+	Float invSinThetaMax = 1 / sinThetaMax;
+	Float cosThetaMax = glm::sqrt(glm::max((Float)0.f, 1.0f - sinThetaMax2));
+
+	Float cosTheta = (cosThetaMax - 1) * u[0] + 1;
+	Float sinTheta2 = 1 - cosTheta * cosTheta;
+
+	if (sinThetaMax2 < 0.00068523f /* sin^2(1.5 deg) */)
+	{
+		/* Fall back to a Taylor series expansion for small angles, where
+		   the standard approach suffers from severe cancellation errors */
+		sinTheta2 = sinThetaMax2 * u[0];
+		cosTheta = glm::sqrt(1 - sinTheta2);
+	}
+
+	// Compute angle $\alpha$ from center of sphere to sampled point on surface
+	Float cosAlpha = sinTheta2 * invSinThetaMax +
+		cosTheta * glm::sqrt(glm::max((Float)0.f, 1.f - sinTheta2 * invSinThetaMax * invSinThetaMax));
+	Float sinAlpha = glm::sqrt(glm::max((Float)0.f, 1.f - cosAlpha * cosAlpha));
+	Float phi = u[1] * 2 * Pi;
+
+	// Compute surface normal and sampled point on sphere
+	Vector3f nWorld = sphericalDirection(sinAlpha, cosAlpha, phi, -wcX, -wcY, -wc);
+	Vector3f pWorld = pCenter + m_radius * Vector3f(nWorld.x, nWorld.y, nWorld.z);
+
+	// Return _Interaction_ for sampled point on sphere
 	Interaction it;
-	it.p = Vector3f(0.0f);
+	it.p = pWorld;
+	it.normal = nWorld;
+
+	// Uniform cone PDF.
+	pdf = 1 / (2 * Pi * (1 - cosThetaMax));
+
 	return it;
 }
 
 Float SphereShape::pdf(const Interaction& ref, const Vector3f& wi) const
 {
-	// TODO
-	return 1.0f;
+	Vector3f pCenter = (m_objectToWorld)(Vector3f(0, 0, 0), 1.0f);
+	// Return uniform PDF if point is inside sphere
+	Vector3f pOrigin = ref.p;
+	if (distanceSquared(pOrigin, pCenter) <= m_radius * m_radius)
+		return Shape::pdf(ref, wi);
+
+	// Compute general sphere PDF
+	Float sinThetaMax2 = m_radius * m_radius / distanceSquared(ref.p, pCenter);
+	Float cosThetaMax = glm::sqrt(glm::max((Float)0, 1 - sinThetaMax2));
+	return uniformConePdf(cosThetaMax);
 }
 
 bool SphereShape::hit(const Ray& r) const
@@ -227,9 +331,17 @@ Float TriangleShape::area() const
 
 Interaction TriangleShape::sample(const Vector2f& u, Float& pdf) const
 {
-	// TODO
+	Vector2f b = uniformSampleTriangle(u);
+	// Get triangle vertices in _p0_, _p1_, and _p2_
+	const Vector3f& p0 = m_p0;
+	const Vector3f& p1 = m_p1;
+	const Vector3f& p2 = m_p2;
 	Interaction it;
-	it.p = Vector3f(0.0f);
+	it.p = b[0] * p0 + b[1] * p1 + (1 - b[0] - b[1]) * p2;
+	// Compute surface normal for sampled point on triangle
+	it.normal = normalize(Vector3f(cross(p1 - p0, p2 - p0)));
+
+	pdf = 1 / area();
 	return it;
 }
 
