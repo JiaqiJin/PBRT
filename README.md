@@ -10,40 +10,39 @@ This repository is my personal offline Ray Tracing renderer, the code basically 
 # Feature
 
 - BSDF, material related
-
-  - [] microfacet BRDF
+  - [ ] microfacet BRDF
   - [x] lambertian Reflection and transmission
   - [x] Specular Reflection and transmission
-  - [] Oren-Nayer
-  - [] Fresnel Blend
-  - [] bump map
-  - [] normal map
+  - [ ] Oren-Nayer
+  - [ ] Fresnel Blend
+  - [ ] bump map
+  - [ ] normal map
 
 - Camera
    - [x] Perspective camera
-   - [] Ortho Camera
-   - [] Real camera
-   - [] Environmental Camera
+   - [ ] Ortho Camera
+   - [ ] Real camera
+   - [ ] Environmental Camera
 
 - Sampler
    - [x] Random sampler
-   - [] halton sampler
-   - [] Stratified sampler
-   - [] sobol sampler
-   - [] MaxMinDistSampler
-   - [] ZeroTwoSequenceSampler
+   - [ ] halton sampler
+   - [ ] Stratified sampler
+   - [ ] sobol sampler
+   - [ ] MaxMinDistSampler
+   - [ ] ZeroTwoSequenceSampler
 
 - Filter
    - [x] Gaussian filter
    - [x] box filter
-   - [] sinc filter
-   - [] mitchell filter
+   - [ ] sinc filter
+   - [ ] mitchell filter
 
 - Light source
    - [x] point light
-   - [] Diffuse area light
-   - [] Spot light (spot light)
-   - [] Ambient light (environment)
-   - [] Distant light (distant light))
-   - [] Projector (projection light)
-   - [] Texture area light 
+   - [ ] Diffuse area light
+   - [ ] Spot light (spot light)
+   - [ ] Ambient light (environment)
+   - [ ] Distant light (distant light))
+   - [ ] Projector (projection light)
+   - [ ] Texture area light 
