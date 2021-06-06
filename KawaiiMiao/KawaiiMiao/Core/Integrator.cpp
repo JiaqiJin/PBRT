@@ -130,14 +130,50 @@ void SamplerIntegrator::render(const Scene& scene)
 Spectrum SamplerIntegrator::specularReflect(const Ray& ray, const SurfaceInteraction& isect,
 	const Scene& scene, Sampler& sampler, MemoryArena& arena, int depth) const
 {
-	return Spectrum(1.f);
+	// Compute specular reflection direction _wi_ and BSDF value
+	Vector3f wo = isect.wo, wi;
+	Float pdf;
+	BxDFType type = BxDFType(BSDF_REFLECTION | BSDF_SPECULAR);
+
+	Spectrum f = isect.bsdf->sample_f(wo, wi, sampler.get2D(), pdf, type);
+
+	// Return contribution of specular reflection
+	const Vector3f& ns = isect.normal;
+
+	if (pdf > 0.f && !f.isBlack() && absDot(wi, ns) != 0.f)
+	{
+		// Compute ray differential _rd_ for specular reflection
+		Ray rd = isect.spawnRay(wi);
+		return f * Li(rd, scene, sampler, arena, depth + 1) * absDot(wi, ns) / pdf;
+	}
+	else
+	{
+		return Spectrum(0.f);
+	}
 }
 
 Spectrum SamplerIntegrator::specularTransmit(const Ray& ray, const SurfaceInteraction& isect,
 	const Scene& scene, Sampler& sampler, MemoryArena& arena, int depth) const
 {
-	return Spectrum(1.f);
+	Vector3f wo = isect.wo, wi;
+	Float pdf;
+	const Vector3f& p = isect.p;
+	const BSDF& bsdf = *(isect.bsdf);
+	BxDFType sampledType = BxDFType(BSDF_TRANSMISSION | BSDF_SPECULAR);
+	Spectrum f = bsdf.sample_f(wo, wi, sampler.get2D(), pdf, sampledType);
+	Spectrum L = Spectrum(0.f);
+	Vector3f ns = isect.normal;
+
+	if (pdf > 0.f && !f.isBlack() && absDot(wi, ns) != 0.f)
+	{
+		// Compute ray differential _rd_ for specular transmission
+		Ray rd = isect.spawnRay(wi);
+		L = f * Li(rd, scene, sampler, arena, depth + 1) * absDot(wi, ns) / pdf;
+	}
+	return L;
 }
+
+// AWhittedIntegrator
 
 Spectrum WhittedIntegrator::Li(const Ray& ray, const Scene& scene,
 	Sampler& sampler, MemoryArena& arena, int depth) const

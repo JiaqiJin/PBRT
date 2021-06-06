@@ -121,10 +121,10 @@ int main()
 
 	//Film & sampler
 	Vector2i res(width, height);
-	std::unique_ptr<Filter> filter(new BoxFilter(Vector2f(0.5f, 0.5f)));
+	std::unique_ptr<Filter> filter(new GaussianFilter(Vector2f(2.0f, 2.0f),2.0f));
 	Film::ptr film = std::make_shared<Film>(res, Bounds2f(Vector2f(0, 0), Vector2f(1, 1)),
 		std::move(filter), "../result.png");
-	Sampler::ptr sampler = std::make_shared<RandomSampler>(8);
+	Sampler::ptr sampler = std::make_shared<RandomSampler>(24);
 
 	Float fovy = 45.0f;
 	Vector3f eye(0, 5, 18), center(0, 5, 0);
