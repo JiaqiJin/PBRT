@@ -4,7 +4,7 @@
 
 ## Examples 
 
-![Image](https://github.com/Jiaqidesune/PBRTStudy/example/result.jpg)
+![Image](https://github.com/Jiaqidesune/PBRTStudy/blob/master/example/result.jpg)
 
 # Feature
 
