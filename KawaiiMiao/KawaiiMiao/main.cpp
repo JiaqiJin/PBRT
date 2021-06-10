@@ -4,7 +4,7 @@
 #include "Core/Primitive.h"
 #include "Core/Material.h"
 #include "Core/Integrator.h"
-
+#include <assimp/Importer.hpp>
 using namespace Render;
 using namespace std;
 

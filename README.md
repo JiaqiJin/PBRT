@@ -15,6 +15,8 @@ This project is built with following third parties :
 - [GLM](https://github.com/g-truc/glm) for fast algebra and math calculation.
 - [stb_image](https://github.com/nothings/stb) for image I/O
 - [oneTBB](https://github.com/oneapi-src/oneTBB) for multi-Thread
+- [Assimp](https://github.com/assimp/assimp) for model import
+- [nlohmann_json](https://github.com/nlohmann/json) for parsing json file of the scene
 ## Examples 
 
 ![Image](https://github.com/Jiaqidesune/PBRTStudy/blob/master/example/result.jpg)
