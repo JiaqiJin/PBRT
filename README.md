@@ -3,7 +3,7 @@
 ## About
 This repository is my personal offline Ray Tracing renderer, the code basically come from [PBRT](https://github.com/mmp/pbrt-v3).
 ### Build
-The main program is in the folder KawaiiMiao. 
+The main program was inside of KawaiiMiao folder. 
 
   ```sh
    git clone https://github.com/Jiaqidesune/PBRTStudy.git
