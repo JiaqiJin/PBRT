@@ -4,7 +4,9 @@
 This repository is my personal offline Ray Tracing renderer, the code basically come from [PBRT](https://github.com/mmp/pbrt-v3).
 ### Build
 The main program is in the folder KawaiiMiao. 
+
 git clone https://github.com/Jiaqidesune/PBRTStudy and open KawaiiMiao.sln in Visual Studio(2019).
+
 This project is built with following third parties :
 - [GLM](https://github.com/g-truc/glm)for fast algebra and math calculation.
 - [stb_image](https://github.com/nothings/stb)for image I/O
