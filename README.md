@@ -8,7 +8,8 @@ The main program is in the folder KawaiiMiao.
   ```sh
    git clone https://github.com/Jiaqidesune/PBRTStudy.git
   ```
-  and open KawaiiMiao.sln in Visual Studio(2019).
+  
+Open KawaiiMiao.sln in KawaiiMiao folder with Visual Studio (2019)
 
 This project is built with following third parties :
 - [GLM](https://github.com/g-truc/glm) for fast algebra and math calculation.
