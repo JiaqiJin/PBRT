@@ -4,16 +4,16 @@
 
 RENDER_BEGIN
 
-HitableEntity::HitableEntity(const Shape::ptr& shape, const Material::ptr& material,
+HitableObject::HitableObject(const Shape::ptr& shape, const Material::ptr& material,
 	const AreaLight::ptr& areaLight)
 	: m_shape(shape), m_material(material), m_areaLight(areaLight) 
 {
 
 }
 
-bool HitableEntity::hit(const Ray& ray) const { return m_shape->hit(ray); }
+bool HitableObject::hit(const Ray& ray) const { return m_shape->hit(ray); }
 
-bool HitableEntity::hit(const Ray& ray, SurfaceInteraction& isect) const
+bool HitableObject::hit(const Ray& ray, SurfaceInteraction& isect) const
 {
 	Float tHit;
 	if (!m_shape->hit(ray, tHit, isect))
@@ -24,7 +24,7 @@ bool HitableEntity::hit(const Ray& ray, SurfaceInteraction& isect) const
 	return true;
 }
 
-void HitableEntity::computeScatteringFunctions(SurfaceInteraction& isect, MemoryArena& arena,
+void HitableObject::computeScatteringFunctions(SurfaceInteraction& isect, MemoryArena& arena,
 	TransportMode mode, bool allowMultipleLobes) const
 {
 	if (m_material != nullptr)
@@ -33,11 +33,11 @@ void HitableEntity::computeScatteringFunctions(SurfaceInteraction& isect, Memory
 	}
 }
 
-Bounds3f HitableEntity::worldBound() const { return m_shape->worldBound(); }
+Bounds3f HitableObject::worldBound() const { return m_shape->worldBound(); }
 
-const AreaLight* HitableEntity::getAreaLight() const { return m_areaLight.get(); }
+const AreaLight* HitableObject::getAreaLight() const { return m_areaLight.get(); }
 
-const Material* HitableEntity::getMaterial() const { return m_material.get(); }
+const Material* HitableObject::getMaterial() const { return m_material.get(); }
 
 // Aggregate
 const AreaLight* HitableAggregate::getAreaLight() const { return nullptr; }

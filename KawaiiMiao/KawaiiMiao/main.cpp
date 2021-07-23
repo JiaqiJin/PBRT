@@ -32,68 +32,68 @@ int main()
 
 	Transform trans1 = translate(Vector3f(+1.5, 1.5, +2));
 	SphereShape::ptr sphere1 = std::make_shared<SphereShape>(trans1, inverse(trans1), 1.5f);
-	HitableEntity::ptr entity1 = std::make_shared<HitableEntity>(sphere1, blueLambert_mat, nullptr);
+	HitableObject::ptr entity1 = std::make_shared<HitableObject>(sphere1, blueLambert_mat, nullptr);
 
 	Transform trans2 = translate(Vector3f(-1.5, 2.5, +0));
 	SphereShape::ptr sphere2 = std::make_shared<SphereShape>(trans2, inverse(trans2), 2.5f);
-	HitableEntity::ptr entity2 = std::make_shared<HitableEntity>(sphere2, whiteLambert_mat, nullptr);
+	HitableObject::ptr entity2 = std::make_shared<HitableObject>(sphere2, whiteLambert_mat, nullptr);
 
 	//Bottom wall
 	Transform identity(Matrix4x4(1.0f));
 	Vector3f t1[3] = { Vector3f(-5, 0, -5), Vector3f(-5, 0, +5), Vector3f(+5, 0, -5) };
 	TriangleShape::ptr bot1 = std::make_shared<TriangleShape>(identity, identity, t1);
-	HitableEntity::ptr entity3 = std::make_shared<HitableEntity>(bot1, whiteLambert_mat, nullptr);
+	HitableObject::ptr entity3 = std::make_shared<HitableObject>(bot1, whiteLambert_mat, nullptr);
 
 	Vector3f t2[3] = { Vector3f(+5, 0, -5), Vector3f(-5, 0, +5), Vector3f(+5, 0, +5) };
 	TriangleShape::ptr bot2 = std::make_shared<TriangleShape>(identity, identity, t2);
-	HitableEntity::ptr entity4 = std::make_shared<HitableEntity>(bot2, whiteLambert_mat, nullptr);
+	HitableObject::ptr entity4 = std::make_shared<HitableObject>(bot2, whiteLambert_mat, nullptr);
 
 	//Top wall
 	Vector3f t3[3] = { Vector3f(-5, 10, -5), Vector3f(+5, 10, -5), Vector3f(-5, 10, +5) };
 	TriangleShape::ptr top1 = std::make_shared<TriangleShape>(identity, identity, t3);
-	HitableEntity::ptr entity5 = std::make_shared<HitableEntity>(top1, whiteLambert_mat, nullptr);
+	HitableObject::ptr entity5 = std::make_shared<HitableObject>(top1, whiteLambert_mat, nullptr);
 
 	Vector3f t4[3] = { Vector3f(+5, 10, -5), Vector3f(+5, 10, +5), Vector3f(-5, 10, +5) };
 	TriangleShape::ptr top2 = std::make_shared<TriangleShape>(identity, identity, t4);
-	HitableEntity::ptr entity6 = std::make_shared<HitableEntity>(top2, whiteLambert_mat, nullptr);
+	HitableObject::ptr entity6 = std::make_shared<HitableObject>(top2, whiteLambert_mat, nullptr);
 
 	//Left wall
 	Vector3f t5[3] = { Vector3f(-5, 10, +5), Vector3f(-5, 10, -5), Vector3f(-5, 0, +5) };
 	TriangleShape::ptr lef1 = std::make_shared<TriangleShape>(identity, identity, t5);
-	HitableEntity::ptr entity7 = std::make_shared<HitableEntity>(lef1, greenLambert_mat, nullptr);
+	HitableObject::ptr entity7 = std::make_shared<HitableObject>(lef1, greenLambert_mat, nullptr);
 
 	Vector3f t6[3] = { Vector3f(-5, 10, -5), Vector3f(-5, 0, -5), Vector3f(-5, 0, +5) };
 	TriangleShape::ptr lef2 = std::make_shared<TriangleShape>(identity, identity, t6);
-	HitableEntity::ptr entity8 = std::make_shared<HitableEntity>(lef2, greenLambert_mat, nullptr);
+	HitableObject::ptr entity8 = std::make_shared<HitableObject>(lef2, greenLambert_mat, nullptr);
 
 	//Right wall
 	Vector3f t7[3] = { Vector3f(+5, 10, +5), Vector3f(+5, 10, -5), Vector3f(+5, 0, +5) };
 	TriangleShape::ptr rig1 = std::make_shared<TriangleShape>(identity, identity, t7);
-	HitableEntity::ptr entity9 = std::make_shared<HitableEntity>(rig1, redLambert_mat, nullptr);
+	HitableObject::ptr entity9 = std::make_shared<HitableObject>(rig1, redLambert_mat, nullptr);
 
 	Vector3f t8[3] = { Vector3f(+5, 10, -5), Vector3f(+5, 0, -5), Vector3f(+5, 0, +5) };
 	TriangleShape::ptr rig2 = std::make_shared<TriangleShape>(identity, identity, t8);
-	HitableEntity::ptr entity10 = std::make_shared<HitableEntity>(rig2, redLambert_mat, nullptr);
+	HitableObject::ptr entity10 = std::make_shared<HitableObject>(rig2, redLambert_mat, nullptr);
 
 	//Back wall
 	Vector3f t9[3] = { Vector3f(-5, 10, -5), Vector3f(+5, 10, -5), Vector3f(-5, 0, -5) };
 	TriangleShape::ptr bak1 = std::make_shared<TriangleShape>(identity, identity, t9);
-	HitableEntity::ptr entity11 = std::make_shared<HitableEntity>(bak1, whiteLambert_mat, nullptr);
+	HitableObject::ptr entity11 = std::make_shared<HitableObject>(bak1, whiteLambert_mat, nullptr);
 
 	Vector3f t10[3] = { Vector3f(+5, 10, -5), Vector3f(+5, 0, -5), Vector3f(-5, 0, -5) };
 	TriangleShape::ptr bak2 = std::make_shared<TriangleShape>(identity, identity, t10);
-	HitableEntity::ptr entity12 = std::make_shared<HitableEntity>(bak2, whiteLambert_mat, nullptr);
+	HitableObject::ptr entity12 = std::make_shared<HitableObject>(bak2, whiteLambert_mat, nullptr);
 
 	//light
 	Vector3f t11[3] = { Vector3f(-2, 10, -2), Vector3f(+2, 10, -2), Vector3f(-2, 10, +2) };
 	TriangleShape::ptr lamp1 = std::make_shared<TriangleShape>(identity, identity, t11);
 	AreaLight::ptr light1 = std::make_shared<DiffuseAreaLight>(identity, light_unit, 8, lamp1);
-	HitableEntity::ptr entity13 = std::make_shared<HitableEntity>(lamp1, whiteLambert_mat, light1);
+	HitableObject::ptr entity13 = std::make_shared<HitableObject>(lamp1, whiteLambert_mat, light1);
 
 	Vector3f t12[3] = { Vector3f(+2, 10, -2), Vector3f(+2, 10, +2), Vector3f(-2, 10, +2) };
 	TriangleShape::ptr lamp2 = std::make_shared<TriangleShape>(identity, identity, t12);
 	AreaLight::ptr light2 = std::make_shared<DiffuseAreaLight>(identity, light_unit, 8, lamp2);
-	HitableEntity::ptr entity14 = std::make_shared<HitableEntity>(lamp2, whiteLambert_mat, light2);
+	HitableObject::ptr entity14 = std::make_shared<HitableObject>(lamp2, whiteLambert_mat, light2);
 
 	HitableList::ptr aggregate = std::make_shared<HitableList>();
 	aggregate->addHitable(entity1);
