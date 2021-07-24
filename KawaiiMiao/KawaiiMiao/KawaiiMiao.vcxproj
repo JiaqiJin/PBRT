@@ -145,6 +145,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Accelerators\KDTree.cpp" />
     <ClCompile Include="Core\BSDF.cpp" />
     <ClCompile Include="Core\Camera.cpp" />
     <ClCompile Include="Core\Film.cpp" />
@@ -156,6 +157,7 @@
     <ClCompile Include="Core\Material.cpp" />
     <ClCompile Include="Core\PathIntegrator.cpp" />
     <ClCompile Include="Core\Primitive.cpp" />
+    <ClCompile Include="Core\Rtti.cpp" />
     <ClCompile Include="Core\Sampler.cpp" />
     <ClCompile Include="Core\Sampling.cpp" />
     <ClCompile Include="Core\Scene.cpp" />
@@ -170,6 +172,7 @@
     <ClCompile Include="Tool\Reporter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Accelerators\KDTree.h" />
     <ClInclude Include="Core\BSDF.h" />
     <ClInclude Include="Core\Camera.h" />
     <ClInclude Include="Core\Film.h" />
@@ -182,6 +185,7 @@
     <ClInclude Include="Core\PathIntegrator.h" />
     <ClInclude Include="Core\Primitive.h" />
     <ClInclude Include="Core\Rendering.h" />
+    <ClInclude Include="Core\Rtti.h" />
     <ClInclude Include="Core\Sampling.h" />
     <ClInclude Include="Core\Scene.h" />
     <ClInclude Include="Core\SceneParser.h" />

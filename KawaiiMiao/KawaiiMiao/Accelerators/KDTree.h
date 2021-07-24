@@ -9,6 +9,8 @@ RENDER_BEGIN
 class KdTreeNode;
 class BoundEdge;
 
+// The KD-Tree is a binary tree, where each interior node always has both children and 
+// where leaves of the tree store the primitive  that overlap them.
 class KdTree : public HitableAggregate
 {
 public:
