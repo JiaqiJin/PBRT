@@ -20,7 +20,17 @@ public:
 		Float emptyBonus = 0.5, int maxPrims = 1, int maxDepth = -1);
 
 	virtual std::string toString() const override { return "KdTree[]"; }
+
+	virtual bool hit(const Ray& ray) const override;
+	virtual bool hit(const Ray& ray, SurfaceInteraction& iset) const override;
+
 private:
+	void buildTree(int nodeNum, const Bounds3f& bounds,
+		const std::vector<Bounds3f>& primBounds, int* primNums,
+		int nprims, int depth,
+		const std::unique_ptr<BoundEdge[]> edges[3], int* prims0,
+		int* prims1, int badRefines = 0);
+
 	// SAH split measurement
 	const Float m_emptyBonus;
 	const int m_isectCost, m_traversalCost, m_maxHitables;
@@ -34,6 +44,11 @@ private:
 	int m_nAllocedNodes, m_nextFreeNode;
 };
 
+struct KdToDo
+{
+	const KdTreeNode* node;
+	Float tMin, tMax;
+};
 
 RENDER_END
 

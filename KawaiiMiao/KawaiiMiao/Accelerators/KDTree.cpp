@@ -5,7 +5,7 @@ RENDER_BEGIN
 
 // Represent the leaves and interior node of kd-tree.
 // Each union member indicate whether a particular field is used for interior nodes, leaf nodes, or both.
-class AKdTreeNode
+class KdTreeNode
 {
 public:
 	void initLeafNode(int* hitableIndices, int np, std::vector<int>* primitiveIndices);
@@ -45,7 +45,22 @@ private:
 	};
 };
 
-void AKdTreeNode::initLeafNode(int* hitableIndices, int np, std::vector<int>* primitiveIndices)
+enum class EdgeType { Start, End };
+class BoundEdge
+{
+public:
+	BoundEdge() = default;
+	BoundEdge(Float t, int hitableIndex, bool starting) : m_t(t), m_hitableIndex(hitableIndex)
+	{
+		m_type = starting ? EdgeType::Start : EdgeType::End;
+	}
+
+	Float m_t;
+	int m_hitableIndex;
+	EdgeType m_type;
+};
+
+void KdTreeNode::initLeafNode(int* hitableIndices, int np, std::vector<int>* primitiveIndices)
 {
 	// Note: the low 2 bits of m_flags which holds the value 3 indicate that it's a leaf node
 	//       the upper 30 bits of m_nPrims are available to record how many hitables overlap it.
@@ -82,7 +97,416 @@ KdTree::KdTree(const std::vector<Hitable::ptr>& hitables, int isectCost/* = 80*/
 	m_emptyBonus(emptyBonus),
 	m_hitables(hitables)
 {
-	// TODO
+	m_nextFreeNode = m_nAllocedNodes = 0;
+
+	// The tree cannot grow without bound in pathological cases. (8 + 1.3log(N))
+	if (maxDepth <= 0)
+	{
+		maxDepth = std::round(8 + 1.3f * glm::log2(float(int64_t(m_hitables.size()))));
+	}
+
+	// Compute bounds for kd-tree construction
+	std::vector<Bounds3f> hitableBounds;
+	hitableBounds.reserve(m_hitables.size());
+	for (const Hitable::ptr& hitable : m_hitables)
+	{
+		Bounds3f b = hitable->worldBound();
+		m_bounds = unionBounds(m_bounds, b);
+		hitableBounds.push_back(b);
+	}
+
+	// Allocate working memory for kd-tree construction
+	std::unique_ptr<BoundEdge[]> edges[3];
+	for (int i = 0; i < 3; ++i)
+	{
+		edges[i].reset(new BoundEdge[2 * m_hitables.size()]);
+	}
+
+	std::unique_ptr<int[]> leftNodeRoom(new int[m_hitables.size()]);
+	std::unique_ptr<int[]> rightNodeRoom(new int[(maxDepth + 1) * m_hitables.size()]);
+
+	// Initialize _primNums_ for kd-tree construction
+	std::unique_ptr<int[]> hitableIndices(new int[m_hitables.size()]);
+	for (size_t i = 0; i < m_hitables.size(); ++i)
+	{
+		hitableIndices[i] = i;
+	}
+
+	// Start recursive construction of kd-tree
+	buildTree(0, m_bounds, hitableBounds, hitableIndices.get(), m_hitables.size(),
+		maxDepth, edges, leftNodeRoom.get(), rightNodeRoom.get());
+}
+
+void KdTree::buildTree(int nodeIndex, 
+	const Bounds3f& nodeBounds,
+	const std::vector<Bounds3f>& allHitableBounds,
+	int* hitableIndices, 
+	int nHitables,
+	int depth,
+	const std::unique_ptr<BoundEdge[]> edges[3],
+	int* leftNodeRoom, 
+	int* rightNodeRoom, 
+	int badRefines)
+{
+	CHECK_EQ(nodeIndex, m_nextFreeNode);
+
+	// Get next free node from _nodes_ array
+	if (m_nextFreeNode == m_nAllocedNodes)
+	{
+		// Note: If all of the allocated nodes have been used up, node memory
+		//		 is reallocated with twice as many entries and the old values are copied.
+		int nNewAllocNodes = glm::max(2 * m_nAllocedNodes, 512);
+		KdTreeNode* n = AllocAligned<KdTreeNode>(nNewAllocNodes);
+		if (m_nAllocedNodes > 0)
+		{
+			memcpy(n, m_nodes, m_nAllocedNodes * sizeof(KdTreeNode));
+			FreeAligned(m_nodes);
+		}
+		m_nodes = n;
+		m_nAllocedNodes = nNewAllocNodes;
+	}
+	++m_nextFreeNode;
+
+	// Initialize leaf node if termination criteria met
+	if (nHitables <= m_maxHitables || depth == 0)
+	{
+		m_nodes[nodeIndex].initLeafNode(hitableIndices, nHitables, &m_hitableIndices);
+		return;
+	}
+
+	// Initialize interior node and continue recursion
+
+	// Choose split axis position for interior node
+	int bestAxis = -1, bestOffset = -1;
+	Float bestCost = Infinity;
+	Float oldCost = m_isectCost * Float(nHitables);
+
+	// Current node surface area
+	const Float invTotalSA = 1 / nodeBounds.surfaceArea();
+	Vector3f diagonal = nodeBounds.m_pMax - nodeBounds.m_pMin;
+
+	// Choose which axis to split along
+	int axis = nodeBounds.maximumExtent();
+	int retries = 0;
+
+retrySplit:
+	// Initialize edges for _axis_
+	for (int i = 0; i < nHitables; ++i)
+	{
+		int hi = hitableIndices[i];
+		const Bounds3f& bounds = allHitableBounds[hi];
+		edges[axis][2 * i] = BoundEdge(bounds.m_pMin[axis], hi, true);
+		edges[axis][2 * i + 1] = BoundEdge(bounds.m_pMax[axis], hi, false);
+	}
+
+	// Sort _edges_ for _axis_
+	std::sort(&edges[axis][0], &edges[axis][2 * nHitables],
+		[](const BoundEdge& e0, const BoundEdge& e1) -> bool
+		{
+			if (e0.m_t == e1.m_t)
+			{
+				return (int)e0.m_type < (int)e1.m_type;
+			}
+			else
+			{
+				return e0.m_t < e1.m_t;
+			}
+		});
+
+	// Compute cost of all splits for _axis_ to find best
+	int nBelow = 0, nAbove = nHitables;
+	const auto& currentEdge = edges[axis];
+	for (int i = 0; i < 2 * nHitables; ++i)
+	{
+		if (currentEdge[i].m_type == EdgeType::End)
+			--nAbove;
+		Float edgeT = currentEdge[i].m_t;
+		if (edgeT > nodeBounds.m_pMin[axis] && edgeT < nodeBounds.m_pMax[axis])
+		{
+			// Compute cost for split at _i_th edge
+
+			// Compute child surface areas for split at _edgeT_
+			int otherAxis0 = (axis + 1) % 3, otherAxis1 = (axis + 2) % 3;
+			Float belowSA = 2 * (diagonal[otherAxis0] * diagonal[otherAxis1] + (edgeT - nodeBounds.m_pMin[axis]) *
+				(diagonal[otherAxis0] + diagonal[otherAxis1]));
+			Float aboveSA = 2 * (diagonal[otherAxis0] * diagonal[otherAxis1] + (nodeBounds.m_pMax[axis] - edgeT) *
+				(diagonal[otherAxis0] + diagonal[otherAxis1]));
+			Float pBelow = belowSA * invTotalSA;
+			Float pAbove = aboveSA * invTotalSA;
+			Float eb = (nAbove == 0 || nBelow == 0) ? m_emptyBonus : 0;
+			Float cost = m_traversalCost + m_isectCost * (1 - eb) * (pBelow * nBelow + pAbove * nAbove);
+
+			// Update best split if this is lowest cost so far
+			if (cost < bestCost)
+			{
+				bestCost = cost;
+				bestAxis = axis;
+				bestOffset = i;
+			}
+		}
+		if (currentEdge[i].m_type == EdgeType::Start)
+			++nBelow;
+	}
+
+	DCHECK(nBelow == nHitables && nAbove == 0);
+
+	if (bestAxis == -1 && retries < 2)
+	{
+		++retries;
+		axis = (axis + 1) % 3;
+		goto retrySplit;
+	}
+
+	// Create leaf if no good splits were found
+	if (bestCost > oldCost)
+		++badRefines;
+	if ((bestCost > 4 * oldCost && nHitables < 16) || bestAxis == -1 || badRefines == 3)
+	{
+		m_nodes[nodeIndex].initLeafNode(hitableIndices, nHitables, &m_hitableIndices);
+		return;
+	}
+
+	// Classify primitives with respect to split
+	int lnHitables = 0, rnHitables = 0;
+	for (int i = 0; i < bestOffset; ++i)
+	{
+		if (edges[bestAxis][i].m_type == EdgeType::Start)
+			leftNodeRoom[lnHitables++] = edges[bestAxis][i].m_hitableIndex;
+	}
+	for (int i = bestOffset + 1; i < 2 * nHitables; ++i)
+	{
+		if (edges[bestAxis][i].m_type == EdgeType::End)
+			rightNodeRoom[rnHitables++] = edges[bestAxis][i].m_hitableIndex;
+	}
+
+	// Recursively initialize children nodes
+	Float tSplit = edges[bestAxis][bestOffset].m_t;
+	Bounds3f bounds0 = nodeBounds, bounds1 = nodeBounds;
+	bounds0.m_pMax[bestAxis] = bounds1.m_pMin[bestAxis] = tSplit;
+
+	// below subtree node
+	buildTree(nodeIndex + 1, bounds0, allHitableBounds, leftNodeRoom, lnHitables, depth - 1, edges,
+		leftNodeRoom, rightNodeRoom + nHitables, badRefines);
+	int aboveChildIndex = m_nextFreeNode;
+
+	m_nodes[nodeIndex].initInteriorNode(bestAxis, aboveChildIndex, tSplit);
+
+	// above subtree node
+	buildTree(aboveChildIndex, bounds1, allHitableBounds, rightNodeRoom, rnHitables, depth - 1, edges,
+		leftNodeRoom, rightNodeRoom + nHitables, badRefines);
+}
+
+KdTree::~KdTree() 
+{ 
+	FreeAligned(m_nodes); 
+}
+
+bool KdTree::hit(const Ray& ray) const
+{
+	// Compute initial parametric range of ray inside kd-tree extent
+	Float tMin, tMax;
+	if (!m_bounds.hit(ray, tMin, tMax))
+	{
+		return false;
+	}
+
+	// Prepare to traverse kd-tree for ray
+	Vector3f invDir(1 / ray.m_dir.x, 1 / ray.m_dir.y, 1 / ray.m_dir.z);
+	constexpr int maxTodo = 64;
+	KdToDo todo[maxTodo];
+	int todoPos = 0;
+	const KdTreeNode* currNode = &m_nodes[0];
+	while (currNode != nullptr)
+	{
+		if (currNode->isLeaf())
+		{
+			// Check for shadow ray intersections inside leaf node
+			int nHitables = currNode->numHitables();
+			if (nHitables == 1)
+			{
+				const Hitable::ptr& p = m_hitables[currNode->m_oneHitable];
+				if (p->hit(ray))
+				{
+					return true;
+				}
+			}
+			else
+			{
+				for (int i = 0; i < nHitables; ++i)
+				{
+					int hitableIndex = m_hitableIndices[currNode->m_hitableIndicesOffset + i];
+					const Hitable::ptr& p = m_hitables[hitableIndex];
+					if (p->hit(ray))
+					{
+						return true;
+					}
+				}
+			}
+
+			// Grab next node to process from todo list
+			if (todoPos > 0)
+			{
+				currNode = todo[--todoPos].node;
+				tMin = todo[todoPos].tMin;
+				tMax = todo[todoPos].tMax;
+			}
+			else
+			{
+				break;
+			}
+		}
+		else
+		{
+			// Process kd-tree interior node
+
+			// Compute parametric distance along ray to split plane
+			int axis = currNode->splitAxis();
+			Float tPlane = (currNode->splitPos() - ray.m_origin[axis]) * invDir[axis];
+
+			// Get node children pointers for ray
+			const KdTreeNode* firstChild, * secondChild;
+			int belowFirst = (ray.m_origin[axis] < currNode->splitPos()) ||
+				(ray.m_origin[axis] == currNode->splitPos() && ray.m_dir[axis] <= 0);
+			if (belowFirst)
+			{
+				firstChild = currNode + 1;
+				secondChild = &m_nodes[currNode->aboveChild()];
+			}
+			else
+			{
+				firstChild = &m_nodes[currNode->aboveChild()];
+				secondChild = currNode + 1;
+			}
+
+			// Advance to next child node, possibly enqueue other child
+			if (tPlane > tMax || tPlane <= 0)
+			{
+				currNode = firstChild;
+			}
+			else if (tPlane < tMin)
+			{
+				currNode = secondChild;
+			}
+			else
+			{
+				// Enqueue _secondChild_ in todo list
+				todo[todoPos].node = secondChild;
+				todo[todoPos].tMin = tPlane;
+				todo[todoPos].tMax = tMax;
+				++todoPos;
+				currNode = firstChild;
+				tMax = tPlane;
+			}
+		}
+	}
+	return false;
+}
+
+bool KdTree::hit(const Ray& ray, SurfaceInteraction& isect) const
+{
+	// Compute initial parametric range of ray inside kd-tree extent
+	Float tMin, tMax;
+	if (!m_bounds.hit(ray, tMin, tMax))
+	{
+		return false;
+	}
+
+	// Prepare to traverse kd-tree for ray
+	Vector3f invDir(1 / ray.m_dir.x, 1 / ray.m_dir.y, 1 / ray.m_dir.z);
+	const int maxTodo = 64;
+	KdToDo todo[maxTodo];
+	int todoPos = 0;
+
+	// Traverse kd-tree nodes in order for ray
+	bool hit = false;
+	const KdTreeNode* currNode = &m_nodes[0];
+	while (currNode != nullptr)
+	{
+		// Bail out if we found a hit closer than the current node
+		if (ray.m_tMax < tMin)
+			break;
+
+		// Process kd-tree interior node
+		if (!currNode->isLeaf())
+		{
+			// Compute parametric distance along ray to split plane
+			int axis = currNode->splitAxis();
+			Float tPlane = (currNode->splitPos() - ray.m_origin[axis]) * invDir[axis];
+
+			// Get node children pointers for ray
+			const KdTreeNode* firstChild, * secondChild;
+			int belowFirst = (ray.m_origin[axis] < currNode->splitPos()) ||
+				(ray.m_origin[axis] == currNode->splitPos() && ray.m_dir[axis] <= 0);
+			if (belowFirst)
+			{
+				firstChild = currNode + 1;
+				secondChild = &m_nodes[currNode->aboveChild()];
+			}
+			else
+			{
+				firstChild = &m_nodes[currNode->aboveChild()];
+				secondChild = currNode + 1;
+			}
+
+			// Advance to next child node, possibly enqueue other child
+			if (tPlane > tMax || tPlane <= 0)
+			{
+				currNode = firstChild;
+			}
+			else if (tPlane < tMin)
+			{
+				currNode = secondChild;
+			}
+			else
+			{
+				// Enqueue _secondChild_ in todo list
+				todo[todoPos].node = secondChild;
+				todo[todoPos].tMin = tPlane;
+				todo[todoPos].tMax = tMax;
+				++todoPos;
+				currNode = firstChild;
+				tMax = tPlane;
+			}
+		}
+		else
+		{
+			// Check for intersections inside leaf node
+			int nHitables = currNode->numHitables();
+			if (nHitables == 1)
+			{
+				const Hitable::ptr& p = m_hitables[currNode->m_oneHitable];
+				// Check one hitable inside leaf node
+				if (p->hit(ray, isect))
+					hit = true;
+			}
+			else
+			{
+				for (int i = 0; i < nHitables; ++i)
+				{
+					int index = m_hitableIndices[currNode->m_hitableIndicesOffset + i];
+					const Hitable::ptr& p = m_hitables[index];
+					// Check one hitable inside leaf node
+					if (p->hit(ray, isect))
+						hit = true;
+				}
+			}
+
+			// Grab next node to process from todo list
+			if (todoPos > 0)
+			{
+				currNode = todo[--todoPos].node;
+				tMin = todo[todoPos].tMin;
+				tMax = todo[todoPos].tMax;
+			}
+			else
+			{
+				break;
+			}
+		}
+
+	}
+
+	return hit;
 }
 
 RENDER_END
