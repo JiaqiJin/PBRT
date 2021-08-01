@@ -17,11 +17,18 @@ enum BxDFType
 	BSDF_ALL = BSDF_DIFFUSE | BSDF_GLOSSY | BSDF_SPECULAR | BSDF_REFLECTION | BSDF_TRANSMISSION,
 };
 
+// Computes the Fresnel reflection formula for dielectric materials and unpolarized light. 
+// Fr = 1/2 (r||^2 + r_|_^2)
 Float frDielectric(Float cosThetaI, Float etaI, Float etaT);
+
 Spectrum FrConductor(Float cosThetaI, const Spectrum& etaI, const Spectrum& etaT, const Spectrum& k);
 
 inline bool sameHemisphere(const Vector3f& w, const Vector3f& wp) { return w.z * wp.z > 0; }
 
+/*
+* Usually the surface of an object has more than one reflection attribute, so a class is needed to manage various BRDF and BTDF
+* 
+*/
 class BSDF
 {
 public:
@@ -60,7 +67,6 @@ public:
 
 	Float pdf(const Vector3f& wo, const Vector3f& wi, BxDFType flags = BSDF_ALL) const;
 
-
 	//Refractive index
 	const Float m_eta;
 private:
@@ -78,9 +84,14 @@ public:
 
 	virtual ~BxDF() = default;
 
+	// Determine if the BxDF matches the user-supplied type flags
 	bool matchesFlags(BxDFType t) const { return (m_type & t) == m_type; }
 
+	// Return the value of the distribution function for giving the pair of directions.
 	virtual Spectrum f(const Vector3f& wo, const Vector3f& wi) const = 0;
+
+	// Handling scattering that is described by delta distributions as well as for randomly 
+	// sampling directions from BxDFs that scatter light along multiple directions
 	virtual Spectrum sample_f(const Vector3f& wo, Vector3f& wi, const Vector2f& sample,
 		Float& pdf, BxDFType& sampledType) const;
 
@@ -90,7 +101,8 @@ public:
 	const BxDFType m_type;
 };
 
-// Fresnel
+// Fresnel 
+// The Fresnel equations describe the amount of light reflected from a surface
 class Fresnel
 {
 public:
@@ -98,9 +110,11 @@ public:
 	virtual Spectrum evaluate(Float cosI) const = 0;
 };
 
+// FresnelDielectric implements the Fresnel interface for dielectric materials.
 class FresnelDielectric : public Fresnel
 {
 public:
+	// Its constructor stores the indices of refraction on the exterior and interior sides of the surface.
 	FresnelDielectric(Float etaI, Float etaT) : m_etaI(etaI), m_etaT(etaT) {}
 
 	virtual Spectrum evaluate(Float cosThetaI) const override
@@ -112,8 +126,10 @@ private:
 	Float m_etaI, m_etaT;
 };
 
+// FresnelConductor implements this interface for conductors.
 class FresnelConductor : public Fresnel {
 public:
+	// Its constructor stores the given index of refraction eta and absorption coefficient k
 	FresnelConductor(const Spectrum& etaI, const Spectrum& etaT, const Spectrum& k)
 		: m_etaI(etaI), m_etaT(etaT), k(k) { }
 
@@ -146,6 +162,7 @@ private:
 	const Spectrum m_R;
 };
 
+// Describes physically plausible specular reflection, using the Fresnel interface to compute the fraction of light that is reflected. 
 class SpecularReflection : public BxDF
 {
 public:
@@ -155,6 +172,7 @@ public:
 
 	virtual Spectrum f(const Vector3f& wo, const Vector3f& wi) const override { return Spectrum(0.f); }
 
+	// The Monte Carlo estimation expression of Lo is as follows
 	virtual Spectrum sample_f(const Vector3f& wo, Vector3f& wi, const Vector2f& sample,
 		Float& pdf, BxDFType& sampledType) const override;
 

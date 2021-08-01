@@ -55,7 +55,7 @@ Spectrum FrConductor(Float cosThetaI, const Spectrum& etaI, const Spectrum& etaT
 	return 0.5 * (Rp + Rs);
 }
 
-//BSDF
+// BSDF
 int BSDF::numComponents(BxDFType flags) const
 {
 	int num = 0;
