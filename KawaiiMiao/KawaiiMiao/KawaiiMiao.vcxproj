@@ -166,6 +166,8 @@
     <ClCompile Include="Core\Spectrum.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Math\Transform.cpp" />
+    <ClCompile Include="Shapes\SphereShape.cpp" />
+    <ClCompile Include="Shapes\TriangleShape.cpp" />
     <ClCompile Include="Tool\Logger.cpp" />
     <ClCompile Include="Tool\Memory.cpp" />
     <ClCompile Include="Tool\Parallel.cpp" />
@@ -197,6 +199,8 @@
     <ClInclude Include="extern\stb_image_write.h" />
     <ClInclude Include="Math\KMathUtil.h" />
     <ClInclude Include="Math\Transform.h" />
+    <ClInclude Include="Shapes\SphereShape.h" />
+    <ClInclude Include="Shapes\TriangleShape.h" />
     <ClInclude Include="Tool\Logger.h" />
     <ClInclude Include="Tool\Macro.h" />
     <ClInclude Include="Tool\Memory.h" />

@@ -90,6 +90,12 @@
     <ClCompile Include="Core\Rtti.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Shapes\SphereShape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shapes\TriangleShape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core\Rendering.h">
@@ -183,6 +189,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Core\Rtti.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shapes\SphereShape.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shapes\TriangleShape.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

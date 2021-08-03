@@ -1,22 +1,26 @@
 #pragma once
 
 #include "Rendering.h"
+#include "Rtti.h"
 #include "../Math/KMathUtil.h"
 #include "../Math/Transform.h"
 #include <vector>
 
 RENDER_BEGIN
 
-class Shape
+class Shape : public AObject
 {
 public:
 	typedef std::shared_ptr<Shape> ptr;
 
-	Shape(const Transform& objectToWorld, const Transform& worldToObject);
+	Shape(Transform* objectToWorld, Transform* worldToObject);
 	virtual ~Shape() = default;
+
+	void setTransform(Transform* objectToWorld, Transform* worldToObject);
 
 	virtual Bounds3f objectBound() const = 0;
 	virtual Bounds3f worldBound() const;
+
 	
 	virtual bool hit(const Ray& ray) const;
 	virtual bool hit(const Ray& ray, Float& tHit, SurfaceInteraction& isect) const = 0;
@@ -40,60 +44,11 @@ public:
 	// used in this case.
 	virtual Float solidAngle(const Vector3f& p, int nSamples = 512) const;
 
+	virtual ClassType getClassType() const override { return ClassType::RShape; }
+
 public:
-	Transform m_objectToWorld, m_worldToObject;
-};
-
-class SphereShape final : public Shape
-{
-public:
-	typedef std::shared_ptr<SphereShape> ptr;
-
-	SphereShape(const Transform& objectToWorld, const Transform& worldToObject, const float radius);
-
-	virtual ~SphereShape() = default;
-
-	virtual Float area() const override;
-
-	virtual Interaction sample(const Vector2f & u, Float & pdf) const override;
-
-	virtual Interaction sample(const Interaction & ref, const Vector2f & u, Float & pdf) const override;
-	virtual Float pdf(const Interaction & ref, const Vector3f & wi) const override;
-
-	virtual Bounds3f objectBound() const override;
-
-	virtual bool hit(const Ray & ray) const override;
-	virtual bool hit(const Ray & ray, Float & tHit, SurfaceInteraction & isect) const override;
-
-	virtual Float solidAngle(const Vector3f & p, int nSamples = 512) const override;
-
-private:
-	Float m_radius;
-};
-
-class TriangleShape final : public Shape
-{
-public:
-	typedef std::shared_ptr<TriangleShape> ptr;
-
-	TriangleShape(const Transform& objectToWorld, const Transform& worldToObject, Vector3f v[3]);
-
-	virtual ~TriangleShape() = default;
-
-	virtual Float area() const override;
-
-	virtual Interaction sample(const Vector2f& u, Float& pdf) const override;
-
-	virtual Bounds3f objectBound() const override;
-	virtual Bounds3f worldBound() const override;
-
-	virtual bool hit(const Ray& ray) const override;
-	virtual bool hit(const Ray& ray, Float& tHit, SurfaceInteraction& isect) const override;
-
-	virtual Float solidAngle(const Vector3f& p, int nSamples = 512) const override;
-
-private:
-	Vector3f m_p0, m_p1, m_p2;
+	Transform* m_objectToWorld = nullptr; 
+	Transform* m_worldToObject = nullptr;
 };
 
 RENDER_END
