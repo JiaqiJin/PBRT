@@ -146,6 +146,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Accelerators\KDTree.cpp" />
+    <ClCompile Include="Cameras\PerspectiveCamera.cpp" />
     <ClCompile Include="Core\BSDF.cpp" />
     <ClCompile Include="Core\Camera.cpp" />
     <ClCompile Include="Core\Film.cpp" />
@@ -175,6 +176,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Accelerators\KDTree.h" />
+    <ClInclude Include="Cameras\PerspectiveCamera.h" />
     <ClInclude Include="Core\BSDF.h" />
     <ClInclude Include="Core\Camera.h" />
     <ClInclude Include="Core\Film.h" />

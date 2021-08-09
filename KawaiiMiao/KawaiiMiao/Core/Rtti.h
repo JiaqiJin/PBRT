@@ -30,6 +30,8 @@ public:
 
 	virtual std::string toString() const = 0;
 
+	virtual void activate();
+
 	static std::string getClassTypeName(ClassType type)
 	{
 		switch (type)
