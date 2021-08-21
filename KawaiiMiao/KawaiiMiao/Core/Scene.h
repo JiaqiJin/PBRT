@@ -3,6 +3,7 @@
 #include "Rendering.h"
 #include "Light.h"
 #include "Primitive.h"
+#include "Rtti.h"
 #include "../Math/KMathUtil.h"
 
 RENDER_BEGIN
