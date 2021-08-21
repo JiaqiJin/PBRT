@@ -2,14 +2,13 @@
 
 #include "Rendering.h"
 #include "../Math/KMathUtil.h"
-
-#include "../Math/Rng.h"
+#include "Rtti.h"
 
 #include <vector>
 
 RENDER_BEGIN
 
-class Sampler
+class Sampler : public AObject
 {
 public:
 	typedef std::shared_ptr<Sampler> ptr;
@@ -41,6 +40,8 @@ public:
 
 	const int64_t samplesPerPixel; //Number of sampling per pixel
 
+	virtual ClassType getClassType() const override { return ClassType::RSampler; }
+
 protected:
 	Vector2f m_currentPixel;
 	int64_t m_currentPixelSampleIndex;
@@ -52,22 +53,5 @@ private:
 	size_t m_array1DOffset, m_array2DOffset;
 };
 
-class RandomSampler : public Sampler
-{
-public:
-	typedef std::shared_ptr<RandomSampler> ptr;
-
-	RandomSampler(int ns, int seed = 0);
-
-	virtual void startPixel(const Vector2i&) override;
-
-	virtual Float get1D() override;
-	virtual Vector2f get2D() override;
-
-	virtual std::unique_ptr<Sampler> clone(int seed) override;
-
-private:	
-	Rng m_rng;
-};
 
 RENDER_END

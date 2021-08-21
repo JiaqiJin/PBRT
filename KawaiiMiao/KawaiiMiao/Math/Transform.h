@@ -10,7 +10,7 @@ class Transform
 public:
 	typedef std::shared_ptr<Transform> ptr;
 
-	Transform() {}
+	Transform() : m_trans(Matrix4x4(1.0f)), m_transInv(Matrix4x4(1.0f)) {}
 
 	Transform(const Float mat[4][4])
 	{
