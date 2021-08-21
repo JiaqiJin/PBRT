@@ -1,6 +1,9 @@
 #pragma once
 
 #include "Rendering.h"
+#include "../Math/KMathUtil.h"
+#include "Scene.h"
+#include "Integrator.h"
 
 #include <json/json.hpp>
 

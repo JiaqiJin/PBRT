@@ -5,16 +5,21 @@
 #include "Sampling.h"
 #include "Camera.h"
 #include "Primitive.h"
+#include "Rtti.h"
 
 RENDER_BEGIN
 
-class Integrator
+class Integrator : public AObject
 {
 public:
 	typedef std::shared_ptr<Integrator> ptr;
 
 	virtual ~Integrator() = default;
-	virtual void render(const Scene& scene) = 0;
+
+	virtual void preprocess(const Scene & scene) = 0;
+	virtual void render(const Scene & scene) = 0;
+
+	virtual ClassType getClassType() const override { return ClassType::RIntegrator; }
 };
 
 class SamplerIntegrator : public Integrator
@@ -22,12 +27,13 @@ class SamplerIntegrator : public Integrator
 public:
 	typedef std::shared_ptr<SamplerIntegrator> ptr;
 
-	SamplerIntegrator(Camera::ptr camera, Sampler::ptr sampler, const Bounds2i& pixelBounds)
-		: m_camera(camera), m_sampler(sampler), m_pixelBounds(pixelBounds) {}
+	// SamplerIntegrator Public Methods
+	SamplerIntegrator(Camera::ptr camera, Sampler::ptr sampler)
+		: m_camera(camera), m_sampler(sampler) {}
 
-	virtual void preprocess(const Scene& scene, Sampler& sampler) {}
+	virtual void preprocess(const Scene& scene) override {}
 
-	virtual void render(const Scene& scene);
+	virtual void render(const Scene& scene) override;
 
 	virtual Spectrum Li(const Ray& ray, const Scene& scene,
 		Sampler& sampler, MemoryArena& arena, int depth = 0) const = 0;
@@ -40,26 +46,9 @@ public:
 
 protected:
 	Camera::ptr m_camera;
-
-private:
 	Sampler::ptr m_sampler;
-	const Bounds2i m_pixelBounds;
 };
 
-class WhittedIntegrator : public SamplerIntegrator
-{
-public:
-	// WhittedIntegrator Public Methods
-	WhittedIntegrator(int maxDepth, Camera::ptr camera, Sampler::ptr sampler,
-		const Bounds2i& pixelBounds)
-		: SamplerIntegrator(camera, sampler, pixelBounds), m_maxDepth(maxDepth) {}
-
-	virtual Spectrum Li(const Ray& ray, const Scene& scene,
-		Sampler& sampler, MemoryArena& arena, int depth) const override;
-
-private:
-	const int m_maxDepth;
-};
 
 Spectrum uiformSampleAllLights(const Interaction& it, const Scene& scene,
 	MemoryArena& arena, Sampler& sampler, const std::vector<int>& nLightSamples);
