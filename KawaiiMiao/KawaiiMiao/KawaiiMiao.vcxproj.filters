@@ -75,9 +75,6 @@
     <ClCompile Include="Tool\Reporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Core\PathIntegrator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Core\LightDistrib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -97,6 +94,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Cameras\PerspectiveCamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Samplers\RandomSampler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Materials\MirrorMaterial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Materials\LambertianMaterial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Integrator\WhittedIntegrator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -179,9 +188,6 @@
     <ClInclude Include="Tool\Reporter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Core\PathIntegrator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Core\LightDistrib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -201,6 +207,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Cameras\PerspectiveCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Samplers\RandomSampler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Materials\MirrorMaterial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Materials\LambertianMaterial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Integrator\WhittedIntegrator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

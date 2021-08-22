@@ -117,6 +117,7 @@
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>E:\VisualStudio\PBRTStudy\extern\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -134,6 +135,7 @@
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>E:\VisualStudio\PBRTStudy\extern\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -156,7 +158,6 @@
     <ClCompile Include="Core\Light.cpp" />
     <ClCompile Include="Core\LightDistrib.cpp" />
     <ClCompile Include="Core\Material.cpp" />
-    <ClCompile Include="Core\PathIntegrator.cpp" />
     <ClCompile Include="Core\Primitive.cpp" />
     <ClCompile Include="Core\Rtti.cpp" />
     <ClCompile Include="Core\Sampler.cpp" />
@@ -165,8 +166,12 @@
     <ClCompile Include="Core\SceneParser.cpp" />
     <ClCompile Include="Core\Shape.cpp" />
     <ClCompile Include="Core\Spectrum.cpp" />
+    <ClCompile Include="Integrator\WhittedIntegrator.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Materials\LambertianMaterial.cpp" />
+    <ClCompile Include="Materials\MirrorMaterial.cpp" />
     <ClCompile Include="Math\Transform.cpp" />
+    <ClCompile Include="Samplers\RandomSampler.cpp" />
     <ClCompile Include="Shapes\SphereShape.cpp" />
     <ClCompile Include="Shapes\TriangleShape.cpp" />
     <ClCompile Include="Tool\Logger.cpp" />
@@ -186,13 +191,15 @@
     <ClInclude Include="Core\Light.h" />
     <ClInclude Include="Core\LightDistrib.h" />
     <ClInclude Include="Core\Material.h" />
-    <ClInclude Include="Core\PathIntegrator.h" />
     <ClInclude Include="Core\Primitive.h" />
     <ClInclude Include="Core\Rendering.h" />
     <ClInclude Include="Core\Rtti.h" />
     <ClInclude Include="Core\Sampling.h" />
     <ClInclude Include="Core\Scene.h" />
     <ClInclude Include="Core\SceneParser.h" />
+    <ClInclude Include="Integrator\WhittedIntegrator.h" />
+    <ClInclude Include="Materials\LambertianMaterial.h" />
+    <ClInclude Include="Materials\MirrorMaterial.h" />
     <ClInclude Include="Math\Rng.h" />
     <ClInclude Include="Core\Sampler.h" />
     <ClInclude Include="Core\Shape.h" />
@@ -201,6 +208,7 @@
     <ClInclude Include="extern\stb_image_write.h" />
     <ClInclude Include="Math\KMathUtil.h" />
     <ClInclude Include="Math\Transform.h" />
+    <ClInclude Include="Samplers\RandomSampler.h" />
     <ClInclude Include="Shapes\SphereShape.h" />
     <ClInclude Include="Shapes\TriangleShape.h" />
     <ClInclude Include="Tool\Logger.h" />
