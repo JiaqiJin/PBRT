@@ -40,6 +40,7 @@ public:
 	virtual bool hit(const Ray& ray) const override;
 	virtual bool hit(const Ray& ray, SurfaceInteraction& iset) const override;
 
+	AreaLight::ptr getAreaLightPtr() const { return m_areaLight; }
 	virtual const AreaLight* getAreaLight() const override;
 	virtual const Material* getMaterial() const override;
 

@@ -188,4 +188,27 @@ void APropertyTreeNode::addChild(const APropertyTreeNode& child) { m_children.pu
 
 void AObject::activate() { /* Do nothing */ }
 
+
+//-------------------------------------------AObjectFactory-------------------------------------
+
+std::map<std::string, AObjectFactory::Constructor>& AObjectFactory::getConstrMap()
+{
+	static std::map<std::string, Constructor> constrMap;
+	return constrMap;
+}
+
+void AObjectFactory::registerClass(const std::string& type, const Constructor& constr)
+{
+	auto& constrMap = getConstrMap();
+	constrMap.insert({ type, constr });
+}
+
+AObject* AObjectFactory::createInstance(const std::string& type, const APropertyTreeNode& node)
+{
+	auto& constrMap = getConstrMap();
+	if (constrMap.find(type) == constrMap.end())
+		K_ERROR("A constructor for class {0} could not be found!", type);
+	return constrMap[type](node);
+}
+
 RENDER_END

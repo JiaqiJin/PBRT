@@ -4,6 +4,7 @@
 #include "Spectrum.h"
 #include "Shape.h"
 #include "Interaction.h"
+#include "Rtti.h"
 #include "../Math/KMathUtil.h"
 #include "../Math/Transform.h"
 
@@ -23,7 +24,7 @@ inline bool isDeltaLight(int flags)
 		|| flags & (int)LightFlags::LightDeltaDirection;
 }
 
-class Light
+class Light : public AObject
 {
 public:
 	typedef std::shared_ptr<Light> ptr;

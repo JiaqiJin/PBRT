@@ -12,10 +12,10 @@
 RENDER_BEGIN
 
 /**
-	 * \brief This is an associative container used to supply the constructors
-	 * of \ref AObject subclasses with parameter information.
-	 */
-	class APropertyList final
+* \brief This is an associative container used to supply the constructors
+* of \ref AObject subclasses with parameter information.
+*/
+class APropertyList final
 {
 public:
 	APropertyList() = default;
@@ -204,5 +204,39 @@ public:
 	}
 
 };
+
+/**
+* \brief Factory for AObjects
+*
+* This utility class is part of a mini-RTTI framework and can
+* instantiate arbitrary AObjects by their name.
+*/
+
+class AObjectFactory
+{
+public:
+	typedef std::function<AObject* (const APropertyTreeNode&)> Constructor;
+
+	static void registerClass(const std::string& type, const Constructor& constr);
+
+	static AObject* createInstance(const std::string& type, const APropertyTreeNode& node);
+
+private:
+
+	static std::map<std::string, Constructor>& getConstrMap();
+};
+
+// Macro for registering an object constructor with the \ref AObjectFactory
+#define RENDER_REGISTER_CLASS(cls, name) \
+    inline cls *cls ##_create(const APropertyTreeNode &node) { \
+        return new cls(node); \
+    } \
+    class cls ##_{ \
+	public:\
+        cls ##_() { \
+            AObjectFactory::registerClass(name, cls ##_create); \
+        } \
+    };\
+	static cls ##_ cls ##__RENDER_;
 
 RENDER_END
