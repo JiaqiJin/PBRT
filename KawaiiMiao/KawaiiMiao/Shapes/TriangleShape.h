@@ -39,6 +39,7 @@ class TriangleShape final : public Shape
 public:
 	typedef std::shared_ptr<TriangleShape> ptr;
 
+	TriangleShape(const APropertyTreeNode& node);
 	TriangleShape(Transform* objectToWorld, Transform* worldToObject,
 		std::array<int, 3> indices, TriangleMesh* mesh);
 

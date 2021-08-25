@@ -9,6 +9,7 @@ class SphereShape final : public Shape
 public:
 	typedef std::shared_ptr<SphereShape> ptr;
 
+	SphereShape(const APropertyTreeNode& node);
 	SphereShape(Transform* objectToWorld, Transform* worldToObject, const float radius);
 
 	virtual ~SphereShape() = default;

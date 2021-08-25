@@ -120,6 +120,14 @@ TriangleMesh::TriangleMesh(Transform* objectToWorld, const std::string& filename
 
 //-------------------------------------------TriangleShape-------------------------------------
 
+RENDER_REGISTER_CLASS(TriangleShape, "Triangle");
+
+TriangleShape::TriangleShape(const APropertyTreeNode& node)
+	:Shape(node.getPropertyList())
+{
+
+}
+
 TriangleShape::TriangleShape(Transform* objectToWorld, Transform* worldToObject,
 	std::array<int, 3> indices, TriangleMesh* mesh) 
 	: Shape(objectToWorld, worldToObject), m_indices(indices), m_mesh(mesh) 

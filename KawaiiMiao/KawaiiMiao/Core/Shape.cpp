@@ -6,6 +6,11 @@
 
 RENDER_BEGIN
 
+Shape::Shape(const APropertyList& props)
+{
+
+}
+
 Shape::Shape(Transform* objectToWorld, Transform* worldToObject)
 	: m_objectToWorld(objectToWorld), m_worldToObject(worldToObject) 
 {

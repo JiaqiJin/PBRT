@@ -8,21 +8,29 @@
 
 RENDER_BEGIN
 
+/*
+The Shape base class defines the general Shape interface. 
+*/
 class Shape : public AObject
 {
 public:
 	typedef std::shared_ptr<Shape> ptr;
 
+	Shape(const APropertyList& props);
 	Shape(Transform* objectToWorld, Transform* worldToObject);
 	virtual ~Shape() = default;
 
 	void setTransform(Transform* objectToWorld, Transform* worldToObject);
 
+	// Return the bounding box in the object coordinate system
 	virtual Bounds3f objectBound() const = 0;
+
+	// Return the bounding box in the world coordinate system
 	virtual Bounds3f worldBound() const;
 
-	
 	virtual bool hit(const Ray& ray) const;
+	// Intersection function, fill in SurfaceInteraction data
+	// Almost all calculations for the intersection of shape and ray are performed by converting ray into object space
 	virtual bool hit(const Ray& ray, Float& tHit, SurfaceInteraction& isect) const = 0;
 
 	virtual Float area() const = 0;

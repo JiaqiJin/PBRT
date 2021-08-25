@@ -6,6 +6,14 @@
 
 RENDER_BEGIN
 
+RENDER_REGISTER_CLASS(SphereShape, "Sphere");
+
+SphereShape::SphereShape(const APropertyTreeNode& node)
+	:Shape(node.getPropertyList()), m_radius(node.getPropertyList().getFloat("Radius", 1.0f))
+{
+
+}
+
 SphereShape::SphereShape(Transform* objectToWorld, Transform* worldToObject, const float radius) :
 	Shape(objectToWorld, worldToObject), m_radius(radius)
 {
