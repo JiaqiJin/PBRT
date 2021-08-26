@@ -331,6 +331,45 @@ public:
 	mutable Float m_tMax;
 };
 
+// RayDifferential 
+class RayDifferential : public Ray
+{
+public:
+	RayDifferential() { hasDifferentials = false; }
+
+	RayDifferential(const Vector3f& ori, const Vector3f& dir, Float tMax = Infinity)
+		: Ray(ori, dir , tMax) 
+	{
+		hasDifferentials = false;
+	}
+
+	RayDifferential(const Ray& ray) : Ray(ray) 
+	{
+		hasDifferentials = false;
+	}
+
+	void scaleDifferentials(Float s) 
+	{
+		rxOrigin = m_origin + (rxOrigin - m_origin) * s;
+		ryOrigin = m_origin + (ryOrigin - m_origin) * s;
+		rxDirection = m_dir + (rxDirection - m_dir) * s;
+		ryDirection = m_dir + (ryDirection - m_dir) * s;
+	}
+
+	friend std::ostream& operator<<(std::ostream& os, const RayDifferential& r) 
+	{
+		os << "[ " << (Ray&)r << " has differentials: " <<
+			(r.hasDifferentials ? "true" : "false") << ", xo = " << r.rxOrigin <<
+			", xd = " << r.rxDirection << ", yo = " << r.ryOrigin << ", yd = " <<
+			r.ryDirection;
+		return os;
+	}
+
+	bool hasDifferentials;
+	Vector3f rxOrigin, ryOrigin;
+	Vector3f rxDirection, ryDirection;
+};
+
 // ---------------------------------- 
 template <typename T>
 inline Float dot(const Vector2<T>& v1, const Vector2<T>& v2) { return glm::dot(v1, v2); }
