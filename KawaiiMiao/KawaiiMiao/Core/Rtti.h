@@ -183,6 +183,36 @@ public:
 
 	virtual std::string toString() const = 0;
 
+
+	/**
+	 * \brief Add a child object to the current instance
+	 *
+	 * The default implementation does not support children and
+	 * simply throws an exception
+	 */
+	virtual void addChild(AObject* child);
+
+	/**
+	 * \brief Set the parent object
+	 *
+	 * Subclasses may choose to override this method to be
+	 * notified when they are added to a parent object. The
+	 * default implementation does nothing.
+	 */
+	virtual void setParent(AObject* parent);
+
+	/**
+	 * \brief Perform some action associated with the object
+	 *
+	 * The default implementation throws an exception. Certain objects
+	 * may choose to override it, e.g. to implement initialization,
+	 * testing, or rendering functionality.
+	 *
+	 * This function is called by the XML parser once it has
+	 * constructed an object and added all of its children
+	 * using \ref addChild().
+	 */
+
 	virtual void activate();
 
 	static std::string getClassTypeName(ClassType type)

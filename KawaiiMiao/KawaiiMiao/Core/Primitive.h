@@ -65,24 +65,4 @@ public:
 		TransportMode mode, bool allowMultipleLobes) const override;
 };
 
-class HitableList final : public HitableAggregate
-{
-public:
-	typedef std::shared_ptr<HitableList> ptr;
-
-	HitableList() = default;
-	virtual bool hit(const Ray & ray) const override;
-	virtual bool hit(const Ray & ray, SurfaceInteraction & iset) const override;
-
-	virtual Bounds3f worldBound() const override;
-
-	bool isEmpty() const { return m_hitableList.empty(); }
-	void addHitable(Hitable::ptr entity);
-
-private:
-	using AHitableBuffer = std::vector<Hitable::ptr>;
-	AHitableBuffer m_hitableList;
-	Bounds3f m_worldBounds;
-};
-
 RENDER_END

@@ -188,6 +188,12 @@ void APropertyTreeNode::addChild(const APropertyTreeNode& child) { m_children.pu
 
 void AObject::activate() { /* Do nothing */ }
 
+void AObject::addChild(AObject* child)
+{
+	K_ERROR("NoriObject::addChild() is not implemented for objects of type {0}", getClassTypeName(getClassType()));
+}
+
+void AObject::setParent(AObject*) { /* Do nothing */ }
 
 //-------------------------------------------AObjectFactory-------------------------------------
 

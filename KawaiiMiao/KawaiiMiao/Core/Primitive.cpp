@@ -8,7 +8,10 @@ HitableObject::HitableObject(const Shape::ptr& shape, const Material::ptr& mater
 	const AreaLight::ptr& areaLight)
 	: m_shape(shape), m_material(material), m_areaLight(areaLight) 
 {
-
+	if (m_areaLight != nullptr)
+	{
+		m_areaLight->setParent(this);
+	}
 }
 
 bool HitableObject::hit(const Ray& ray) const { return m_shape->hit(ray); }
@@ -39,7 +42,7 @@ const AreaLight* HitableObject::getAreaLight() const { return m_areaLight.get();
 
 const Material* HitableObject::getMaterial() const { return m_material.get(); }
 
-// Aggregate
+// ------------------------ Aggregate ---------------------------------
 const AreaLight* HitableAggregate::getAreaLight() const { return nullptr; }
 
 const Material* HitableAggregate::getMaterial() const { return nullptr; }
@@ -48,44 +51,7 @@ void HitableAggregate::computeScatteringFunctions(SurfaceInteraction& isect, Mem
 	TransportMode mode, bool allowMultipleLobes) const
 {
 	//Note: should not go here at all.
-	std::cout <<
-		"AHitableAggregate::computeScatteringFunctions() shouldn't be "	"called";
+	std::cout << "AHitableAggregate::computeScatteringFunctions() shouldn't be ""called";
 }
-
-Bounds3f HitableList::worldBound() const { return m_worldBounds; }
-
-void HitableList::addHitable(Hitable::ptr entity)
-{
-	m_hitableList.push_back(entity);
-	m_worldBounds = unionBounds(m_worldBounds, entity->worldBound());
-}
-
-bool HitableList::hit(const Ray& ray) const
-{
-	for (int i = 0; i < m_hitableList.size(); i++)
-	{
-		if (m_hitableList[i]->hit(ray))
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-bool HitableList::hit(const Ray& ray, SurfaceInteraction& ret) const
-{
-	SurfaceInteraction temp_rec;
-	bool hit_anything = false;
-	for (int i = 0; i < m_hitableList.size(); i++)
-	{
-		if (m_hitableList[i]->hit(ray, temp_rec))
-		{
-			hit_anything = true;
-			ret = temp_rec;
-		}
-	}
-	return hit_anything;
-}
-
 
 RENDER_END
