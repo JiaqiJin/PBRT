@@ -3,6 +3,7 @@
 #include "Rendering.h"
 #include "Spectrum.h"
 #include "Filter.h"
+#include "Rtti.h"
 #include "../Tool/Parallel.h"
 #include "../Math/KMathUtil.h"
 
@@ -17,11 +18,12 @@ struct FilmTilePixel
 	Float filterWeightSum = 0.f;
 };
 
-class Film final
+class Film final : public AObject
 {
 public:
 	typedef std::shared_ptr<Film> ptr;
 
+	Film(const APropertyTreeNode& node);
 	Film(const Vector2i& resolution, const Bounds2f& cropWindow,
 		std::unique_ptr<Filter> filter, const std::string& filename, Float diagonal = 35.f,
 		Float scale = 1.f, Float maxSampleLuminance = Infinity);

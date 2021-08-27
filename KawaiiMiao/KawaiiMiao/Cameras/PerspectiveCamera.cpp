@@ -2,6 +2,27 @@
 
 RENDER_BEGIN
 
+RENDER_REGISTER_CLASS(PerspectiveCamera, "Perspective");
+
+PerspectiveCamera::PerspectiveCamera(const APropertyTreeNode& node)
+{
+	const auto props = node.getPropertyList();
+	Float _fov = props.getFloat("Fov");
+	auto _eye = props.getVector3f("Eye");
+	auto _focus = props.getVector3f("Focus");
+	auto _up = props.getVector3f("WorldUp", Vector3f(0.f, 1.f, 0.f));
+	m_cameraToWorld = inverse(lookAt(_eye, _focus, _up));
+	m_cameraToScreen = perspective(_fov, 1e-2f, 1000.f);
+
+	// Film 
+	{
+		const auto& filmNode = node.getPropertyChild("Film");
+		m_film = Film::ptr(static_cast<Film*>(AObjectFactory::createInstance(filmNode.getTypeName(), filmNode)));
+	}
+
+	activate();
+}
+
 PerspectiveCamera::PerspectiveCamera(const Transform& CameraToWorld, Float fov, Film::ptr film)
 	: ProjectiveCamera(CameraToWorld, perspective(fov, 1e-2f, 1000.f), film)
 {

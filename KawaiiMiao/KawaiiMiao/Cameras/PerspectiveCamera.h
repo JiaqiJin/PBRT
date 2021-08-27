@@ -9,6 +9,7 @@ class PerspectiveCamera final : public ProjectiveCamera
 public:
 	typedef std::shared_ptr<PerspectiveCamera> ptr;
 
+	PerspectiveCamera(const APropertyTreeNode& node);
 	PerspectiveCamera(const Transform& CameraToWorld, Float fov, Film::ptr film);
 
 	virtual Float castingRay(const CameraSample& sample, Ray& ray) const override;

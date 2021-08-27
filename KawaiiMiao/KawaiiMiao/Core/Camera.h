@@ -64,19 +64,4 @@ protected:
 	Transform m_screenToRaster, m_rasterToScreen;
 };
 
-//class PerspectiveCamera final : public ProjectiveCamera
-//{
-//public:
-//	typedef std::shared_ptr<PerspectiveCamera> ptr;
-//
-//	PerspectiveCamera(const Transform& CameraToWorld, const Bounds2f& screenWindow,
-//		Float fov, Film::ptr film);
-//
-//	virtual Float castingRay(const CameraSample& sample, Ray& ray) const override;
-//
-//private:
-//	Float A;
-//};
-
-
 RENDER_END
