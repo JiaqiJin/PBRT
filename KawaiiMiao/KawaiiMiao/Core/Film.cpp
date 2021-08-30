@@ -5,6 +5,39 @@
 
 RENDER_BEGIN
 
+RENDER_REGISTER_CLASS(Film, "Film")
+
+Film::Film(const APropertyTreeNode& node)
+{
+	const auto& props = node.getPropertyList();
+	Vector2f res_ = props.getVector2f("Resolution", Vector2f(800, 600));
+	m_resolution = Vector2i(static_cast<int>(res_.x), static_cast<int>(res_.y));
+	m_filename = props.getString("Filename", "rendered.png");
+
+	Vector2f _cropMin = props.getVector2f("CropMin", Vector2f(0.0f));
+	Vector2f _cropMax = props.getVector2f("CropMax", Vector2f(1.0f));
+	//Compute film image bounds
+		//Note: cropWindow range [0,1]x[0,1]
+	m_croppedPixelBounds =
+		Bounds2i(
+			Vector2i(glm::ceil(m_resolution.x * _cropMin.x), glm::ceil(m_resolution.y * _cropMin.y)),
+			Vector2i(glm::ceil(m_resolution.x * _cropMax.x), glm::ceil(m_resolution.y * _cropMax.y)));
+	K_INFO("Created film with full resolution {0} . Crop window -> croppedPixelBounds {1}", m_resolution, m_croppedPixelBounds);
+
+	m_diagonal = props.getFloat("Diagonal", 35.f);
+	m_scale = props.getFloat("Scale", 1.0f);
+	m_maxSampleLuminance = props.getFloat("MaxLum", Infinity);
+
+	//Filter
+	{
+		const auto& filterNode = node.getPropertyChild("Filter");
+		m_filter = std::unique_ptr<Filter>(static_cast<Filter*>(AObjectFactory::createInstance(
+			filterNode.getTypeName(), filterNode)));
+	}
+
+	activate();
+}
+
 Film::Film(const Vector2i& resolution, const Bounds2f& cropWindow, std::unique_ptr<Filter> filter,
 	const std::string& filename, Float diagonal, Float scale, Float maxSampleLuminance)
 	: m_resolution(resolution), m_filter(std::move(filter)), m_diagonal(diagonal),
@@ -21,6 +54,26 @@ Film::Film(const Vector2i& resolution, const Bounds2f& cropWindow, std::unique_p
 	K_INFO("Created film with full resolution ", resolution.x, resolution.y, ". Crop window of ", cropWindow,
 		" -> croppedPixelBounds ", m_croppedPixelBounds);
 
+	m_pixels = std::unique_ptr<APixel[]>(new APixel[m_croppedPixelBounds.area()]);
+
+	//Precompute filter weight table
+	//Note: we assume that filtering function f(x,y)=f(|x|,|y|)
+	//      hence only store values for the positive quadrant of filter offsets.
+	int offset = 0;
+	for (int y = 0; y < filterTableWidth; ++y)
+	{
+		for (int x = 0; x < filterTableWidth; ++x, ++offset)
+		{
+			Vector2f p;
+			p.x = (x + 0.5f) * m_filter->m_radius.x / filterTableWidth;
+			p.y = (y + 0.5f) * m_filter->m_radius.y / filterTableWidth;
+			m_filterTable[offset] = m_filter->evaluate(p);
+		}
+	}
+}
+
+void Film::initialize()
+{
 	m_pixels = std::unique_ptr<APixel[]>(new APixel[m_croppedPixelBounds.area()]);
 
 	//Precompute filter weight table

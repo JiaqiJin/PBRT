@@ -41,8 +41,15 @@ public:
 
 	void clear();
 
-private:
+	virtual void activate() override { initialize(); }
 
+	virtual ClassType getClassType() const override { return ClassType::RFilm; }
+	virtual std::string toString() const override { return "Film[]"; }
+
+private:
+	void initialize();
+
+private:
 	//Note: XYZ is a display independent representation of color,
 	//      and this is why we choose to use XYZ color herein.
 	struct APixel
@@ -58,11 +65,11 @@ private:
 		Float m_pad;				//unused, ensure sizeof(APixel) -> 32 bytes
 	};
 
-	const Vector2i m_resolution; //(width, height)
-	const std::string m_filename;
+	Vector2i m_resolution; //(width, height)
+	std::string m_filename;
 	std::unique_ptr<APixel[]> m_pixels;
 
-	const Float m_diagonal;
+	Float m_diagonal;
 	Bounds2i m_croppedPixelBounds;	//actual rendering window
 
 	std::unique_ptr<Filter> m_filter;
@@ -72,8 +79,8 @@ private:
 	static constexpr int filterTableWidth = 16;
 	Float m_filterTable[filterTableWidth * filterTableWidth];
 
-	const Float m_scale;
-	const Float m_maxSampleLuminance;
+	Float m_scale;
+	Float m_maxSampleLuminance;
 
 	APixel& getPixel(const Vector2i& p)
 	{

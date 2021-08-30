@@ -1,11 +1,12 @@
 #pragma once
 
 #include "Rendering.h"
+#include "Rtti.h"
 #include "../Math/KMathUtil.h"
 
 RENDER_BEGIN
 
-class Filter
+class Filter : public AObject
 {
 public:
 	virtual ~Filter() = default;
