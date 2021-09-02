@@ -2,6 +2,7 @@
 
 #include "Sampler.h"
 #include "Sampling.h"
+#include "../Math/Rng.h"
 
 RENDER_BEGIN
 
@@ -117,7 +118,7 @@ Spectrum BSDF::sample_f(const Vector3f& woWorld, Vector3f& wiWorld, const Vector
 	DCHECK(bxdf != nullptr);
 
 	// Remap _BxDF_ sample _u_ to $[0,1)^2$
-	Vector2f uRemapped(glm::min(u[0] * matchingComps - comp, aOneMinusEpsilon), u[1]);
+	Vector2f uRemapped(glm::min(u[0] * matchingComps - comp, aOneMinusEpsilon), u[1]); 
 
 	// Sample chosen _BxDF_
 	Vector3f wi, wo = worldToLocal(woWorld);

@@ -10,7 +10,7 @@ public:
 	// WhittedIntegrator Public Methods
 	WhittedIntegrator(int maxDepth, Camera::ptr camera, Sampler::ptr sampler,
 		const Bounds2i& pixelBounds)
-		: SamplerIntegrator(camera, sampler, pixelBounds), m_maxDepth(maxDepth) {}
+		: SamplerIntegrator(camera, sampler), m_maxDepth(maxDepth) {}
 
 	virtual Spectrum Li(const Ray& ray, const Scene& scene,
 		Sampler& sampler, MemoryArena& arena, int depth) const override;

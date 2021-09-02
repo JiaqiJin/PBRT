@@ -4,6 +4,7 @@
 #include "Light.h"
 #include "Primitive.h"
 #include "Rtti.h"
+#include "Entity.h"
 #include "../Math/KMathUtil.h"
 
 RENDER_BEGIN
@@ -13,8 +14,8 @@ class Scene
 public:
 	typedef std::shared_ptr<Scene> ptr;
 
-	Scene(const HitableAggregate::ptr& hitables, const std::vector<Light::ptr>& lights)
-		: m_lights(lights), m_aggreShape(hitables)
+	Scene(const std::vector<Entity::ptr>& entities, const HitableAggregate::ptr& hitables, const std::vector<Light::ptr>& lights)
+		: m_lights(lights), m_aggreShape(hitables), m_entities(entities)
 	{
 		for (const auto& light : lights)
 		{
@@ -39,6 +40,7 @@ private:
 	// Scene Private Data
 	Bounds3f m_worldBound;
 	HitableAggregate::ptr m_aggreShape;
+	std::vector<Entity::ptr> m_entities;
 };
 
 RENDER_END

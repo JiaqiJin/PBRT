@@ -22,7 +22,7 @@ Film::Film(const APropertyTreeNode& node)
 		Bounds2i(
 			Vector2i(glm::ceil(m_resolution.x * _cropMin.x), glm::ceil(m_resolution.y * _cropMin.y)),
 			Vector2i(glm::ceil(m_resolution.x * _cropMax.x), glm::ceil(m_resolution.y * _cropMax.y)));
-	K_INFO("Created film with full resolution {0} . Crop window -> croppedPixelBounds {1}", m_resolution, m_croppedPixelBounds);
+	K_INFO("Created film with full resolution {0} {1} Crop window -> croppedPixelBounds", m_resolution.x, m_resolution.y);
 
 	m_diagonal = props.getFloat("Diagonal", 35.f);
 	m_scale = props.getFloat("Scale", 1.0f);

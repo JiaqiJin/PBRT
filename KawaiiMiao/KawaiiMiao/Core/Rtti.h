@@ -66,7 +66,7 @@ private:
 	{
 		auto it = m_properties.find(name);
 		if (it == m_properties.end())
-			LOG(ERROR) << "Property \"" << name << "\" is missing!";
+			K_INFO("Property {0} is missing!", name);
 
 		//Note: only support float, int, bool and string
 		auto valueStr = it->second[index];
