@@ -1,10 +1,10 @@
 {
 	"Integrator": {
-		"Type": "Whitted",
+		"Type": "Path",
 		"Depth": 15,
 		"Sampler": {
 			"Type": "Random",
-			"SPP": 64
+			"SPP": 8
 		},
 		"Camera": {
 			"Type": "Perspective",

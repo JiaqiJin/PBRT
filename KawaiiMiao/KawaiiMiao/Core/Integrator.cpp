@@ -23,94 +23,91 @@ void SamplerIntegrator::render(const Scene& scene)
 	Vector2i nTiles((sampleExtent.x + tileSize - 1) / tileSize, (sampleExtent.y + tileSize - 1) / tileSize);
 
 	Reporter reporter(nTiles.x * nTiles.y, "Rendering");
-	parallelFor((size_t)0, (size_t)(nTiles.x * nTiles.y), (size_t)1, [&](const tbb::blocked_range<size_t>& range)
-		{
-			for (size_t t = range.begin(); t != range.end(); ++t)
+	AParallelUtils::parallelFor((size_t)0, (size_t)(nTiles.x * nTiles.y), [&](const size_t& t)
+	{
+
+			Vector2i tile(t % nTiles.x, t / nTiles.x);
+			MemoryArena arena;
+
+			// Get sampler instance for tile
+			int seed = t;
+			std::unique_ptr<Sampler> tileSampler = sampler->clone(seed);
+
+			// Compute sample bounds for tile
+			int x0 = sampleBounds.m_pMin.x + tile.x * tileSize;
+			int x1 = glm::min(x0 + tileSize, sampleBounds.m_pMax.x);
+			int y0 = sampleBounds.m_pMin.y + tile.y * tileSize;
+			int y1 = glm::min(y0 + tileSize, sampleBounds.m_pMax.y);
+			Bounds2i tileBounds(Vector2i(x0, y0), Vector2i(x1, y1));
+			//K_INFO("Starting image tile");
+
+			// Get _FilmTile_ for tile
+			std::unique_ptr<FilmTile> filmTile = m_camera->m_film->getFilmTile(tileBounds);
+
+			// Loop over pixels in tile to render them
+			for (Vector2i pixel : tileBounds)
 			{
-				Vector2i tile(t % nTiles.x, t / nTiles.x);
-				MemoryArena arena;
+				tileSampler->startPixel(pixel);
 
-				// Get sampler instance for tile
-				int seed = /*tile.y * nTiles.x + tile.x*/t;
-				std::unique_ptr<Sampler> tileSampler = sampler->clone(seed);
-
-				// Compute sample bounds for tile
-				int x0 = sampleBounds.m_pMin.x + tile.x * tileSize;
-				int x1 = glm::min(x0 + tileSize, sampleBounds.m_pMax.x);
-				int y0 = sampleBounds.m_pMin.y + tile.y * tileSize;
-				int y1 = glm::min(y0 + tileSize, sampleBounds.m_pMax.y);
-				Bounds2i tileBounds(Vector2i(x0, y0), Vector2i(x1, y1));
-				//K_INFO("Starting image tile " , tileBounds);
-
-				// Get _FilmTile_ for tile
-				std::unique_ptr<FilmTile> filmTile = m_camera->m_film->getFilmTile(tileBounds);
-
-				// Loop over pixels in tile to render them
-				for (Vector2i pixel : tileBounds)
+				do
 				{
-					tileSampler->startPixel(pixel);
+					// Initialize _CameraSample_ for current sample
+					CameraSample cameraSample = tileSampler->getCameraSample(pixel);
 
-					do
+					// Generate camera ray for current sample
+					Ray ray;
+					Float rayWeight = m_camera->castingRay(cameraSample, ray);
+
+					// Evaluate radiance along camera ray
+					Spectrum L(0.f);
+					if (rayWeight > 0)
 					{
-						// Initialize _CameraSample_ for current sample
-						CameraSample cameraSample = tileSampler->getCameraSample(pixel);
+						L = Li(ray, scene, *tileSampler, arena);
+					}
 
-						// Generate camera ray for current sample
-						Ray ray;
-						Float rayWeight = m_camera->castingRay(cameraSample, ray);
+					// Issue warning if unexpected radiance value returned
+					if (L.hasNaNs())
+					{
+						K_ERROR(stringPrintf(
+							"Not-a-number radiance value returned "
+							"for pixel (%d, %d), sample %d. Setting to black.",
+							pixel.x, pixel.y,
+							(int)tileSampler->currentSampleNumber()));
+						L = Spectrum(0.f);
+					}
+					else if (L.y() < -1e-5)
+					{
+						K_ERROR(stringPrintf(
+							"Negative luminance value, %f, returned "
+							"for pixel (%d, %d), sample %d. Setting to black.",
+							L.y(), pixel.x, pixel.y,
+							(int)tileSampler->currentSampleNumber()));
+						L = Spectrum(0.f);
+					}
+					else if (std::isinf(L.y()))
+					{
+						K_ERROR(stringPrintf(
+							"Infinite luminance value returned "
+							"for pixel (%d, %d), sample %d. Setting to black.",
+							pixel.x, pixel.y,
+							(int)tileSampler->currentSampleNumber()));
+						L = Spectrum(0.f);
+					}
+					//K_INFO("Camera Sample : {0} {1}", cameraSample.pFilm.x, cameraSample.pFilm.y);
+					// Add camera ray's contribution to image
+					filmTile->addSample(cameraSample.pFilm, L, rayWeight);
 
-						// Evaluate radiance along camera ray
-						Spectrum L(0.f);
-						if (rayWeight > 0)
-						{
-							L = Li(ray, scene, *tileSampler, arena);
-						}
+					// Free _MemoryArena_ memory from computing image sample value
+					arena.Reset();
 
-						// Issue warning if unexpected radiance value returned
-						if (L.hasNaNs())
-						{
-							K_ERROR(stringPrintf(
-								"Not-a-number radiance value returned "
-								"for pixel (%d, %d), sample %d. Setting to black.",
-								pixel.x, pixel.y,
-								(int)tileSampler->currentSampleNumber()));
-							L = Spectrum(0.f);
-						}
-						else if (L.y() < -1e-5)
-						{
-							K_ERROR(stringPrintf(
-								"Negative luminance value, %f, returned "
-								"for pixel (%d, %d), sample %d. Setting to black.",
-								L.y(), pixel.x, pixel.y,
-								(int)tileSampler->currentSampleNumber()));
-							L = Spectrum(0.f);
-						}
-						else if (std::isinf(L.y()))
-						{
-							K_ERROR(stringPrintf(
-								"Infinite luminance value returned "
-								"for pixel (%d, %d), sample %d. Setting to black.",
-								pixel.x, pixel.y,
-								(int)tileSampler->currentSampleNumber()));
-							L = Spectrum(0.f);
-						}
-
-						//std::cout << "Camera sample: " << cameraSample << " -> ray: " << ray << " -> L = " << L;
-
-						// Add camera ray's contribution to image
-						filmTile->addSample(cameraSample.pFilm, L, rayWeight);
-
-						// Free _MemoryArena_ memory from computing image sample value
-						arena.Reset();
-
-					} while (tileSampler->startNextSample());
-				}
-				//K_INFO("Finished image tile ",tileBounds);
-
-				m_camera->m_film->mergeFilmTile(std::move(filmTile));
-				reporter.update();
+				} while (tileSampler->startNextSample());
 			}
-		}, ExecutionPolicy::APARALLEL);
+			//K_INFO("Finished image tile {0}", tileBounds.area());
+
+			m_camera->m_film->mergeFilmTile(std::move(filmTile));
+			reporter.update();
+
+		}, ExecutionPolicy::PARALLEL);
 
 	reporter.done();
 

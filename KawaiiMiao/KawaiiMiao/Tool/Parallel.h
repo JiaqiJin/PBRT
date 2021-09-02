@@ -69,14 +69,12 @@ private:
 	int m_count;
 };
 
-using FilmMutexType = tbb::spin_mutex;
-
 //Execution policy tag.
-enum class ExecutionPolicy { ASERIAL, APARALLEL };
+enum class ExecutionPolicy { SERIAL, PARALLEL };
 
 inline int numSystemCores() { return glm::max(1u, std::thread::hardware_concurrency()); }
 
-class ParallelUtils
+class AParallelUtils
 {
 public:
 
@@ -86,9 +84,9 @@ public:
 	{
 		if (start > end)
 			return;
-		if (policy == ExecutionPolicy::APARALLEL)
+		if (policy == ExecutionPolicy::PARALLEL)
 		{
-			ParallelUtils::parallel_for_seize(start, end, func);
+			AParallelUtils::parallel_for_seize(start, end, func);
 		}
 		else
 		{
@@ -169,19 +167,19 @@ private:
 //parallel for loop with automic chunking
 template <typename Function>
 void parallelFor(size_t beginIndex, size_t endIndex,
-	const Function& function, ExecutionPolicy policy = ExecutionPolicy::APARALLEL);
+	const Function& function, ExecutionPolicy policy = ExecutionPolicy::PARALLEL);
 
 //parallel for loop with manual chunking
 template <typename Function>
 void parallelFor(size_t beginIndex, size_t endIndex, size_t grainSize,
-	const Function& function, ExecutionPolicy policy = ExecutionPolicy::APARALLEL);
+	const Function& function, ExecutionPolicy policy = ExecutionPolicy::PARALLEL);
 
 template <typename Function>
 void parallelFor(size_t start, size_t end, const Function& func, ExecutionPolicy policy)
 {
 	if (start > end)
 		return;
-	if (policy == ExecutionPolicy::APARALLEL)
+	if (policy == ExecutionPolicy::PARALLEL)
 	{
 		tbb::parallel_for(start, end, func);
 	}
@@ -197,7 +195,7 @@ void parallelFor(size_t start, size_t end, size_t grainSize, const Function& fun
 {
 	if (start > end)
 		return;
-	if (policy == ExecutionPolicy::APARALLEL)
+	if (policy == ExecutionPolicy::PARALLEL)
 	{
 		tbb::parallel_for(tbb::blocked_range<size_t>(start, end, grainSize),
 			func, tbb::simple_partitioner());
