@@ -34,7 +34,7 @@ class HitableObject : public Hitable
 public:
 	typedef std::shared_ptr<HitableObject> ptr;
 
-	HitableObject(const Shape::ptr &shape, const Material::ptr& material,
+	HitableObject(const Shape::ptr &shape, const Material* material, 
 		const AreaLight::ptr& areaLight);
 	virtual Bounds3f worldBound() const;
 	virtual bool hit(const Ray& ray) const override;
@@ -52,7 +52,7 @@ public:
 private:
 	Shape::ptr m_shape;
 	AreaLight::ptr m_areaLight;
-	Material::ptr m_material;
+	const Material* m_material;
 };
 
 class HitableAggregate : public Hitable

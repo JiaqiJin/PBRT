@@ -7,6 +7,23 @@ RENDER_BEGIN
 
 // AWhittedIntegrator
 
+WhittedIntegrator::WhittedIntegrator(const APropertyTreeNode& node)
+	: SamplerIntegrator(nullptr, nullptr), m_maxDepth(node.getPropertyList().getInteger("Depth", 2))
+{
+	//Sampler
+	const auto& samplerNode = node.getPropertyChild("Sampler");
+	m_sampler = Sampler::ptr(static_cast<Sampler*>(AObjectFactory::createInstance(
+		samplerNode.getTypeName(), samplerNode)));
+
+	//Camera
+	const auto& cameraNode = node.getPropertyChild("Camera");
+	m_camera = Camera::ptr(static_cast<Camera*>(AObjectFactory::createInstance(
+		cameraNode.getTypeName(), cameraNode)));
+
+	activate();
+
+}
+
 Spectrum WhittedIntegrator::Li(const Ray& ray, const Scene& scene,
 	Sampler& sampler, MemoryArena& arena, int depth) const
 {

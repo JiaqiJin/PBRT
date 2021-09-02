@@ -8,6 +8,7 @@ class WhittedIntegrator : public SamplerIntegrator
 {
 public:
 	// WhittedIntegrator Public Methods
+	WhittedIntegrator(const APropertyTreeNode& node);
 	WhittedIntegrator(int maxDepth, Camera::ptr camera, Sampler::ptr sampler,
 		const Bounds2i& pixelBounds)
 		: SamplerIntegrator(camera, sampler), m_maxDepth(maxDepth) {}

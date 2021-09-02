@@ -4,7 +4,7 @@
 
 RENDER_BEGIN
 
-HitableObject::HitableObject(const Shape::ptr& shape, const Material::ptr& material,
+HitableObject::HitableObject(const Shape::ptr& shape, const Material* material,
 	const AreaLight::ptr& areaLight)
 	: m_shape(shape), m_material(material), m_areaLight(areaLight) 
 {
@@ -40,7 +40,7 @@ Bounds3f HitableObject::worldBound() const { return m_shape->worldBound(); }
 
 const AreaLight* HitableObject::getAreaLight() const { return m_areaLight.get(); }
 
-const Material* HitableObject::getMaterial() const { return m_material.get(); }
+const Material* HitableObject::getMaterial() const { return m_material; }
 
 // ------------------------ Aggregate ---------------------------------
 const AreaLight* HitableAggregate::getAreaLight() const { return nullptr; }
