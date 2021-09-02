@@ -7,6 +7,17 @@
 
 RENDER_BEGIN
 
+RENDER_REGISTER_CLASS(MirrorMaterial, "Mirror");
+
+MirrorMaterial::MirrorMaterial(const APropertyTreeNode& node)
+{
+	const auto& props = node.getPropertyList();
+	Vector3f _kr = props.getVector3f("R");
+	Float _tmp[] = { _kr.x, _kr.y, _kr.z };
+	m_Kr = Spectrum::fromRGB(_tmp);
+	activate();
+}
+
 void MirrorMaterial::computeScatteringFunctions(SurfaceInteraction& si, MemoryArena& arena,
 	TransportMode mode, bool allowMultipleLobes) const
 {

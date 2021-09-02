@@ -30,6 +30,7 @@ public:
 	typedef std::shared_ptr<Light> ptr;
 
 	virtual ~Light();
+	Light(const APropertyList& props);
 	Light(int flags, const Render::Transform& LightToWorld, int nSamples = 1);
 
 	virtual Spectrum power() const = 0;
@@ -49,13 +50,15 @@ public:
 
 	virtual void pdf_Le(const Ray&, const Vector3f&, Float& pdfPos, Float& pdfDir) const = 0;
 
+	virtual ClassType getClassType() const override { return ClassType::RLight; }
+
 	// Light Public Data
-	const int flags;
-	const int nSamples;
+	int flags;
+	int nSamples;
 
 protected:
 	// Light Protected Data
-	const Transform m_lightToWorld, m_worldToLight;
+	Transform m_lightToWorld, m_worldToLight;
 };
 
 class VisibilityTester final
@@ -81,46 +84,11 @@ class AreaLight : public Light
 public:
 	typedef std::shared_ptr<AreaLight> ptr;
 
+	AreaLight(const APropertyList& props);
 	AreaLight(const Transform& lightToWorld, int nSamples);
 	virtual Spectrum L(const Interaction& intr, const Vector3f& w) const = 0;
 };
 
-class DiffuseAreaLight final : public AreaLight
-{
-public:
-	typedef std::shared_ptr<DiffuseAreaLight> ptr;
-
-	// DiffuseAreaLight Public Methods
-	DiffuseAreaLight(const Transform& lightToWorld, const Spectrum& Le, int nSamples,
-		const Shape::ptr& shape, bool twoSided = false);
-
-	virtual Spectrum L(const Interaction& intr, const Vector3f& w) const override
-	{
-		return (m_twoSided || dot(intr.normal, w) > 0) ? m_Lemit : Spectrum(0.f);
-	}
-
-	virtual Spectrum power() const override;
-
-	virtual Spectrum sample_Li(const Interaction& ref, const Vector2f& u, Vector3f& wo,
-		Float& pdf, VisibilityTester& vis) const override;
-
-	virtual Float pdf_Li(const Interaction&, const Vector3f&) const override;
-
-	virtual Spectrum sample_Le(const Vector2f& u1, const Vector2f& u2, Ray& ray,
-		Vector3f& nLight, Float& pdfPos, Float& pdfDir) const override;
-
-	virtual void pdf_Le(const Ray&, const Vector3f&, Float& pdfPos, Float& pdfDir) const override;
-
-protected:
-
-	const Spectrum m_Lemit;
-	Shape::ptr m_shape;
-	// Added after book publication: by default, DiffuseAreaLights still
-	// only emit in the hemimsphere around the surface normal.  However,
-	// this behavior can now be overridden to give emission on both sides.
-	const bool m_twoSided;
-	const Float m_area;
-};
 
 
 RENDER_END

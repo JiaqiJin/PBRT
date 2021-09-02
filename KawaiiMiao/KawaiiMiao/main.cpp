@@ -12,7 +12,6 @@ int main()
 	//Banner
 	{
 		printf("Kawaii (built %s at %s) [Detected %d cores]\n", __DATE__, __TIME__, numSystemCores());
-		printf("Copyright (c)2021-Present Wencong Yang\n");
 	}
 
 	auto parsing_func = [](const std::string& filename)->void

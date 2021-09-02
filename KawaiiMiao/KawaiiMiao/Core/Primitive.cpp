@@ -36,6 +36,8 @@ void HitableObject::computeScatteringFunctions(SurfaceInteraction& isect, Memory
 	}
 }
 
+Shape* HitableObject::getShape() const { return m_shape.get(); }
+
 Bounds3f HitableObject::worldBound() const { return m_shape->worldBound(); }
 
 const AreaLight* HitableObject::getAreaLight() const { return m_areaLight.get(); }

@@ -171,6 +171,7 @@
     <ClCompile Include="Filter\GaussianFilter.cpp" />
     <ClCompile Include="Integrator\PathIntegrator.cpp" />
     <ClCompile Include="Integrator\WhittedIntegrator.cpp" />
+    <ClCompile Include="Lights\DiffuseAreaLight.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Materials\LambertianMaterial.cpp" />
     <ClCompile Include="Materials\MirrorMaterial.cpp" />
@@ -206,6 +207,7 @@
     <ClInclude Include="Filter\GaussianFilter.h" />
     <ClInclude Include="Integrator\PathIntegrator.h" />
     <ClInclude Include="Integrator\WhittedIntegrator.h" />
+    <ClInclude Include="Lights\DiffuseAreaLight.h" />
     <ClInclude Include="Materials\LambertianMaterial.h" />
     <ClInclude Include="Materials\MirrorMaterial.h" />
     <ClInclude Include="Math\Rng.h" />
