@@ -5,6 +5,8 @@
 
 RENDER_BEGIN
 
+RENDER_REGISTER_CLASS(WhittedIntegrator, "Whitted");
+
 // AWhittedIntegrator
 
 WhittedIntegrator::WhittedIntegrator(const APropertyTreeNode& node)

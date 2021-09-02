@@ -14,6 +14,7 @@ public:
 	typedef std::shared_ptr<Sampler> ptr;
 
 	virtual ~Sampler();
+	Sampler(const APropertyList& props);
 	Sampler(int64_t samplesPerPixel);
 
 	virtual void startPixel(const Vector2i& p);

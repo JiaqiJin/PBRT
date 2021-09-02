@@ -6,6 +6,12 @@ RENDER_BEGIN
 
 Sampler::~Sampler() {}
 
+Sampler::Sampler(const APropertyList& props)
+	: samplesPerPixel(props.getInteger("SPP", 1))
+{
+
+}
+
 Sampler::Sampler(int64_t samplesPerPixel) 
 	: samplesPerPixel(samplesPerPixel) 
 {

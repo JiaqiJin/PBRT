@@ -2,7 +2,7 @@
 
 RENDER_BEGIN
 
-RENDER_REGISTER_CLASS(BoxFilter, "BoxFilter");
+RENDER_REGISTER_CLASS(BoxFilter, "Box");
 
 BoxFilter::BoxFilter(const APropertyTreeNode& node)
 	: Filter(node.getPropertyList())

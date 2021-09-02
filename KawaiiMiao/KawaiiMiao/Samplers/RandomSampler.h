@@ -10,6 +10,7 @@ class RandomSampler final : public Sampler
 public:
 	typedef std::shared_ptr<RandomSampler> ptr;
 
+	RandomSampler(const APropertyTreeNode& node);
 	RandomSampler(int ns, int seed = 0);
 
 	virtual void startPixel(const Vector2i&) override;

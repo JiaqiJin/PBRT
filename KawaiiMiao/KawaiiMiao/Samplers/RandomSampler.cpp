@@ -2,6 +2,15 @@
 
 RENDER_BEGIN
 
+RENDER_REGISTER_CLASS(RandomSampler, "Random");
+
+RandomSampler::RandomSampler(const APropertyTreeNode& node)
+	: Sampler(node.getPropertyList()), m_rng(0)
+{
+	activate();
+}
+
+
 RandomSampler::RandomSampler(int ns, int seed)
 	: Sampler(ns), m_rng(seed)
 {

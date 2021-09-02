@@ -16,6 +16,7 @@ public:
 	virtual Spectrum Li(const Ray& ray, const Scene& scene,
 		Sampler& sampler, MemoryArena& arena, int depth) const override;
 
+	virtual std::string toString() const override { return "WhittedIntegrator[]"; }
 private:
 	const int m_maxDepth;
 };

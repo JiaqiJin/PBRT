@@ -169,6 +169,7 @@
     <ClCompile Include="Core\Spectrum.cpp" />
     <ClCompile Include="Filter\BoxFilter.cpp" />
     <ClCompile Include="Filter\GaussianFilter.cpp" />
+    <ClCompile Include="Integrator\PathIntegrator.cpp" />
     <ClCompile Include="Integrator\WhittedIntegrator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Materials\LambertianMaterial.cpp" />
@@ -203,6 +204,7 @@
     <ClInclude Include="Core\SceneParser.h" />
     <ClInclude Include="Filter\BoxFilter.h" />
     <ClInclude Include="Filter\GaussianFilter.h" />
+    <ClInclude Include="Integrator\PathIntegrator.h" />
     <ClInclude Include="Integrator\WhittedIntegrator.h" />
     <ClInclude Include="Materials\LambertianMaterial.h" />
     <ClInclude Include="Materials\MirrorMaterial.h" />

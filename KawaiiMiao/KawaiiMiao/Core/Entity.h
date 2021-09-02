@@ -3,6 +3,7 @@
 #include "Rendering.h"
 #include "Rtti.h"
 #include "Primitive.h"
+#include "../Shapes/TriangleShape.h"
 #include "../Math/KMathUtil.h"
 
 RENDER_BEGIN
@@ -32,5 +33,19 @@ protected:
 	std::vector<Hitable::ptr> m_hitables;
 	Transform m_objectToWorld, m_worldToObject;
 };
+
+class MeshEntity : public Entity
+{
+public:
+	typedef std::shared_ptr<MeshEntity> ptr;
+
+	MeshEntity(const APropertyTreeNode& node);
+
+	virtual std::string toString() const override { return "MeshEntity[]"; }
+
+private:
+	TriangleMesh::unique_ptr m_mesh;
+};
+
 
 RENDER_END
