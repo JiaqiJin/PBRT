@@ -56,8 +56,18 @@ public:
 
 	Transform operator*(const Transform& t2) const;
 
+	bool HasScale() const
+	{
+		Float la2 = lengthSquared((Vector3f(1, 0, 0)));
+		Float lb2 = lengthSquared((Vector3f(0, 1, 0)));
+		Float lc2 = lengthSquared((Vector3f(0, 0, 1)));
+#define NOT_ONE(x) ((x) < .999f || (x) > 1.001f)
+		return (NOT_ONE(la2) || NOT_ONE(lb2) || NOT_ONE(lc2));
+#undef NOT_ONE
+	}
 private:
 	Matrix4x4 m_trans, m_transInv;
+	friend class AnimatedTransform;
 };
 
 Transform translate(const Vector3f& delta);
@@ -93,5 +103,44 @@ inline Ray Transform::operator()(const Ray& r) const
 
 	return Ray(o, d, tMax);
 }
+
+//// AnimatedTransform 
+//class AnimatedTransform
+//{
+//public:
+//	AnimatedTransform(const Transform* startTransform, Float startTime,
+//		const Transform* endTransform, Float endTime);
+//	static void Decompose(const Matrix4x4& m, Vector3f* T, Quaternion* R, Matrix4x4* S);
+//	void Interpolate(Float time, Transform* t) const;
+//	Ray operator()(const Ray& r) const;
+//	RayDifferential operator()(const RayDifferential& r) const;
+//	Vector3f operator()(Float time, const Vector3f& v) const;
+//	bool HasScale() const 
+//	{
+//		return startTransform->HasScale() || endTransform->HasScale();
+//	}
+//	Bounds3f MotionBounds(const Bounds3f& b) const;
+//	Bounds3f BoundPointMotion(const Vector3f& p) const;
+//private:
+//	// AnimatedTransform Private Data
+//	const Transform* startTransform, * endTransform;
+//	const Float startTime, endTime;
+//	const bool actuallyAnimated;
+//	Vector3f T[2];
+//	Quaternion R[2];
+//	Matrix4x4 S[2];
+//	bool hasRotation;
+//	struct DerivativeTerm {
+//		DerivativeTerm() {}
+//		DerivativeTerm(Float c, Float x, Float y, Float z)
+//			: kc(c), kx(x), ky(y), kz(z) {}
+//		Float kc, kx, ky, kz;
+//		Float Eval(const Vector3f& p) const
+//		{
+//			return kc + kx * p.x + ky * p.y + kz * p.z;
+//		}
+//	};
+//	DerivativeTerm c1[3], c2[3], c3[3], c4[3], c5[3];
+//};
 
 RENDER_END

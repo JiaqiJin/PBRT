@@ -14,9 +14,11 @@ class Scene
 public:
 	typedef std::shared_ptr<Scene> ptr;
 
-	Scene(const std::vector<Entity::ptr>& entities, const HitableAggregate::ptr& hitables, const std::vector<Light::ptr>& lights)
-		: m_lights(lights), m_aggreShape(hitables), m_entities(entities)
+	Scene(const std::vector<Entity::ptr>& entities, const HitableAggregate::ptr& aggre,
+		const std::vector<Light::ptr>& lights)
+		: m_lights(lights), m_aggreShape(aggre), m_entities(entities)
 	{
+		m_worldBound = m_aggreShape->worldBound();
 		for (const auto& light : lights)
 		{
 			light->preprocess(*this);

@@ -40,13 +40,26 @@ inline std::ostream& operator<<(std::ostream& os, const Vector3<T>& v)
 
 // Matrix
 using Matrix4x4 = glm::mat<4, 4, Float>;
-using Quaterion = glm::qua<Float>;
+using Quaternion = glm::qua<Float>;
 
 inline Matrix4x4 transpose(const Matrix4x4& m) { return glm::transpose(m); }
 inline Matrix4x4 mul(const Matrix4x4& m1, const Matrix4x4& m2) { return m1 * m2; }
 inline Matrix4x4 inverse(const Matrix4x4& m) { return glm::inverse(m); }
 
-inline Matrix4x4 toMatrix4x4(const Quaterion& q) { return glm::mat4_cast(q); }
+inline Matrix4x4 toMatrix4x4(const Quaternion& q) { return glm::mat4_cast(q); }
+
+inline Quaternion Slerp(Float t, const Quaternion& q1, const Quaternion& q2)
+{
+	Float cosTheta = dot(q1, q2);
+	if (cosTheta > .9995f)
+		return normalize((1 - t) * q1 + t * q2);
+	else {
+		Float theta = std::acos(clamp(cosTheta, -1, 1));
+		Float thetap = theta * t;
+		Quaternion qperp = normalize(q2 - q1 * cosTheta);
+		return q1 * std::cos(thetap) + qperp * std::sin(thetap);
+	}
+}
 
 // AABB
 
