@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../Core/Rendering.h"
 
@@ -317,15 +317,27 @@ inline Bounds2iIterator end(const Bounds2i& b)
 	return Bounds2iIterator(b, pEnd);
 }
 
-// Ray
+class Medium;
+
+/*
+The ray class has a point as the starting point and a unit vector as the direction
+tMax determines the farthest distance of ray
+*/
 class Ray
 {
 public:
 
 	Ray() : m_tMax(Infinity) {}
 
-	Ray(const Vector3f& o, const Vector3f& d, Float tMax = Infinity)
-		: m_origin(o), m_dir(normalize(d)), m_tMax(tMax) {}
+	/*Ray(const Vector3f& o, const Vector3f& d, Float tMax = Infinity)
+		: m_origin(o), m_dir(normalize(d)), m_tMax(tMax) {}*/
+
+	Ray(const Vector3f& o, const Vector3f& d, Float tMax = Infinity, Float time = 0.f, Medium* medium = nullptr)
+		: m_origin(o), m_dir(normalize(d)), m_tMax(tMax), m_time(time), m_medium(medium) {}
+
+	/*Ray(const Vector3f& o, const Vector3f& d, Float tMax = Infinity,
+		Float time = 0.f, Medium* medium = nullptr)
+		: m_origin(o), m_dir(d), m_tMax(tMax), m_time(time), m_medium(medium) {}*/
 
 	const Vector3f& origin() const { return m_origin; }
 	const Vector3f& direction() const { return m_dir; }
@@ -339,9 +351,16 @@ public:
 	}
 
 public:
+	// origin
 	Vector3f m_origin;
+	// direction
 	Vector3f m_dir;
+	// The farthest distance of the light
 	mutable Float m_tMax;
+	// The time of emission, used to make motion blur
+	Float m_time;
+	// Medium
+	Medium* m_medium;
 };
 
 // RayDifferential 
@@ -600,6 +619,15 @@ bool insideExclusive(const Vector2<T>& pt, const Bounds2<T>& b)
 	return (pt.x >= b.m_pMin.x && pt.x < b.m_pMax.x&& pt.y >= b.m_pMin.y && pt.y < b.m_pMax.y);
 }
 
+/*
+* Calculate the intersection point of ray and bound
+* Assuming that the point where ray intersects a plane of bound is (x, y, z), then t and x satisfy the following relationship
+* t = (x − Ox)/dx
+* t = (x ⊖ Ox) ⊗ (1 ⊘ dx)
+* ∈ ((x − Ox)/dx) * (1 ± ε)^3
+* ∈ ((x − Ox)/dx) * (1 ± γ3) 
+* gamma(3)
+*/
 template <typename T>
 inline bool Bounds3<T>::hit(const Ray& ray, Float& hitt0, Float& hitt1) const
 {
@@ -630,6 +658,8 @@ inline bool Bounds3<T>::hit(const Ray& ray, Float& hitt0, Float& hitt1) const
 template <typename T>
 inline bool Bounds3<T>::hit(const Ray& ray, const Vector3f& invDir, const int dirIsNeg[3]) const
 {
+	// First use the X dir to find t value of the two intersection point, 
+	// then add the y direction to update the t value, and finally add the z direction to update the t value
 	const Bounds3f& bounds = *this;
 	// Check for ray intersection against $x$ and $y$ slabs
 	Float tMin = (bounds[dirIsNeg[0]].x - ray.m_origin.x) * invDir.x;
@@ -638,6 +668,7 @@ inline bool Bounds3<T>::hit(const Ray& ray, const Vector3f& invDir, const int di
 	Float tyMax = (bounds[1 - dirIsNeg[1]].y - ray.m_origin.y) * invDir.y;
 
 	// Update _tMax_ and _tyMax_ to ensure robust bounds intersection
+	// The gamma function is used for error analysis
 	tMax *= 1 + 2 * gamma(3);
 	tyMax *= 1 + 2 * gamma(3);
 	if (tMin > tyMax || tyMin > tMax)

@@ -9,7 +9,9 @@
 RENDER_BEGIN
 
 /*
-The Shape base class defines the general Shape interface. 
+* The Shape base class defines the general Shape interface. 
+* The shape class is just a shape, not a specific object. 
+* The specific object is a subclass of primitive, with attributes such as material, shape, and whether it emits light.
 */
 class Shape : public AObject
 {
