@@ -8,12 +8,12 @@
 
 RENDER_BEGIN
 
-class Hitable : public AObject
+class Primitive : public AObject
 {
 public:
-	typedef std::shared_ptr<Hitable> ptr;
+	typedef std::shared_ptr<Primitive> ptr;
 
-	virtual ~Hitable() = default;
+	virtual ~Primitive() = default;
 
 	virtual bool hit(const Ray & ray) const = 0;
 	virtual bool hit(const Ray & ray, SurfaceInteraction & iset) const = 0;
@@ -26,15 +26,15 @@ public:
 	virtual void computeScatteringFunctions(SurfaceInteraction & isect, MemoryArena & arena,
 		TransportMode mode, bool allowMultipleLobes) const = 0;
 
-	virtual ClassType getClassType() const override { return ClassType::RHitable; }
+	virtual ClassType getClassType() const override { return ClassType::RPrimitive; }
 };
 
-class HitableObject : public Hitable
+class PrimitiveObject : public Primitive
 {
 public:
-	typedef std::shared_ptr<HitableObject> ptr;
+	typedef std::shared_ptr<PrimitiveObject> ptr;
 
-	HitableObject(const Shape::ptr &shape, const Material* material, 
+	PrimitiveObject(const Shape::ptr &shape, const Material* material, 
 		const AreaLight::ptr& areaLight);
 	virtual Bounds3f worldBound() const;
 	virtual bool hit(const Ray& ray) const override;
@@ -49,7 +49,7 @@ public:
 	virtual void computeScatteringFunctions(SurfaceInteraction& isect, MemoryArena& arena,
 		TransportMode mode, bool allowMultipleLobes) const override;
 
-	virtual std::string toString() const override { return "HitableObject[]"; }
+	virtual std::string toString() const override { return "PrimitiveObject[]"; }
 
 private:
 	Shape::ptr m_shape;
@@ -57,7 +57,7 @@ private:
 	const Material* m_material;
 };
 
-class HitableAggregate : public Hitable
+class PrimitiveAggregate : public Primitive
 {
 public:
 	virtual const AreaLight* getAreaLight() const override;

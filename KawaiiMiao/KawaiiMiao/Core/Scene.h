@@ -14,7 +14,7 @@ class Scene
 public:
 	typedef std::shared_ptr<Scene> ptr;
 
-	Scene(const std::vector<Entity::ptr>& entities, const HitableAggregate::ptr& aggre,
+	Scene(const std::vector<Entity::ptr>& entities, const PrimitiveAggregate::ptr& aggre,
 		const std::vector<Light::ptr>& lights)
 		: m_lights(lights), m_aggreShape(aggre), m_entities(entities)
 	{
@@ -41,7 +41,7 @@ public:
 private:
 	// Scene Private Data
 	Bounds3f m_worldBound;
-	HitableAggregate::ptr m_aggreShape;
+	PrimitiveAggregate::ptr m_aggreShape;
 	std::vector<Entity::ptr> m_entities;
 };
 

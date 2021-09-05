@@ -60,7 +60,7 @@ public:
 	BSDF* bsdf = nullptr;
 
 	const Shape* shape = nullptr;
-	const Hitable* hitable = nullptr;
+	const Primitive* primitive = nullptr;
 };
 
 RENDER_END

@@ -9,12 +9,12 @@ RENDER_BEGIN
 class KdTreeNode;
 class BoundEdge;
 
-class KdTree : public HitableAggregate
+class KdTree : public PrimitiveAggregate
 {
 public:
 	typedef std::shared_ptr<KdTree> ptr;
 
-	KdTree(const std::vector<Hitable::ptr>& hitables, int isectCost = 80, int traversalCost = 1,
+	KdTree(const std::vector<Primitive::ptr>& Primitives, int isectCost = 80, int traversalCost = 1,
 		Float emptyBonus = 0.5, int maxPrims = 1, int maxDepth = -1);
 
 	virtual Bounds3f worldBound() const override { return m_bounds; }
@@ -35,15 +35,15 @@ private:
 
 	// SAH split measurement
 	const Float m_emptyBonus;
-	const int m_isectCost, m_traversalCost, m_maxHitables;
+	const int m_isectCost, m_traversalCost, m_maxPrimitives;
 
 	// Compact the node into an array
 	KdTreeNode* m_nodes;
 	int m_nAllocedNodes, m_nextFreeNode;
 
 	Bounds3f m_bounds;
-	std::vector<Hitable::ptr> m_hitables;
-	std::vector<int> m_hitableIndices;
+	std::vector<Primitive::ptr> m_Primitives;
+	std::vector<int> m_PrimitiveIndices;
 };
 
 struct KdToDo

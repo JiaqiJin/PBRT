@@ -108,7 +108,7 @@ SurfaceInteraction Transform::operator()(const SurfaceInteraction& si) const
 	ret.shape = si.shape;
 	ret.dpdu = trans(si.dpdu, 0.0f);
 	ret.dpdv = trans(si.dpdv, 0.0f);
-	ret.hitable = si.hitable;
+	ret.primitive = si.primitive;
 	return ret;
 }
 

@@ -65,7 +65,7 @@ class Light;
 class Shape;
 class Scene;
 class Camera;
-class Hitable;
+class Primitive;
 class FilmTile;
 class Sampler;
 class Material; 

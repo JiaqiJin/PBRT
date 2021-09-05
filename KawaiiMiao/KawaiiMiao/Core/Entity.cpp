@@ -82,7 +82,7 @@ Entity::Entity(const APropertyTreeNode& node)
 			lightNode.getTypeName(), lightNode)));
 	}
 
-	m_hitables.push_back(std::make_shared<HitableObject>(shape, m_material.get(), areaLight));
+	m_Primitives.push_back(std::make_shared<PrimitiveObject>(shape, m_material.get(), areaLight));
 }
 
 RENDER_REGISTER_CLASS(MeshEntity, "MeshEntity")
@@ -151,7 +151,7 @@ MeshEntity::MeshEntity(const APropertyTreeNode& node)
 	m_material = Material::ptr(static_cast<Material*>(AObjectFactory::createInstance(
 		materialNode.getTypeName(), materialNode)));
 
-	//Load each triangle of the mesh as a HitableEntity
+	//Load each triangle of the mesh as a PrimitiveEntity
 	m_mesh = TriangleMesh::unique_ptr(new TriangleMesh(&m_objectToWorld, APropertyTreeNode::m_directory + filename));
 	const auto& meshIndices = m_mesh->getIndices();
 	for (size_t i = 0; i < meshIndices.size(); i += 3)
@@ -170,7 +170,7 @@ MeshEntity::MeshEntity(const APropertyTreeNode& node)
 			areaLight = AreaLight::ptr(static_cast<AreaLight*>(AObjectFactory::createInstance(
 				lightNode.getTypeName(), lightNode)));
 		}
-		m_hitables.push_back(std::make_shared<HitableObject>(triangle, m_material.get(), areaLight));
+		m_Primitives.push_back(std::make_shared<PrimitiveObject>(triangle, m_material.get(), areaLight));
 	}
 }
 

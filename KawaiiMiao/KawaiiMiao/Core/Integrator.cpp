@@ -309,7 +309,7 @@ Spectrum estimateDirect(const Interaction& it, const Vector2f& uScattering, cons
 			Spectrum Li(0.f);
 			if (foundSurfaceInteraction)
 			{
-				if (lightIsect.hitable->getAreaLight() == &light)
+				if (lightIsect.primitive->getAreaLight() == &light)
 					Li = lightIsect.Le(-wi);
 			}
 			else

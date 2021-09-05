@@ -164,7 +164,7 @@ class AObject
 public:
 	enum ClassType
 	{
-		RHitable = 0,
+		RPrimitive = 0,
 		RShape,
 		RMaterial,
 		RLight,
@@ -220,7 +220,7 @@ public:
 		switch (type)
 		{
 		case RMaterial:   return "Material";
-		case RHitable:    return "Hitable";
+		case RPrimitive:    return "Primitive";
 		case RShape:	   return "Shape";
 		case RLight:      return "Light";
 		case RCamera:	   return "Camera";

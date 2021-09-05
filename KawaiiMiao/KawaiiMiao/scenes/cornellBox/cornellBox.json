@@ -4,7 +4,7 @@
 		"Depth": 15,
 		"Sampler": {
 			"Type": "Random",
-			"SPP": 8
+			"SPP": 2
 		},
 		"Camera": {
 			"Type": "Perspective",

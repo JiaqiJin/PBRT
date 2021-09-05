@@ -127,7 +127,7 @@ void SceneParser::parser(const std::string& path, Scene::ptr& _scene, Integrator
 
 	std::vector<Light::ptr> _lights;
 	std::vector<Entity::ptr> _entities;
-	std::vector<Hitable::ptr> _hitables;
+	std::vector<Primitive::ptr> _Primitives;
 
 	//Entity loading
 	{
@@ -145,23 +145,23 @@ void SceneParser::parser(const std::string& path, Scene::ptr& _scene, Integrator
 
 		for (auto& entity : _entities)
 		{
-			for (const auto& hitable : entity->getHitables())
+			for (const auto& Primitive : entity->getPrimitives())
 			{
-				_hitables.push_back(hitable);
+				_Primitives.push_back(Primitive);
 			}
 		}
 
-		for (int i = 0; i < _hitables.size(); ++i)
+		for (int i = 0; i < _Primitives.size(); ++i)
 		{
-			if (_hitables[i]->getAreaLight() != nullptr)
+			if (_Primitives[i]->getAreaLight() != nullptr)
 			{
-				_lights.push_back(Light::ptr(dynamic_cast<HitableObject*>(_hitables[i].get())->getAreaLightPtr()));
+				_lights.push_back(Light::ptr(dynamic_cast<PrimitiveObject*>(_Primitives[i].get())->getAreaLightPtr()));
 			}
 		}
 	}
 
-	KdTree::ptr _aggregate = std::make_shared<KdTree>(_hitables);
-	//ALinearAggregate::ptr _aggregate = std::make_shared<ALinearAggregate>(_hitables);
+	KdTree::ptr _aggregate = std::make_shared<KdTree>(_Primitives);
+	//ALinearAggregate::ptr _aggregate = std::make_shared<ALinearAggregate>(_Primitives);
 	_scene = std::make_shared<Scene>(_entities, _aggregate, _lights);
 }
 

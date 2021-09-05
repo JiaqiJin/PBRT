@@ -8,7 +8,7 @@ RENDER_BEGIN
 class KdTreeNode
 {
 public:
-	void initLeafNode(int* hitableIndices, int np, std::vector<int>* primitiveIndices);
+	void initLeafNode(int* PrimitiveIndices, int np, std::vector<int>* primitiveIndices);
 
 	void initInteriorNode(int axis, int ac, Float split)
 	{
@@ -24,7 +24,7 @@ public:
 	}
 
 	Float splitPos() const { return m_split; }
-	int numHitables() const { return m_nHitables >> 2; }
+	int numPrimitives() const { return m_nPrimitives >> 2; }
 	int splitAxis() const { return m_flags & 3; }
 	bool isLeaf() const { return (m_flags & 3) == 3; }
 	int aboveChild() const { return m_rightChildIndex >> 2; }
@@ -32,15 +32,15 @@ public:
 	union
 	{
 		Float m_split; // Split position which is for interior nodes
-		int m_oneHitable; // Leaf
-		int m_hitableIndicesOffset; // Leaf
+		int m_onePrimitive; // Leaf
+		int m_PrimitiveIndicesOffset; // Leaf
 	};
 
 private:
 	union 
 	{
 		int m_flags; // Both
-		int m_nHitables; // Leaf
+		int m_nPrimitives; // Leaf
 		int m_rightChildIndex; // Interior
 	};
 };
@@ -50,98 +50,98 @@ class BoundEdge
 {
 public:
 	BoundEdge() = default;
-	BoundEdge(Float t, int hitableIndex, bool starting) : m_t(t), m_hitableIndex(hitableIndex)
+	BoundEdge(Float t, int PrimitiveIndex, bool starting) : m_t(t), m_PrimitiveIndex(PrimitiveIndex)
 	{
 		m_type = starting ? EdgeType::Start : EdgeType::End;
 	}
 
 	Float m_t;
-	int m_hitableIndex;
+	int m_PrimitiveIndex;
 	EdgeType m_type;
 };
 
-void KdTreeNode::initLeafNode(int* hitableIndices, int np, std::vector<int>* primitiveIndices)
+void KdTreeNode::initLeafNode(int* PrimitiveIndices, int np, std::vector<int>* primitiveIndices)
 {
 	// Note: the low 2 bits of m_flags which holds the value 3 indicate that it's a leaf node
-	//       the upper 30 bits of m_nPrims are available to record how many hitables overlap it.
+	//       the upper 30 bits of m_nPrims are available to record how many Primitives overlap it.
 	m_flags = 3;
-	m_nHitables |= (np << 2);
+	m_nPrimitives |= (np << 2);
 
-	// Store hitable ids for leaf node
+	// Store Primitive ids for leaf node
 	if (np == 0)
 	{
-		m_oneHitable = 0;
+		m_onePrimitive = 0;
 	}
 	else if (np == 1)
 	{
-		m_oneHitable = hitableIndices[0];
+		m_onePrimitive = PrimitiveIndices[0];
 	}
 	else
 	{
 		// Note: if more than one primitive overlaps, then their indices are
 		//       stored in a segment of m_primitiveIndicesOffset. The offset
 		//       to the first index for the leaf is stored in m_primitiveIndicesOffset
-		m_hitableIndicesOffset = primitiveIndices->size();
+		m_PrimitiveIndicesOffset = primitiveIndices->size();
 		for (int i = 0; i < np; ++i)
 		{
-			primitiveIndices->push_back(hitableIndices[i]);
+			primitiveIndices->push_back(PrimitiveIndices[i]);
 		}
 	}
 }
 
-KdTree::KdTree(const std::vector<Hitable::ptr>& hitables, int isectCost/* = 80*/, int traversalCost/* = 1*/,
-	Float emptyBonus/* = 0.5*/, int maxHitables/* = 1*/, int maxDepth/* = -1*/) :
+KdTree::KdTree(const std::vector<Primitive::ptr>& Primitives, int isectCost/* = 80*/, int traversalCost/* = 1*/,
+	Float emptyBonus/* = 0.5*/, int maxPrimitives/* = 1*/, int maxDepth/* = -1*/) :
 	m_isectCost(isectCost),
 	m_traversalCost(traversalCost),
-	m_maxHitables(maxHitables),
+	m_maxPrimitives(maxPrimitives),
 	m_emptyBonus(emptyBonus),
-	m_hitables(hitables)
+	m_Primitives(Primitives)
 {
 	m_nextFreeNode = m_nAllocedNodes = 0;
 
 	// The tree cannot grow without bound in pathological cases. (8 + 1.3log(N))
 	if (maxDepth <= 0)
 	{
-		maxDepth = std::round(8 + 1.3f * glm::log2(float(int64_t(m_hitables.size()))));
+		maxDepth = std::round(8 + 1.3f * glm::log2(float(int64_t(m_Primitives.size()))));
 	}
 
 	// Compute bounds for kd-tree construction
-	std::vector<Bounds3f> hitableBounds;
-	hitableBounds.reserve(m_hitables.size());
-	for (const Hitable::ptr& hitable : m_hitables)
+	std::vector<Bounds3f> PrimitiveBounds;
+	PrimitiveBounds.reserve(m_Primitives.size());
+	for (const Primitive::ptr& Primitive : m_Primitives)
 	{
-		Bounds3f b = hitable->worldBound();
+		Bounds3f b = Primitive->worldBound();
 		m_bounds = unionBounds(m_bounds, b);
-		hitableBounds.push_back(b);
+		PrimitiveBounds.push_back(b);
 	}
 
 	// Allocate working memory for kd-tree construction
 	std::unique_ptr<BoundEdge[]> edges[3];
 	for (int i = 0; i < 3; ++i)
 	{
-		edges[i].reset(new BoundEdge[2 * m_hitables.size()]);
+		edges[i].reset(new BoundEdge[2 * m_Primitives.size()]);
 	}
 
-	std::unique_ptr<int[]> leftNodeRoom(new int[m_hitables.size()]);
-	std::unique_ptr<int[]> rightNodeRoom(new int[(maxDepth + 1) * m_hitables.size()]);
+	std::unique_ptr<int[]> leftNodeRoom(new int[m_Primitives.size()]);
+	std::unique_ptr<int[]> rightNodeRoom(new int[(maxDepth + 1) * m_Primitives.size()]);
 
 	// Initialize _primNums_ for kd-tree construction
-	std::unique_ptr<int[]> hitableIndices(new int[m_hitables.size()]);
-	for (size_t i = 0; i < m_hitables.size(); ++i)
+	std::unique_ptr<int[]> PrimitiveIndices(new int[m_Primitives.size()]);
+	for (size_t i = 0; i < m_Primitives.size(); ++i)
 	{
-		hitableIndices[i] = i;
+		PrimitiveIndices[i] = i;
 	}
 
 	// Start recursive construction of kd-tree
-	buildTree(0, m_bounds, hitableBounds, hitableIndices.get(), m_hitables.size(),
+	buildTree(0, m_bounds, PrimitiveBounds, PrimitiveIndices.get(), m_Primitives.size(),
 		maxDepth, edges, leftNodeRoom.get(), rightNodeRoom.get());
 }
 
 void KdTree::buildTree(int nodeIndex, 
 	const Bounds3f& nodeBounds,
-	const std::vector<Bounds3f>& allHitableBounds,
-	int* hitableIndices, 
-	int nHitables,
+	const std::vector<Bounds3f>& allPrimitiveBounds,
+	int* PrimitiveIndices, 
+	int nPrimitives,
 	int depth,
 	const std::unique_ptr<BoundEdge[]> edges[3],
 	int* leftNodeRoom, 
@@ -168,9 +168,9 @@ void KdTree::buildTree(int nodeIndex,
 	++m_nextFreeNode;
 
 	// Initialize leaf node if termination criteria met
-	if (nHitables <= m_maxHitables || depth == 0)
+	if (nPrimitives <= m_maxPrimitives || depth == 0)
 	{
-		m_nodes[nodeIndex].initLeafNode(hitableIndices, nHitables, &m_hitableIndices);
+		m_nodes[nodeIndex].initLeafNode(PrimitiveIndices, nPrimitives, &m_PrimitiveIndices);
 		return;
 	}
 
@@ -179,7 +179,7 @@ void KdTree::buildTree(int nodeIndex,
 	// Choose split axis position for interior node
 	int bestAxis = -1, bestOffset = -1;
 	Float bestCost = Infinity;
-	Float oldCost = m_isectCost * Float(nHitables);
+	Float oldCost = m_isectCost * Float(nPrimitives);
 
 	// Current node surface area
 	const Float invTotalSA = 1 / nodeBounds.surfaceArea();
@@ -191,16 +191,16 @@ void KdTree::buildTree(int nodeIndex,
 
 retrySplit:
 	// Initialize edges for _axis_
-	for (int i = 0; i < nHitables; ++i)
+	for (int i = 0; i < nPrimitives; ++i)
 	{
-		int hi = hitableIndices[i];
-		const Bounds3f& bounds = allHitableBounds[hi];
+		int hi = PrimitiveIndices[i];
+		const Bounds3f& bounds = allPrimitiveBounds[hi];
 		edges[axis][2 * i] = BoundEdge(bounds.m_pMin[axis], hi, true);
 		edges[axis][2 * i + 1] = BoundEdge(bounds.m_pMax[axis], hi, false);
 	}
 
 	// Sort _edges_ for _axis_
-	std::sort(&edges[axis][0], &edges[axis][2 * nHitables],
+	std::sort(&edges[axis][0], &edges[axis][2 * nPrimitives],
 		[](const BoundEdge& e0, const BoundEdge& e1) -> bool
 		{
 			if (e0.m_t == e1.m_t)
@@ -214,9 +214,9 @@ retrySplit:
 		});
 
 	// Compute cost of all splits for _axis_ to find best
-	int nBelow = 0, nAbove = nHitables;
+	int nBelow = 0, nAbove = nPrimitives;
 	const auto& currentEdge = edges[axis];
-	for (int i = 0; i < 2 * nHitables; ++i)
+	for (int i = 0; i < 2 * nPrimitives; ++i)
 	{
 		if (currentEdge[i].m_type == EdgeType::End)
 			--nAbove;
@@ -248,7 +248,7 @@ retrySplit:
 			++nBelow;
 	}
 
-	DCHECK(nBelow == nHitables && nAbove == 0);
+	DCHECK(nBelow == nPrimitives && nAbove == 0);
 
 	if (bestAxis == -1 && retries < 2)
 	{
@@ -260,23 +260,23 @@ retrySplit:
 	// Create leaf if no good splits were found
 	if (bestCost > oldCost)
 		++badRefines;
-	if ((bestCost > 4 * oldCost && nHitables < 16) || bestAxis == -1 || badRefines == 3)
+	if ((bestCost > 4 * oldCost && nPrimitives < 16) || bestAxis == -1 || badRefines == 3)
 	{
-		m_nodes[nodeIndex].initLeafNode(hitableIndices, nHitables, &m_hitableIndices);
+		m_nodes[nodeIndex].initLeafNode(PrimitiveIndices, nPrimitives, &m_PrimitiveIndices);
 		return;
 	}
 
 	// Classify primitives with respect to split
-	int lnHitables = 0, rnHitables = 0;
+	int lnPrimitives = 0, rnPrimitives = 0;
 	for (int i = 0; i < bestOffset; ++i)
 	{
 		if (edges[bestAxis][i].m_type == EdgeType::Start)
-			leftNodeRoom[lnHitables++] = edges[bestAxis][i].m_hitableIndex;
+			leftNodeRoom[lnPrimitives++] = edges[bestAxis][i].m_PrimitiveIndex;
 	}
-	for (int i = bestOffset + 1; i < 2 * nHitables; ++i)
+	for (int i = bestOffset + 1; i < 2 * nPrimitives; ++i)
 	{
 		if (edges[bestAxis][i].m_type == EdgeType::End)
-			rightNodeRoom[rnHitables++] = edges[bestAxis][i].m_hitableIndex;
+			rightNodeRoom[rnPrimitives++] = edges[bestAxis][i].m_PrimitiveIndex;
 	}
 
 	// Recursively initialize children nodes
@@ -285,15 +285,15 @@ retrySplit:
 	bounds0.m_pMax[bestAxis] = bounds1.m_pMin[bestAxis] = tSplit;
 
 	// below subtree node
-	buildTree(nodeIndex + 1, bounds0, allHitableBounds, leftNodeRoom, lnHitables, depth - 1, edges,
-		leftNodeRoom, rightNodeRoom + nHitables, badRefines);
+	buildTree(nodeIndex + 1, bounds0, allPrimitiveBounds, leftNodeRoom, lnPrimitives, depth - 1, edges,
+		leftNodeRoom, rightNodeRoom + nPrimitives, badRefines);
 	int aboveChildIndex = m_nextFreeNode;
 
 	m_nodes[nodeIndex].initInteriorNode(bestAxis, aboveChildIndex, tSplit);
 
 	// above subtree node
-	buildTree(aboveChildIndex, bounds1, allHitableBounds, rightNodeRoom, rnHitables, depth - 1, edges,
-		leftNodeRoom, rightNodeRoom + nHitables, badRefines);
+	buildTree(aboveChildIndex, bounds1, allPrimitiveBounds, rightNodeRoom, rnPrimitives, depth - 1, edges,
+		leftNodeRoom, rightNodeRoom + nPrimitives, badRefines);
 }
 
 KdTree::~KdTree() 
@@ -321,10 +321,10 @@ bool KdTree::hit(const Ray& ray) const
 		if (currNode->isLeaf())
 		{
 			// Check for shadow ray intersections inside leaf node
-			int nHitables = currNode->numHitables();
-			if (nHitables == 1)
+			int nPrimitives = currNode->numPrimitives();
+			if (nPrimitives == 1)
 			{
-				const Hitable::ptr& p = m_hitables[currNode->m_oneHitable];
+				const Primitive::ptr& p = m_Primitives[currNode->m_onePrimitive];
 				if (p->hit(ray))
 				{
 					return true;
@@ -332,10 +332,10 @@ bool KdTree::hit(const Ray& ray) const
 			}
 			else
 			{
-				for (int i = 0; i < nHitables; ++i)
+				for (int i = 0; i < nPrimitives; ++i)
 				{
-					int hitableIndex = m_hitableIndices[currNode->m_hitableIndicesOffset + i];
-					const Hitable::ptr& p = m_hitables[hitableIndex];
+					int PrimitiveIndex = m_PrimitiveIndices[currNode->m_PrimitiveIndicesOffset + i];
+					const Primitive::ptr& p = m_Primitives[PrimitiveIndex];
 					if (p->hit(ray))
 					{
 						return true;
@@ -471,21 +471,21 @@ bool KdTree::hit(const Ray& ray, SurfaceInteraction& isect) const
 		else
 		{
 			// Check for intersections inside leaf node
-			int nHitables = currNode->numHitables();
-			if (nHitables == 1)
+			int nPrimitives = currNode->numPrimitives();
+			if (nPrimitives == 1)
 			{
-				const Hitable::ptr& p = m_hitables[currNode->m_oneHitable];
-				// Check one hitable inside leaf node
+				const Primitive::ptr& p = m_Primitives[currNode->m_onePrimitive];
+				// Check one Primitive inside leaf node
 				if (p->hit(ray, isect))
 					hit = true;
 			}
 			else
 			{
-				for (int i = 0; i < nHitables; ++i)
+				for (int i = 0; i < nPrimitives; ++i)
 				{
-					int index = m_hitableIndices[currNode->m_hitableIndicesOffset + i];
-					const Hitable::ptr& p = m_hitables[index];
-					// Check one hitable inside leaf node
+					int index = m_PrimitiveIndices[currNode->m_PrimitiveIndicesOffset + i];
+					const Primitive::ptr& p = m_Primitives[index];
+					// Check one Primitive inside leaf node
 					if (p->hit(ray, isect))
 						hit = true;
 				}

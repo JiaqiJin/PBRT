@@ -4,7 +4,7 @@
 
 RENDER_BEGIN
 
-HitableObject::HitableObject(const Shape::ptr& shape, const Material* material,
+PrimitiveObject::PrimitiveObject(const Shape::ptr& shape, const Material* material,
 	const AreaLight::ptr& areaLight)
 	: m_shape(shape), m_material(material), m_areaLight(areaLight) 
 {
@@ -14,20 +14,20 @@ HitableObject::HitableObject(const Shape::ptr& shape, const Material* material,
 	}
 }
 
-bool HitableObject::hit(const Ray& ray) const { return m_shape->hit(ray); }
+bool PrimitiveObject::hit(const Ray& ray) const { return m_shape->hit(ray); }
 
-bool HitableObject::hit(const Ray& ray, SurfaceInteraction& isect) const
+bool PrimitiveObject::hit(const Ray& ray, SurfaceInteraction& isect) const
 {
 	Float tHit;
 	if (!m_shape->hit(ray, tHit, isect))
 		return false;
 
 	ray.m_tMax = tHit;
-	isect.hitable = this;
+	isect.primitive = this;
 	return true;
 }
 
-void HitableObject::computeScatteringFunctions(SurfaceInteraction& isect, MemoryArena& arena,
+void PrimitiveObject::computeScatteringFunctions(SurfaceInteraction& isect, MemoryArena& arena,
 	TransportMode mode, bool allowMultipleLobes) const
 {
 	if (m_material != nullptr)
@@ -36,24 +36,24 @@ void HitableObject::computeScatteringFunctions(SurfaceInteraction& isect, Memory
 	}
 }
 
-Shape* HitableObject::getShape() const { return m_shape.get(); }
+Shape* PrimitiveObject::getShape() const { return m_shape.get(); }
 
-Bounds3f HitableObject::worldBound() const { return m_shape->worldBound(); }
+Bounds3f PrimitiveObject::worldBound() const { return m_shape->worldBound(); }
 
-const AreaLight* HitableObject::getAreaLight() const { return m_areaLight.get(); }
+const AreaLight* PrimitiveObject::getAreaLight() const { return m_areaLight.get(); }
 
-const Material* HitableObject::getMaterial() const { return m_material; }
+const Material* PrimitiveObject::getMaterial() const { return m_material; }
 
 // ------------------------ Aggregate ---------------------------------
-const AreaLight* HitableAggregate::getAreaLight() const { return nullptr; }
+const AreaLight* PrimitiveAggregate::getAreaLight() const { return nullptr; }
 
-const Material* HitableAggregate::getMaterial() const { return nullptr; }
+const Material* PrimitiveAggregate::getMaterial() const { return nullptr; }
 
-void HitableAggregate::computeScatteringFunctions(SurfaceInteraction& isect, MemoryArena& arena,
+void PrimitiveAggregate::computeScatteringFunctions(SurfaceInteraction& isect, MemoryArena& arena,
 	TransportMode mode, bool allowMultipleLobes) const
 {
 	//Note: should not go here at all.
-	std::cout << "AHitableAggregate::computeScatteringFunctions() shouldn't be ""called";
+	std::cout << "APrimitiveAggregate::computeScatteringFunctions() shouldn't be ""called";
 }
 
 RENDER_END

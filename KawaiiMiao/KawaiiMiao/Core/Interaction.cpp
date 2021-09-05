@@ -14,14 +14,14 @@ SurfaceInteraction::SurfaceInteraction(const Vector3f& p, const Vector2f& uv, co
 
 Spectrum SurfaceInteraction::Le(const Vector3f& w) const
 {
-	const AreaLight* area = hitable->getAreaLight();
+	const AreaLight* area = primitive->getAreaLight();
 	return area != nullptr ? area->L(*this, w) : Spectrum(0.f);
 }
 
 void SurfaceInteraction::computeScatteringFunctions(const Ray& ray, MemoryArena& arena,
 	bool allowMultipleLobes, TransportMode mode)
 {
-	hitable->computeScatteringFunctions(*this, arena, mode, allowMultipleLobes);
+	primitive->computeScatteringFunctions(*this, arena, mode, allowMultipleLobes);
 }
 
 RENDER_END

@@ -32,8 +32,8 @@ void DiffuseAreaLight::setParent(AObject* parent)
 {
 	switch (parent->getClassType())
 	{
-	case ClassType::RHitable:
-		m_shape = static_cast<HitableObject*>(parent)->getShape();
+	case ClassType::RPrimitive:
+		m_shape = static_cast<PrimitiveObject*>(parent)->getShape();
 		m_area = m_shape->area();
 		m_lightToWorld = *m_shape->m_objectToWorld;
 		m_worldToLight = *m_shape->m_worldToObject;
