@@ -8,6 +8,7 @@
 
 RENDER_BEGIN
 
+// The abstract Primitive base class is the bridge between the geometry processing and shading subsystems
 class Primitive : public AObject
 {
 public:
@@ -15,9 +16,11 @@ public:
 
 	virtual ~Primitive() = default;
 
+	// Ray intersection test
 	virtual bool hit(const Ray & ray) const = 0;
 	virtual bool hit(const Ray & ray, SurfaceInteraction & iset) const = 0;
 
+	// Return a box that encloses the primitive geometry in world space.
 	virtual Bounds3f worldBound() const = 0;
 
 	virtual const AreaLight* getAreaLight() const = 0;
