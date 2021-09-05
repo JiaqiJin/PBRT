@@ -14,10 +14,6 @@ int main()
 		printf("Kawaii (built %s at %s) [Detected %d cores]\n", __DATE__, __TIME__, numSystemCores());
 	}
 
-	auto parsing_func = [](const std::string& filename)->void
-	{
-		
-	};
 	const std::string filename = "scenes/cornellBox/cornellBox.json";
 
 	Scene::ptr scene = nullptr;
@@ -30,8 +26,6 @@ int main()
 
 	integrator->preprocess(*scene);
 	integrator->render(*scene);
-
-	//parsing_func("scenes/cornellBox/cornellBox.json");
 
 	return 0;
 }
