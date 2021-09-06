@@ -59,8 +59,6 @@ public:
 public:
 	Transform* m_objectToWorld = nullptr; 
 	Transform* m_worldToObject = nullptr;
-	bool reverseOrientation;
-	bool transformSwapsHandedness;
 };
 
 RENDER_END

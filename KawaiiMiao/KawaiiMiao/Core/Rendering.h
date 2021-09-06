@@ -66,7 +66,6 @@ class Shape;
 class Scene;
 class Camera;
 class Primitive;
-class Medium;
 class FilmTile;
 class Sampler;
 class Material; 
@@ -77,9 +76,8 @@ class CameraSample;
 class RGBSpectrum;
 class Distribution1D;
 class VisibilityTester;
+
 class MemoryArena;
-class MediumInteraction;
-struct MediumInterface;
 
 using Spectrum = RGBSpectrum;
 
