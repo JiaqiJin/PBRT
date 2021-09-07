@@ -42,6 +42,14 @@ public:
 	template <typename T>
 	inline Vector3<T> operator()(const Vector3<T>& p, const Float& w) const;
 
+	template <typename T>
+	inline Vector3<T> operator()(const Vector3<T>& v, Vector3<T>* vTransError) const;
+
+	template <typename T>
+	inline Vector3<T> operator()(const Ray& r) const;
+
+	inline Ray operator()(const Ray& r, Vector3f* oError, Vector3f* dError) const;
+
 	bool isIdentity() const
 	{
 		return (
@@ -67,7 +75,7 @@ public:
 	}
 private:
 	Matrix4x4 m_trans, m_transInv;
-	friend class AnimatedTransform;
+	//friend class AnimatedTransform;
 };
 
 Transform translate(const Vector3f& delta);
@@ -93,6 +101,60 @@ inline Vector3<T> Transform::operator()(const Vector3<T>& p, const Float& w) con
 		return Vector3<T>(ret.x, ret.y, ret.z);
 	else
 		return Vector3<T>(ret.x, ret.y, ret.z) / ret.w;
+}
+
+template <typename T>
+inline Vector3<T> Transform::operator()(const Vector3<T>& v, Vector3<T>* absError) const
+{
+	T x = v.x, y = v.y, z = v.z;
+	absError->x =
+		gamma(3) * (std::abs(m_trans[0][0] * v.x) + std::abs(m_trans[0][1] * v.y) +
+			std::abs(m_trans[0][2] * v.z));
+	absError->y =
+		gamma(3) * (std::abs(m_trans[1][0] * v.x) + std::abs(m_trans[1][1] * v.y) +
+			std::abs(m_trans[1][2] * v.z));
+	absError->z =
+		gamma(3) * (std::abs(m_trans[2][0] * v.x) + std::abs(m_trans[2][1] * v.y) +
+			std::abs(m_trans[2][2] * v.z));
+	return Vector3<T>(m_trans[0][0] * x + m_trans[0][1] * y + m_trans[0][2] * z,
+		m_trans[1][0] * x + m_trans[1][1] * y + m_trans[1][2] * z,
+		m_trans[2][0] * x + m_trans[2][1] * y + m_trans[2][2] * z);
+}
+
+//inline Ray Transform::operator()(const Ray& r) const
+//{
+//	Vector3f oError;
+//	Vector3f o = (*this)(r.m_origin, &oError);
+//	Vector3f d = (*this)(r.m_dir, 0.0f);
+//
+//	// Offset ray origin to edge of error bounds and compute _tMax_
+//	Float lengthSquared_ = lengthSquared(d);
+//	Float tMax = r.m_tMax;
+//	if (lengthSquared_ > 0)
+//	{
+//		Float dt = dot(abs(d), oError) / lengthSquared_;
+//		o += d * dt;
+//		tMax -= dt;
+//	}
+//	return Ray(o, d, tMax);
+//}
+
+inline Ray Transform::operator()(const Ray& r, Vector3f* oError, Vector3f* dError) const
+{
+	Vector3f o = (*this)(r.m_origin, 1.0f);
+	Vector3f dir = (*this)(r.m_dir, 0.0f);
+	Float tMax = r.m_tMax;
+
+	Float length = dir.length();
+	if (length > 0)
+	{
+		Float d = dot(abs(dir), *oError);
+		Float dt = d / length;
+		o = o + dt * dir;
+		tMax = tMax - dt;
+	}
+
+	return Ray(o, dir, tMax, r.m_time, r.m_medium);
 }
 
 inline Ray Transform::operator()(const Ray& r) const

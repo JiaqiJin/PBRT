@@ -104,11 +104,30 @@ SurfaceInteraction Transform::operator()(const SurfaceInteraction& si) const
 	const Transform& trans = *this;
 	ret.normal = normalize(trans(si.normal, 0.0f));
 	ret.wo = normalize(trans(si.wo, 0.0f));
+	ret.time = si.time;
+	ret.mediumInterface = si.mediumInterface;
 	ret.uv = si.uv;
 	ret.shape = si.shape;
 	ret.dpdu = trans(si.dpdu, 0.0f);
 	ret.dpdv = trans(si.dpdv, 0.0f);
+	ret.dndu = trans(si.dndu, 0.0f);
+	ret.dndv = trans(si.dndv, 0.0f);
 	ret.primitive = si.primitive;
+	ret.shading.n = normalize(trans(si.shading.n, 0.0f));
+	ret.shading.dpdu = trans(si.shading.dpdu, 0.0f);
+	ret.shading.dpdv = trans(si.shading.dpdv, 0.0f);
+	ret.shading.dndu = trans(si.shading.dndu, 0.0f);
+	ret.shading.dndv = trans(si.shading.dndv, 0.0f);
+	ret.dudx = si.dudx;
+	ret.dvdx = si.dvdx;
+	ret.dudy = si.dudy;
+	ret.dvdy = si.dvdy;
+	ret.dpdx = trans(si.dpdx, 0.0f);
+	ret.dpdy = trans(si.dpdy, 0.0f);
+	ret.bsdf = si.bsdf;
+	//    ret.n = Faceforward(ret.n, ret.shading.n);
+	ret.shading.n = faceforward(ret.shading.n, ret.normal);
+	ret.faceIndex = si.faceIndex;
 	return ret;
 }
 
