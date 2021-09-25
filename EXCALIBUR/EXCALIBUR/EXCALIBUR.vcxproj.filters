@@ -186,6 +186,9 @@
     <ClCompile Include="lights\diffuse.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="accelerators\kdtreeaccel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ext\tinyobj\tiny_obj_loader.h">
@@ -411,6 +414,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="lights\diffuse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="accelerators\kdtreeaccel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

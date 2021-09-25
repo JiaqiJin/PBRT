@@ -148,6 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="accelerators\bvh.cpp" />
+    <ClCompile Include="accelerators\kdtreeaccel.cpp" />
     <ClCompile Include="cameras\perspective.cpp" />
     <ClCompile Include="core\BXDF\BSDF.cpp" />
     <ClCompile Include="core\BXDF\BSSRDF.cpp" />
@@ -207,6 +208,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="accelerators\bvh.h" />
+    <ClInclude Include="accelerators\kdtreeaccel.h" />
     <ClInclude Include="cameras\perspective.h" />
     <ClInclude Include="core\BXDF\BSDF.h" />
     <ClInclude Include="core\BXDF\BSSRDF.h" />

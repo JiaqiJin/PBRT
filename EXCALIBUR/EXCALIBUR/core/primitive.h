@@ -1,17 +1,17 @@
 ﻿#pragma once
 
 #include "Header.h"
+#include "Shape.h"
 #include "Interaction.h"
 #include "Material.h"
 #include "../math/animatedtransform.h"
 
 RENDERING_BEGIN
 
+// Primitive Declarations
 class Primitive {
 public:
-    virtual ~Primitive() {
-
-    }
+    virtual ~Primitive() {}
     virtual AABB3f worldBound() const = 0;
     virtual bool intersect(const Ray& r, SurfaceInteraction*) const = 0;
     virtual bool intersectP(const Ray& r) const = 0;
