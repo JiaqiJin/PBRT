@@ -1,9 +1,10 @@
-#include "bvh.h"
+﻿#include "bvh.h"
 
 RENDERING_BEGIN
 
 // BVHAccel Utility Functions
-inline uint32_t LeftShift3(uint32_t x) {
+inline uint32_t LeftShift3(uint32_t x) 
+{
     CHECK_LE(x, (1 << 10));
     if (x == (1 << 10)) --x;
 #ifdef PBRT_HAVE_BINARY_CONSTANTS
@@ -28,14 +29,16 @@ inline uint32_t LeftShift3(uint32_t x) {
     return x;
 }
 
-inline uint32_t EncodeMorton3(const Vector3f& v) {
+inline uint32_t EncodeMorton3(const Vector3f& v) 
+{
     CHECK_GE(v.x, 0);
     CHECK_GE(v.y, 0);
     CHECK_GE(v.z, 0);
     return (LeftShift3(v.z) << 2) | (LeftShift3(v.y) << 1) | LeftShift3(v.x);
 }
 
-static void RadixSort(std::vector<MortonPrimitive>* v) {
+static void RadixSort(std::vector<MortonPrimitive>* v) 
+{
     std::vector<MortonPrimitive> tempVector(v->size());
     CONSTEXPR int bitsPerPass = 6;
     CONSTEXPR int nBits = 30;
@@ -78,17 +81,17 @@ static void RadixSort(std::vector<MortonPrimitive>* v) {
     if (nPasses & 1) std::swap(*v, tempVector);
 }
 
-AABB3f BVHAccel::worldBound() const {
+AABB3f BVHAccel::worldBound() const 
+{
     return nodes ? nodes[0].bounds : AABB3f();
 }
-
 
 BVHAccel::BVHAccel(std::vector<std::shared_ptr<Primitive>> p,
     int maxPrimsInNode, SplitMethod splitMethod)
     : maxPrimsInNode(std::min(255, maxPrimsInNode)),
     splitMethod(splitMethod),
-    primitives(std::move(p)) {
-
+    primitives(std::move(p))
+{
     if (primitives.empty()) return;
 
     // Initialize _primitiveInfo_ array for primitives
@@ -96,6 +99,7 @@ BVHAccel::BVHAccel(std::vector<std::shared_ptr<Primitive>> p,
     for (size_t i = 0; i < primitives.size(); ++i)
         primitiveInfo[i] = { i, primitives[i]->worldBound() };
 
+    // Build BVH tree for primitives using primitiveInfo
     MemoryArena arena(1024 * 1024);
     int totalNodes = 0;
     std::vector<std::shared_ptr<Primitive>> orderedPrims;
@@ -104,8 +108,7 @@ BVHAccel::BVHAccel(std::vector<std::shared_ptr<Primitive>> p,
     if (splitMethod == SplitMethod::HLBVH)
         root = HLBVHBuild(arena, primitiveInfo, &totalNodes, orderedPrims);
     else
-        root = recursiveBuild(arena, primitiveInfo, 0, primitives.size(),
-            &totalNodes, orderedPrims);
+        root = recursiveBuild(arena, primitiveInfo, 0, primitives.size(), &totalNodes, orderedPrims);
     primitives.swap(orderedPrims);
     primitiveInfo.resize(0);
     
@@ -115,19 +118,52 @@ BVHAccel::BVHAccel(std::vector<std::shared_ptr<Primitive>> p,
     CHECK_EQ(totalNodes, offset);
 }
 
-BVHAccel::~BVHAccel() {}
+BVHAccel::~BVHAccel() { freeAligned(nodes); }
 
 BVHBuildNode* BVHAccel::recursiveBuild(
     MemoryArena& arena, std::vector<BVHPrimitiveInfo>& primitiveInfo,
     int start, int end, int* totalNodes,
-    std::vector<std::shared_ptr<Primitive>>& orderedPrims) {
-    return nullptr;
+    std::vector<std::shared_ptr<Primitive>>& orderedPrims) 
+{
+    CHECK_NE(start, end);
+    BVHBuildNode* node = ARENA_ALLOC(arena, BVHBuildNode);
+    (*totalNodes)++;
+    // Compute bounds of all primitives in BVH node
+    AABB3f bounds;
+    for (int i = start; i < end; i++)
+        bounds = unionSet(bounds, primitiveInfo[i].bounds);
+
+    int numPrimitives = end - start;
+    if (numPrimitives == 1)
+    {
+        // 生成叶子节点
+        int firstPrimOffset = orderedPrims.size();
+        for (int i = start; i < end; ++i)
+        {
+            int primNum = primitiveInfo[i].primitiveNumber;
+            orderedPrims.push_back(primitives[primNum]);
+        }
+        node->InitLeaf(firstPrimOffset, numPrimitives, bounds);
+        return node;
+    }
+    // 
+    else
+    {
+        // Compute bound of primitive centroids, choose split dimension _dim_
+        AABB3f centroidBounds;
+        for (int i = start; i < end; i++)
+            centroidBounds = unionSet(centroidBounds, primitiveInfo[i].bounds);
+        int dim = centroidBounds.maximumExtent();
+    }
+
+    return node;
 }
 
 BVHBuildNode* BVHAccel::HLBVHBuild(
     MemoryArena& arena, const std::vector<BVHPrimitiveInfo>& primitiveInfo,
     int* totalNodes,
-    std::vector<std::shared_ptr<Primitive>>& orderedPrims) const {
+    std::vector<std::shared_ptr<Primitive>>& orderedPrims) const
+{
     return nullptr;
 }
 
