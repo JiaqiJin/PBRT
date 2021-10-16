@@ -70,12 +70,6 @@ inline Vector3f cosineSampleHemisphere(const Point2f& u) {
     return Vector3f(d.x, d.y, z);
 }
 
-inline Vector3f cosineSampleHemisphere(const Point2f& u) {
-    Point2f d = uniformSampleDisk(u);
-    Float z = std::sqrt(std::max((Float)0, 1 - d.x * d.x - d.y * d.y));
-    return Vector3f(d.x, d.y, z);
-}
-
 inline Float cosineHemispherePdf(Float cosTheta) {
     return cosTheta * InvPi;
 }
